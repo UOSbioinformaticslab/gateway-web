@@ -22,15 +22,19 @@ export default function DataUsesContent({
 }: DataUsesContentProps) {
     const t = useTranslations(translationPath.concat(TRANSLATION_PATH));
 
+    // Ensure datauses is always an array
+    const safeDatauses = Array.isArray(datauses) ? datauses : [];
+    const datausesLength = safeDatauses.length;
+
     return (
         <AccordionSection
             id={`anchor${anchorIndex}`}
-            disabled={!datauses.length}
+            disabled={!datausesLength}
             heading={t("heading", {
-                length: datauses.length,
+                length: datausesLength,
             })}
-            defaultExpanded={datauses.length > 0}
-            contents={datauses.map(
+            defaultExpanded={datausesLength > 0}
+            contents={safeDatauses.map(
                 ({ project_title, organisation_name, id }) => (
                     <Fragment key={`dataUse_${id}`}>
                         <Link href={`/${RouteName.DATA_USE_ITEM}/${id}`}>

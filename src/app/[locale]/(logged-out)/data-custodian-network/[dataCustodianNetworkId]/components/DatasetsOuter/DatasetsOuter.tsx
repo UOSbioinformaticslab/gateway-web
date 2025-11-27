@@ -17,7 +17,6 @@ export default async function DatasetsOuter({
                 revalidate: 180,
                 tags: ["all", `datasets_summary-${dataCustodianNetworkId}`],
             },
-            cache: "force-cache",
         }
     );
     if (!resp.ok) {

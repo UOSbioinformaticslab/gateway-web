@@ -23,15 +23,19 @@ export default function DatasetContent({
 }: DatasetsContentProps) {
     const t = useTranslations(translationPath.concat(TRANSLATION_PATH));
 
+    // Ensure datasets is always an array
+    const safeDatasets = Array.isArray(datasets) ? datasets : [];
+    const datasetsLength = safeDatasets.length;
+
     return (
         <AccordionSection
             id={`anchor${anchorIndex}`}
-            disabled={!datasets.length}
+            disabled={!datasetsLength}
             heading={t("heading", {
-                length: datasets.length,
+                length: datasetsLength,
             })}
-            defaultExpanded={datasets.length > 0}
-            contents={datasets.map(
+            defaultExpanded={datasetsLength > 0}
+            contents={safeDatasets.map(
                 ({ id, title, populationSize, datasetType }) => (
                     <Fragment key={`dataset_${id}`}>
                         <Link href={`/${RouteName.DATASET_ITEM}/${id}`}>
