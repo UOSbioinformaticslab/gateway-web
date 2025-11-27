@@ -21,15 +21,19 @@ export default function PublicationContent({
 }: PublicationsContentProps) {
     const t = useTranslations(translationPath.concat(TRANSLATION_PATH));
 
+    // Ensure publications is always an array
+    const safePublications = Array.isArray(publications) ? publications : [];
+    const publicationsLength = safePublications.length;
+
     return (
         <AccordionSection
             id={`anchor${anchorIndex}`}
-            disabled={!publications.length}
+            disabled={!publicationsLength}
             heading={t("heading", {
-                length: publications.length,
+                length: publicationsLength,
             })}
-            defaultExpanded={publications.length > 0}
-            contents={publications.map(
+            defaultExpanded={publicationsLength > 0}
+            contents={safePublications.map(
                 ({ id, paper_title, authors, url, year_of_publication }) => (
                     <Fragment key={`publication_${id}`}>
                         <Link component="a" href={url} target="_blank">

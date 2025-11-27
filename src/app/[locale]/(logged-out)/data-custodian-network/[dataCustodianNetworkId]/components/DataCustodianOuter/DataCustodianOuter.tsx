@@ -15,7 +15,6 @@ export default async function DataCustodianOuter({
                 revalidate: 180,
                 tags: ["all", `custodians_summary-${dataCustodianNetworkId}`],
             },
-            cache: "force-cache",
         }
     );
     if (!resp.ok) {
