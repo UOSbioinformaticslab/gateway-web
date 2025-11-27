@@ -36,7 +36,6 @@ async function DataCustodianContent({
                 revalidate: 180,
                 tags: ["all", `custodian_datasets-${dataCustodianId}`],
             },
-            cache: "force-cache",
         }
     );
     if (!resp.ok) {

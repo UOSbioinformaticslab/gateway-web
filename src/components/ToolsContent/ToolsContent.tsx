@@ -23,15 +23,19 @@ export default function ToolsContent({
 }: ToolsContentProps) {
     const t = useTranslations(translationPath.concat(TRANSLATION_PATH));
 
+    // Ensure tools is always an array
+    const safeTools = Array.isArray(tools) ? tools : [];
+    const toolsLength = safeTools.length;
+
     return (
         <AccordionSection
             id={`anchor${anchorIndex}`}
-            disabled={!tools.length}
+            disabled={!toolsLength}
             heading={t("heading", {
-                length: tools.length,
+                length: toolsLength,
             })}
-            defaultExpanded={tools.length > 0}
-            contents={tools.map(({ name, id, created_at, user }) => (
+            defaultExpanded={toolsLength > 0}
+            contents={safeTools.map(({ name, id, created_at, user }) => (
                 <Fragment key={`tool_${id}`}>
                     <Link href={`/${RouteName.TOOL_ITEM}/${id}`}>{name}</Link>
                     {!!user && (

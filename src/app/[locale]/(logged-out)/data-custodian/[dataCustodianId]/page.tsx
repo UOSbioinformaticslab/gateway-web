@@ -15,6 +15,7 @@ import apis from "@/config/apis";
 import { StaticImages } from "@/config/images";
 import { AspectRatioImage } from "@/consts/image";
 import { getTeamInfo } from "@/utils/api";
+import { normalizeImageUrl } from "@/utils/general";
 import { getCohortDiscovery } from "@/utils/cms";
 import metaData from "@/utils/metadata";
 import ActionBar from "./components/ActionBar";
@@ -50,7 +51,6 @@ export default async function DataCustodianItemPage({
                 revalidate: 180,
                 tags: ["all", `custodian_datasets-${dataCustodianId}`],
             },
-            cache: "force-cache",
         }
     );
     if (!resp.ok) {
@@ -84,7 +84,7 @@ export default async function DataCustodianItemPage({
                             height={250}
                             alt={infoData.name}
                             src={
-                                infoData?.team_logo ||
+                                normalizeImageUrl(infoData?.team_logo) ||
                                 StaticImages.BASE.placeholder
                             }
                             style={AspectRatioImage}

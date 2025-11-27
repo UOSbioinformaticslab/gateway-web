@@ -21,15 +21,19 @@ export default function CollectionsContent({
 }: CollectionsContentProps) {
     const t = useTranslations(translationPath.concat(TRANSLATION_PATH));
 
+    // Ensure collections is always an array
+    const safeCollections = Array.isArray(collections) ? collections : [];
+    const collectionsLength = safeCollections.length;
+
     return (
         <AccordionSection
             id={`anchor${anchorIndex}`}
-            disabled={!collections.length}
+            disabled={!collectionsLength}
             heading={t("heading", {
-                length: collections.length,
+                length: collectionsLength,
             })}
-            defaultExpanded={collections.length > 0}
-            contents={collections.map(({ name, id, image_link }) => (
+            defaultExpanded={collectionsLength > 0}
+            contents={safeCollections.map(({ name, id, image_link }) => (
                 <CardStacked
                     href={`/${RouteName.COLLECTION_ITEM}/${id}`}
                     title={name}

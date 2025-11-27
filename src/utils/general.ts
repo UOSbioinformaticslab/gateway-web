@@ -57,6 +57,71 @@ function decodeHtmlEntity(input: string): string {
     return decode(input);
 }
 
+/**
+ * Normalizes image URLs for use with Next.js Image component.
+ * Ensures URLs are either absolute (http:// or https://) or relative starting with "/".
+ * Handles malformed URLs that may contain literal strings like "media_base_url".
+ */
+function normalizeImageUrl(url: string | undefined | null): string {
+    if (!url) {
+        return "";
+    }
+
+    // If it's already an absolute URL, return as is
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+        return url;
+    }
+
+    const mediaBaseUrl = process.env.NEXT_PUBLIC_MEDIA_STATIC_URL || "";
+    let normalizedUrl = url;
+
+    // Handle malformed URLs that might contain literal "media_base_url" strings
+    // This can happen if the backend returns a template string instead of the actual URL
+    if (normalizedUrl.includes("media_base_url")) {
+        // Replace all occurrences of "media_base_url" with the actual base URL
+        normalizedUrl = normalizedUrl.replace(/media_base_url/g, mediaBaseUrl);
+        
+        // Handle case where "media_base_url" appears multiple times consecutively
+        // e.g., "media_base_urlmedia_base_url/teams/..." -> "baseUrl/teams/..."
+        if (mediaBaseUrl) {
+            const escapedBaseUrl = mediaBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            // Remove consecutive duplicate base URLs
+            normalizedUrl = normalizedUrl.replace(
+                new RegExp(`(${escapedBaseUrl})+`, "g"),
+                mediaBaseUrl
+            );
+        } else {
+            // If base URL is not set, remove the literal "media_base_url" strings
+            normalizedUrl = normalizedUrl.replace(/media_base_url/g, "");
+        }
+    }
+
+    // Remove duplicate base URLs if they exist (e.g., "baseUrlbaseUrl/path" -> "baseUrl/path")
+    if (mediaBaseUrl && normalizedUrl.includes(mediaBaseUrl)) {
+        const escapedBaseUrl = mediaBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        // Remove consecutive duplicate base URLs
+        normalizedUrl = normalizedUrl.replace(
+            new RegExp(`(${escapedBaseUrl})+`, "g"),
+            mediaBaseUrl
+        );
+        
+        // If the URL starts with the base URL, return it as absolute
+        if (normalizedUrl.startsWith(mediaBaseUrl)) {
+            return normalizedUrl;
+        }
+    }
+
+    // Clean up any double slashes (except after http:// or https://)
+    normalizedUrl = normalizedUrl.replace(/([^:]\/)\/+/g, "$1");
+
+    // Ensure relative URLs start with "/"
+    if (!normalizedUrl.startsWith("/") && !normalizedUrl.startsWith("http")) {
+        normalizedUrl = `/${normalizedUrl}`;
+    }
+
+    return normalizedUrl;
+}
+
 export {
     capitalise,
     convertToCamelCase,
@@ -66,4 +131,5 @@ export {
     parseStaticImagePaths,
     getTeamAssetPath,
     decodeHtmlEntity,
+    normalizeImageUrl,
 };
