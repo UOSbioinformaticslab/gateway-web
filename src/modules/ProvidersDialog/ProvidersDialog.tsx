@@ -4,15 +4,19 @@ import { useEffect, useState } from "react";
 import MuiDialogContent from "@mui/material/DialogContent";
 import { useTranslations } from "next-intl";
 import Script from "next/script";
+import Box from "@/components/Box";
 import BulletList from "@/components/BulletList";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
 import Link from "@/components/Link";
 import Loading from "@/components/Loading";
+import Typography from "@/components/Typography";
 import useDialog from "@/hooks/useDialog";
 import useFullPathname from "@/hooks/useFullPathname";
 import { CUSTOMER_PORTAL_SUPPORT_URL } from "@/config/hrefs";
 import ProviderLinks from "../ProviderLinks";
+import SignInDialog from "../SignInDialog";
+import RegisterDialog from "../RegisterDialog";
 
 const TRANSLATIONS_PROVIDERS_DIALOG = "modules.dialogs.ProvidersDialog";
 const oaId = process.env.NEXT_PUBLIC_OA_APP_ID;
@@ -22,7 +26,7 @@ const ProvidersDialog = () => {
     const [institutionSelectVisible, setInstitutionSelectVisible] =
         useState<boolean>();
 
-    const { hideDialog, store } = useDialog();
+    const { hideDialog, store, showDialog } = useDialog();
     const pathname = useFullPathname();
 
     useEffect(() => {
@@ -30,6 +34,22 @@ const ProvidersDialog = () => {
     }, [store?.dialogComponent]);
 
     const redirectPath = store.dialogProps?.redirectPath || pathname || "";
+
+    const handleSignIn = () => {
+        hideDialog();
+        showDialog(SignInDialog, {
+            isSignInDialog: true,
+            redirectPath,
+        });
+    };
+
+    const handleRegister = () => {
+        hideDialog();
+        showDialog(RegisterDialog, {
+            isRegisterDialog: true,
+            redirectPath,
+        });
+    };
 
     return (
         <Dialog
@@ -57,16 +77,24 @@ const ProvidersDialog = () => {
                             ]}
                         />
                         <p>{t("intro2")}</p>
-                        <ProviderLinks
-                            showInstitution={() =>
-                                setInstitutionSelectVisible(true)
-                            }
-                            redirectPath={redirectPath as string}
-                        />
+                        
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={handleSignIn}
+                                sx={{ width: "100%" }}>
+                                {t("signIn")}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleRegister}
+                                sx={{ width: "100%" }}>
+                                {t("createAccount") || "Create an account"}
+                            </Button>
+                        </Box>
 
-                        <Link href={CUSTOMER_PORTAL_SUPPORT_URL}>
-                            {t("suggestAnother")}
-                        </Link>
                     </>
                 )}
 
