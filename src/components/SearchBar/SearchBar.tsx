@@ -17,6 +17,7 @@ interface SearchBarProps {
     defaultValue?: string;
     queryName: string;
     queryPlaceholder: string;
+    fullWidth?: boolean;
 }
 export const TEST_ID_WRAPPER = "search-bar";
 export const TEST_ID_RESET_BUTTON = "reset-btn";
@@ -31,6 +32,7 @@ const SearchBar = ({
     defaultValue,
     queryName,
     queryPlaceholder,
+    fullWidth = false,
 }: SearchBarProps) => {
     const { control, handleSubmit, setValue } = useForm({
         defaultValues: { [queryName]: defaultValue },
@@ -41,7 +43,10 @@ const SearchBar = ({
     }, [queryName, setValue, valueOverride]);
 
     return (
-        <FormWrapper data-testid={TEST_ID_WRAPPER}>
+        <FormWrapper 
+            data-testid={TEST_ID_WRAPPER}
+            sx={fullWidth ? { maxWidth: "100%" } : undefined}
+        >
             <SearchForm onSubmit={handleSubmit(submitAction)} role="search">
                 <InputWrapper
                     onClick={() =>

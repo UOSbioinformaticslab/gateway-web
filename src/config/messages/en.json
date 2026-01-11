@@ -1651,6 +1651,8 @@
             "ProvidersDialog": {
                 "title": "Sign in or create an account",
                 "signIn": "Sign in with username",
+                "createAccount": "Create an account",
+                "or": "or",
                 "socialProviders": {
                     "azure": "Azure",
                     "linkedIn": "LinkedIn",
@@ -1664,7 +1666,35 @@
             },
             "SignInDialog": {
                 "title": "Sign in",
-                "button": "Sign in"
+                "button": "Sign in",
+                "emailLabel": "Email",
+                "passwordLabel": "Password",
+                "emailRequired": "Email is required",
+                "emailInvalid": "Invalid email address",
+                "passwordRequired": "Password is required",
+                "loginSuccess": "Login successful",
+                "loginFailed": "Login failed",
+                "loginError": "An error occurred during login. Please try again.",
+                "cancelButton": "Cancel"
+            },
+            "RegisterDialog": {
+                "title": "Create an account",
+                "button": "Create account",
+                "emailLabel": "Email",
+                "passwordLabel": "Password",
+                "passwordConfirmLabel": "Confirm Password",
+                "firstnameLabel": "First name",
+                "lastnameLabel": "Last name",
+                "emailRequired": "Email is required",
+                "emailInvalid": "Invalid email address",
+                "passwordRequired": "Password is required",
+                "passwordMinLength": "Password must be at least 8 characters",
+                "passwordConfirmRequired": "Please confirm your password",
+                "passwordMismatch": "Passwords must match",
+                "registerSuccess": "Registration successful",
+                "registerFailed": "Registration failed",
+                "registerError": "An error occurred during registration. Please try again.",
+                "cancelButton": "Cancel"
             },
             "AddTeamMemberDialog": {
                 "title": "Add members to your team",

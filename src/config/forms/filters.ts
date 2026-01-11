@@ -24,6 +24,7 @@ export const FILTER_DATA_SUBTYPE = "dataSubType";
 export const FILTER_COLLECTION_NAME = "collectionName";
 export const FILTER_COLLECTION_NAMES = "collectionNames";
 export const FILTER_FORMAT_STANDARDS = "formatAndStandards";
+export const FILTER_STUDY = "study";
 
 export const filtersList = [
     FILTER_PUBLISHER_NAME,
@@ -52,4 +53,5 @@ export const filtersList = [
     FILTER_COLLECTION_NAME,
     FILTER_COLLECTION_NAMES,
     FILTER_FORMAT_STANDARDS,
+    FILTER_STUDY,
 ];

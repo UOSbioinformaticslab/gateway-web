@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { get } from "lodash";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { BucketCheckbox, Filter } from "@/interfaces/Filter";
+import { Bucket, BucketCheckbox, Filter } from "@/interfaces/Filter";
 import { Aggregations, SearchCategory } from "@/interfaces/Search";
 import Box from "@/components/Box";
 import Typography from "@/components/Typography";
@@ -36,6 +36,7 @@ import {
     FILTER_FORMAT_STANDARDS,
     FILTER_COHORT_DISCOVERY,
     FILTER_DATA_PROVIDER,
+    FILTER_STUDY,
 } from "@/config/forms/filters";
 import { SOURCE_GAT } from "@/config/forms/search";
 import { colors } from "@/config/theme";
@@ -46,6 +47,7 @@ import {
 } from "@/utils/filters";
 import { ClearButton } from "../ClearFilterButton/ClearFilterButton.styles";
 import FilterSectionInlineSwitch from "../FilterSectionInlineSwitch";
+import FilterSection from "@/components/FilterSection";
 
 const TRANSLATION_PATH = "pages.search.components.FilterPanel.filters";
 const FILTER_CATEGORY_PUBLICATIONS = "paper";
@@ -74,6 +76,7 @@ const FILTER_ORDERING: { [key: string]: Array<string> } = {
         FILTER_DATA_TYPE,
         FILTER_DATA_SUBTYPE,
         FILTER_FORMAT_STANDARDS,
+        FILTER_STUDY,
         FILTER_PUBLISHER_NAME,
         FILTER_DATA_CUSTODIAN_NETWORK,
         FILTER_COLLECTION_NAME,
@@ -135,6 +138,7 @@ const EMPTY_FILTERS = {
     [FILTER_DATA_TYPE]: {},
     [FILTER_DATA_SUBTYPE]: {},
     [FILTER_FORMAT_STANDARDS]: {},
+    [FILTER_STUDY]: {},
 };
 
 const FilterPanel = ({
@@ -143,6 +147,7 @@ const FilterPanel = ({
     selectedFilters,
     setFilterQueryParams,
     aggregations,
+    cancerTypeFilters,
     getParamString,
     resetQueryParamState,
 }: {
@@ -156,6 +161,7 @@ const FilterPanel = ({
         secondFilterSections?: string
     ) => void;
     aggregations?: Aggregations;
+    cancerTypeFilters?: { key: string; doc_count?: number }[];
     // eslint-disable-next-line react/no-unused-prop-types
     updateStaticFilter: (filterSection: string, value: string) => void;
     getParamString: (paramName: string) => string | null;
@@ -203,17 +209,19 @@ const FilterPanel = ({
     }, [filterCategory]);
 
     // useForm applys to the search fields above each filter (other components, such as checkboxes/map are controlled)
-    useForm<{
+    const { control, setValue } = useForm<{
         [FILTER_DATA_TYPE]: string;
         [FILTER_DATA_SUBTYPE]: string;
         [FILTER_DATA_CUSTODIAN_NETWORK]: string;
         [FILTER_FORMAT_STANDARDS]: string;
+        [FILTER_STUDY]: string;
     }>({
         defaultValues: {
             [FILTER_DATA_TYPE]: "",
             [FILTER_DATA_SUBTYPE]: "",
             [FILTER_DATA_CUSTODIAN_NETWORK]: "",
             [FILTER_FORMAT_STANDARDS]: "",
+            [FILTER_STUDY]: "",
         },
     });
     const filterItems = useMemo(() => {
@@ -221,9 +229,108 @@ const FilterPanel = ({
             filterSourceData,
             filterCategory
         ).filter(filterItem => filtersList.includes(filterItem.label));
+        
         // Manually add any static filters not returned from the filters api
         if (filterCategory === FILTER_CATEGORY_PUBLICATIONS) {
             formattedFilters.unshift(STATIC_FILTER_SOURCE_OBJECT);
+        }
+        
+        // Ensure study filter appears by default for datasets
+        if (filterCategory === "dataset") {
+            const hasStudyFilter = formattedFilters.some(
+                filter => filter.label === FILTER_STUDY
+            );
+            if (!hasStudyFilter) {
+                // Add study filter that will be populated from cancerTypeFilters, filterSourceData, or aggregations
+                const studyBuckets: BucketCheckbox[] = [];
+                
+                // First, try to get buckets from cancerTypeFilters API
+                if (cancerTypeFilters && cancerTypeFilters.length > 0) {
+                    cancerTypeFilters.forEach(item => {
+                        studyBuckets.push({
+                            value: item.key,
+                            label: item.key,
+                            count: item.doc_count,
+                        });
+                    });
+                }
+                
+                // Then, try to get buckets from filterSourceData (filters API)
+                const studyFilterFromSource = filterSourceData.find(
+                    filter => filter.keys === FILTER_STUDY && filter.type === filterCategory
+                );
+                if (studyFilterFromSource?.buckets) {
+                    studyFilterFromSource.buckets.forEach(bucket => {
+                        const existingBucket = studyBuckets.find(
+                            b => b.value === bucket.key
+                        );
+                        if (existingBucket) {
+                            // Update count from filterSourceData if not already set
+                            if (!existingBucket.count) {
+                                existingBucket.count = bucket.doc_count;
+                            }
+                        } else {
+                            studyBuckets.push({
+                                value: bucket.key,
+                                label: bucket.key,
+                                count: bucket.doc_count,
+                            });
+                        }
+                    });
+                }
+                
+                // Finally, merge/update with aggregations from search API
+                const studyAggregations = aggregations?.[FILTER_STUDY];
+                if (studyAggregations?.buckets) {
+                    studyAggregations.buckets.forEach(aggBucket => {
+                        const existingBucket = studyBuckets.find(
+                            b => b.value === aggBucket.key
+                        );
+                        if (existingBucket) {
+                            // Update count from aggregations (most up-to-date)
+                            existingBucket.count = aggBucket.doc_count;
+                        } else {
+                            // Add new bucket from aggregations
+                            studyBuckets.push({
+                                value: aggBucket.key,
+                                label: aggBucket.key,
+                                count: aggBucket.doc_count,
+                            });
+                        }
+                    });
+                }
+                
+                formattedFilters.push({
+                    label: FILTER_STUDY,
+                    value: "",
+                    buckets: studyBuckets,
+                });
+            } else {
+                // Update existing study filter with aggregation counts
+                const studyFilterIndex = formattedFilters.findIndex(
+                    filter => filter.label === FILTER_STUDY
+                );
+                if (studyFilterIndex !== -1) {
+                    const studyAggregations = aggregations?.[FILTER_STUDY];
+                    
+                    if (studyAggregations?.buckets) {
+                        const updatedBuckets = formattedFilters[
+                            studyFilterIndex
+                        ].buckets.map(bucket => {
+                            const aggregationBucket = studyAggregations.buckets?.find(
+                                b => b.key === bucket.value
+                            );
+                            return {
+                                ...bucket,
+                                count:
+                                    aggregationBucket?.doc_count ?? bucket.count,
+                            };
+                        });
+                        formattedFilters[studyFilterIndex].buckets =
+                            updatedBuckets;
+                    }
+                }
+            }
         }
 
         // If the selected source is 'Search Online Publications' then remove the 'Dataset' filter
@@ -246,7 +353,7 @@ const FilterPanel = ({
             );
         }
         return formattedFilters;
-    }, [filterCategory, filterSourceData, staticFilterValues, aggregations]);
+    }, [filterCategory, filterSourceData, staticFilterValues, aggregations, cancerTypeFilters]);
 
     const resetFilterSection = (filterSection: string) => {
         setFilterValues({
@@ -329,23 +436,26 @@ const FilterPanel = ({
             value: string;
             buckets: BucketCheckbox[];
         }
-    ) => {
+    ): number => {
         const ordering = FILTER_ORDERING[filterCategory];
         if (!ordering) {
-            return null;
+            return 0;
         }
 
         const item1 = ordering.indexOf(itemA.label);
         const item2 = ordering.indexOf(itemB.label);
 
-        if (item1 && item2) {
+        if (item1 !== -1 && item2 !== -1) {
             return item1 - item2;
         }
-        if (item1 && !item2) {
+        if (item1 !== -1 && item2 === -1) {
+            return -1;
+        }
+        if (item1 === -1 && item2 !== -1) {
             return 1;
         }
 
-        return -1;
+        return 0;
     };
 
     return (
@@ -418,6 +528,43 @@ const FilterPanel = ({
                                 ?.length
                         ) {
                             return null;
+                        }
+
+                        // Render study filter using FilterSection
+                        if (filterItem.label === FILTER_STUDY) {
+                            const studyAggregations = aggregations?.[FILTER_STUDY];
+                            const studyCounts: { [key: string]: number } = {};
+                            studyAggregations?.buckets?.forEach(bucket => {
+                                studyCounts[bucket.key] = bucket.doc_count;
+                            });
+
+                            return (
+                                <FilterSection
+                                    key={filterItem.label}
+                                    filterItem={filterItem}
+                                    filterSection={FILTER_STUDY}
+                                    control={control}
+                                    checkboxValues={
+                                        filterValues[FILTER_STUDY] || {}
+                                    }
+                                    counts={studyCounts}
+                                    countsDisabled={false}
+                                    handleCheckboxChange={updatedCheckbox =>
+                                        updateCheckboxes(
+                                            updatedCheckbox,
+                                            FILTER_STUDY
+                                        )
+                                    }
+                                    setValue={(name, value) => {
+                                        if (typeof value === "string") {
+                                            setValue(name, value);
+                                        }
+                                    }}
+                                    resetFilterSection={() =>
+                                        resetFilterSection(FILTER_STUDY)
+                                    }
+                                />
+                            );
                         }
                         // const isPublicationSource = label === STATIC_FILTER_SOURCE;
 
