@@ -1,6 +1,6 @@
 import { Filter } from "@/interfaces/Filter";
 import { FILTER_DATA_SUBTYPE } from "@/config/forms/filters";
-import { getFilters, getSchemaFromTraser } from "@/utils/api";
+import { getFilters, getSchemaFromTraser, getCancerTypeFilters } from "@/utils/api";
 import { getCohortDiscovery } from "@/utils/cms";
 import metaData, { noFollowRobots } from "@/utils/metadata";
 import Search from "./components/Search";
@@ -16,6 +16,14 @@ export const metadata = metaData(
 const SearchPage = async () => {
     const filters: Filter[] = await getFilters();
     const cohortDiscovery = await getCohortDiscovery();
+    let cancerTypeFilters: { key: string; doc_count?: number }[] | undefined;
+    try {
+        cancerTypeFilters = await getCancerTypeFilters(cookieStore);
+    } catch (error) {
+        // If cancer type filters API fails, continue without it
+        console.warn("Failed to fetch cancer type filters:", error);
+        cancerTypeFilters = undefined;
+    }
 
     const adjustedFilters = filters.map(filter => {
         if (filter.keys === FILTER_DATA_SUBTYPE) {
@@ -38,6 +46,7 @@ const SearchPage = async () => {
             filters={adjustedFilters}
             cohortDiscovery={cohortDiscovery}
             schema={schema}
+            cancerTypeFilters={cancerTypeFilters}
         />
     );
 };

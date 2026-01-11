@@ -203,16 +203,7 @@ const FilterPanel = ({
     }, [filterCategory]);
 
     // useForm applys to the search fields above each filter (other components, such as checkboxes/map are controlled)
-    const { control, setValue } = useForm<{
-        [FILTER_PUBLISHER_NAME]: string;
-        [FILTER_COLLECTION_NAME]: string;
-        [FILTER_COLLECTION_NAMES]: string;
-        [FILTER_DATA_USE_TITLES]: string;
-        [FILTER_SECTOR]: string;
-        [FILTER_ACCESS_SERVICE]: string;
-        [FILTER_PROGRAMMING_LANGUAGE]: string;
-        [FILTER_TYPE_CATEGORY]: string;
-        [FILTER_MATERIAL_TYPE]: string;
+    useForm<{
         [FILTER_DATA_TYPE]: string;
         [FILTER_DATA_SUBTYPE]: string;
         [FILTER_DATA_CUSTODIAN_NETWORK]: string;
@@ -264,37 +255,6 @@ const FilterPanel = ({
                 filterItem => filterItem.label !== FILTER_DATA_CUSTODIAN_NETWORK
             );
         }
-
-        if (filterCategory === FILTER_CATEGORY_DATASETS) {
-            // Add in sub-buckets to filterItem.buckets
-            if (aggregations !== undefined) {
-                const ffIndex = formattedFilters.findIndex(
-                    bucket => bucket.label === FILTER_DATA_TYPE
-                );
-
-                if (ffIndex !== -1) {
-                    const dataTypeFilters = formattedFilters[
-                        ffIndex
-                    ].buckets?.map(filterItem => {
-                        const subtypeOptions = getSubtypeOptionsFromSchema(
-                            schemadefs,
-                            filterItem.label
-                        );
-
-                        return {
-                            ...filterItem,
-                            subBuckets: subtypeOptions.map(item => ({
-                                label: item,
-                                value: item,
-                            })),
-                        };
-                    });
-
-                    formattedFilters[ffIndex].buckets = dataTypeFilters;
-                }
-            }
-        }
-
         return formattedFilters;
     }, [filterCategory, filterSourceData, staticFilterValues, aggregations]);
 

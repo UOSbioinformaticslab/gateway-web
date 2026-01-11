@@ -42,6 +42,7 @@ import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
 import SearchBar from "@/components/SearchBar";
+import StudyFilter from "@/components/StudyFilter";
 import FeasibilityEnquiryDialog from "@/modules/FeasibilityEnquiryDialog";
 import GeneralEnquirySidebar from "@/modules/GeneralEnquirySidebar";
 import PublicationSearchDialog from "@/modules/PublicationSearchDialog";
@@ -85,6 +86,7 @@ import {
     FILTER_TYPE_CATEGORY,
     filtersList,
     FILTER_COHORT_DISCOVERY,
+    FILTER_STUDY,
 } from "@/config/forms/filters";
 import searchFormConfig, {
     PAGE_FIELD,
@@ -120,6 +122,8 @@ import ResultCardPublication from "../ResultCardPublication/ResultCardPublicatio
 import ResultCardTool from "../ResultCardTool/ResultCardTool";
 import ResultsList from "../ResultsList";
 import ResultsTable from "../ResultsTable";
+import { Filter } from "@mui/icons-material";
+import { FilterHeader } from "@/components/StudyFilter/FilterHeader";
 
 const TRANSLATION_PATH = "pages.search";
 const STATIC_FILTER_SOURCE = "source";
@@ -130,6 +134,7 @@ interface SearchProps {
     filters: Filter[];
     cohortDiscovery: PageTemplatePromo;
     schema: V4Schema;
+    cancerTypeFilters?: { key: string; doc_count?: number }[];
 }
 
 const filterSidebarWidth = 350;
@@ -146,7 +151,7 @@ const filterSidebarStyles = {
     },
 };
 
-const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
+const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchProps) => {
     const { showDialog, hideDialog } = useDialog();
     const [hasSearched, setHasSearched] = useState(false);
     const router = useRouter();
@@ -234,6 +239,7 @@ const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
         [FILTER_MATERIAL_TYPE]: getParamArray(FILTER_MATERIAL_TYPE),
         [FILTER_FORMAT_STANDARDS]: getParamArray(FILTER_FORMAT_STANDARDS),
         [FILTER_COHORT_DISCOVERY]: getParamArray(FILTER_COHORT_DISCOVERY),
+        [FILTER_STUDY]: getParamArray(FILTER_STUDY),
     });
 
     const [datasetNamesArray, setDatasetNamesArray] = useState<string[]>([]);
@@ -695,6 +701,7 @@ const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
                     });
                 }}
                 aggregations={data?.aggregations}
+                cancerTypeFilters={cancerTypeFilters}
                 updateStaticFilter={(filterName: string, value: string) => {
                     setQueryParams({
                         ...queryParams,
@@ -830,7 +837,8 @@ const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
                             display: "flex",
                             justifyContent: "center",
                             flexDirection: "column",
-                            maxWidth: "768px",
+                            maxWidth: "70%",
+                            
                             marginX: 1,
                             flexGrow: 1,
                         }}
@@ -843,49 +851,6 @@ const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
                         width: "100%",
                         position: "relative",
                     }}>
-                    {!isMobile && (
-                        <>
-                            <IconButton
-                                ref={iconRef}
-                                size="large"
-                                edge="start"
-                                onClick={() =>
-                                    setFilterSidebarOpen(!filterSidebarOpen)
-                                }
-                                sx={filterSidebarButtonStyles}
-                                color="secondary">
-                                <PanelExpandIcon
-                                    sx={{
-                                        transform: `scaleX(${
-                                            filterSidebarOpen ? 1 : -1
-                                        })`,
-                                    }}
-                                />
-                            </IconButton>
-
-                            {/* Filter Sidebar */}
-                            <Drawer
-                                sx={filterSidebarStyles}
-                                variant="persistent"
-                                anchor="left"
-                                PaperProps={{
-                                    sx: {
-                                        boxShadow: "none",
-                                        border: 0,
-                                    },
-                                }}
-                                open={filterSidebarOpen}>
-                                <Box
-                                    sx={{
-                                        ml: 3,
-                                        mb: 2,
-                                        mt: 1,
-                                    }}>
-                                    {filterPanel}
-                                </Box>
-                            </Drawer>
-                        </>
-                    )}
 
                     <Box component="section" sx={mainContentStyles}>
                         <Box
@@ -966,10 +931,28 @@ const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
                                                 }}
                                             />
                                         )}
-                                        <Box
+     
+                                        <Box>
+                                       <FilterHeader />
+                                            </Box>
+                                        <Box mb={2}
+                                        >
+                                        
+                                        <StudyFilter
+                                            filterData={undefined}
+                                            onFilterChange={(selectedFilters) => {
+                                                // Handle filter changes - integrate with existing filter system
+                                                console.log("Selected filters:", Array.from(selectedFilters));
+                                            }}
+                                        />
+                                        </Box>
+                                                                           <Box
                                             sx={{
-                                                flexGrow: 1,
-                                                paddingLeft: 2,
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                width: "100%",
+                                                maxWidth: "70%",
+                                                marginX: "auto",
                                             }}>
                                             <SearchBar
                                                 defaultValue={queryParams.query}
@@ -995,25 +978,6 @@ const Search = ({ filters, cohortDiscovery, schema }: SearchProps) => {
                                                 }
                                             />
                                         </Box>
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                paddingLeft: 10,
-                                                textAlign: "center",
-                                            }}
-                                        />
-                                        <Typography variant="h2" align="center">
-                                            Unleashing the power of big data
-                                        </Typography>
-                                        <Typography
-                                            variant="h4"
-                                            paragraph
-                                            align="center"
-                                            sx={{ mb: 3 }}>
-                                            Explore a vast array of datasets,
-                                            tools, and publications to fuel your
-                                            research and innovation.
-                                        </Typography>
                                         <Box
                                             component="section"
                                             aria-describedby="result-summary"

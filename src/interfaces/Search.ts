@@ -22,6 +22,7 @@ import {
     FILTER_MATERIAL_TYPE,
     FILTER_FORMAT_STANDARDS,
     FILTER_COHORT_DISCOVERY,
+    FILTER_STUDY,
 } from "@/config/forms/filters";
 import { PMC_TYPE_FIELD } from "@/config/forms/search";
 import { Metadata } from "./Dataset";
@@ -74,6 +75,9 @@ export interface Aggregations {
         buckets: Bucket[];
     };
     [FILTER_DATA_CUSTODIAN_NETWORK]: {
+        buckets: Bucket[];
+    };
+    [FILTER_STUDY]?: {
         buckets: Bucket[];
     };
     startDate: { value_as_string: string };
@@ -256,6 +260,7 @@ export interface SearchQueryParams {
     [PMC_TYPE_FIELD]: string | undefined;
     [FILTER_FORMAT_STANDARDS]: string[] | undefined;
     [FILTER_COHORT_DISCOVERY]: string[] | undefined;
+    [FILTER_STUDY]: string[] | undefined;
 }
 
 export type CountType = { [key: string]: number };
