@@ -92,6 +92,8 @@ const apis = {
     doiSearchV1Url: `${apiV1Url}/search/doi`,
     aliasesV1Url: `${apiV1Url}/aliases`,
     licensesV1URL: `${apiV1Url}/licenses`,
+    cancerTypeFiltersV1Url: `${apiV1Url}/cancer-type-filters`,
+    cancerTypeFiltersV1UrlIP: `${apiV1IPUrl}/cancer-type-filters`,
 };
 
 export default apis;

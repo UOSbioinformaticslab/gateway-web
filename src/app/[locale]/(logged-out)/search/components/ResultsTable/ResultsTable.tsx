@@ -101,7 +101,7 @@ const getColumns = ({
                 describeChild
                 title={translations.dataProviderTooltip}
                 tabIndex={0}>
-                {translations.dataProviderLabel}
+                <span>{translations.dataProviderLabel}</span>
             </Tooltip>
         ),
         size: 400,
@@ -118,7 +118,7 @@ const getColumns = ({
                 describeChild
                 title={translations.dateRangePublisherTooltip}
                 tabIndex={0}>
-                {translations.dateRangePublisherLabel}
+                <span>{translations.dateRangePublisherLabel}</span>
             </Tooltip>
         ),
         size: 120,

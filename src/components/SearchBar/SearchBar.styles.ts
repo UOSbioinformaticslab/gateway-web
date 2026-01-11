@@ -10,7 +10,7 @@ export const FormWrapper = styled(Box)(() => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    maxWidth: "768px",
+    maxWidth: "100%",
     width: "100%",
     padding: 0,
     paddingBottom: 5,
