@@ -47,7 +47,6 @@ import {
 } from "@/utils/filters";
 import { ClearButton } from "../ClearFilterButton/ClearFilterButton.styles";
 import FilterSectionInlineSwitch from "../FilterSectionInlineSwitch";
-import FilterSection from "@/components/FilterSection";
 
 const TRANSLATION_PATH = "pages.search.components.FilterPanel.filters";
 const FILTER_CATEGORY_PUBLICATIONS = "paper";
@@ -138,7 +137,6 @@ const EMPTY_FILTERS = {
     [FILTER_DATA_TYPE]: {},
     [FILTER_DATA_SUBTYPE]: {},
     [FILTER_FORMAT_STANDARDS]: {},
-    [FILTER_STUDY]: {},
 };
 
 const FilterPanel = ({
@@ -209,7 +207,7 @@ const FilterPanel = ({
     }, [filterCategory]);
 
     // useForm applys to the search fields above each filter (other components, such as checkboxes/map are controlled)
-    const { control, setValue } = useForm<{
+    useForm<{
         [FILTER_DATA_TYPE]: string;
         [FILTER_DATA_SUBTYPE]: string;
         [FILTER_DATA_CUSTODIAN_NETWORK]: string;
@@ -353,7 +351,7 @@ const FilterPanel = ({
             );
         }
         return formattedFilters;
-    }, [filterCategory, filterSourceData, staticFilterValues, aggregations, cancerTypeFilters]);
+    }, [filterCategory, filterSourceData, staticFilterValues, aggregations]);
 
     const resetFilterSection = (filterSection: string) => {
         setFilterValues({
@@ -455,7 +453,7 @@ const FilterPanel = ({
             return 1;
         }
 
-        return 0;
+        return -1;
     };
 
     return (
@@ -572,6 +570,124 @@ const FilterPanel = ({
                     })}
                 </Box>
             </Box>
+
+            {filterItems.sort(getFilterSortOrder).map(filterItem => {
+                const { label } = filterItem;
+                if (
+                    filterItem.label === FILTER_CONTAINS_BIOSAMPLES ||
+                    filterItem.label === FILTER_COHORT_DISCOVERY
+                ) {
+                    return (
+                        <FilterSectionInlineSwitch
+                            key={filterItem.label}
+                            filterCategory={filterCategory}
+                            filterItem={filterItem}
+                            selectedFilters={selectedFilters}
+                            handleRadioChange={(
+                                event: React.ChangeEvent<HTMLInputElement>
+                            ) =>
+                                updateCheckboxes(
+                                    {
+                                        [filterItem.label]:
+                                            event.target.checked,
+                                    },
+                                    label
+                                )
+                            }
+                            containerSx={
+                                label === FILTER_CONTAINS_BIOSAMPLES
+                                    ? { pt: 1 }
+                                    : { pb: 1 }
+                            }
+                        />
+                    );
+                }
+
+                if (
+                    filterItem.label === FILTER_MATERIAL_TYPE &&
+                    !get(selectedFilters, FILTER_CONTAINS_BIOSAMPLES)?.length
+                ) {
+                    return null;
+                }
+
+                if (filterItem.label === FILTER_DATA_SUBTYPE) {
+                    return null;
+                }
+
+                const isPublicationSource = label === STATIC_FILTER_SOURCE;
+
+                const filterCount = filterValues[label] &&
+                    !!Object.entries(filterValues[label]).length && (
+                        <Typography sx={filterCountStyles}>
+                            {label === FILTER_DATA_TYPE
+                                ? Object.entries(filterValues[label]).length +
+                                  Object.entries(
+                                      filterValues[FILTER_DATA_SUBTYPE]
+                                  ).length
+                                : Object.entries(filterValues[label]).length}
+                        </Typography>
+                    );
+
+                return (
+                    <Accordion
+                        key={label}
+                        sx={{
+                            background: colors.white,
+                            boxShadow: "none",
+                            mt: 0.5,
+                            mb: 0.5,
+                            border: 0,
+                            "&:before": { display: "none" },
+                            "&.MuiAccordion-root.Mui-expanded": {
+                                mt: 0.5,
+                                mb: 0.5,
+                            },
+                            ...(isPublicationSource && {
+                                ".MuiAccordionSummary-expandIconWrapper": {
+                                    opacity: 0,
+                                },
+                                ".MuiButtonBase-root.MuiAccordionSummary-root.Mui-expanded":
+                                    {
+                                        cursor: "default",
+                                    },
+                            }),
+                        }}
+                        expanded={
+                            maximised.includes(label) || isPublicationSource
+                        }
+                        tooltip={t(`${label}${TOOLTIP_SUFFIX}`)}
+                        heading={
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    p: 0,
+                                    m: 0,
+                                    flexDirection: "row",
+                                    alignContent: "center",
+                                    justifyContent: "space-between",
+                                    width: "100%",
+                                    pr: 3.25,
+                                }}>
+                                <Typography
+                                    fontWeight="400"
+                                    fontSize={20}
+                                    sx={{ textWrap: "auto" }}>
+                                    {t(label)}
+                                </Typography>
+                                {filterCount}
+                            </Box>
+                        }
+                        onChange={() =>
+                            setMaximised(
+                                maximised.includes(label)
+                                    ? maximised.filter(e => e !== label)
+                                    : [...maximised, label]
+                            )
+                        }
+                        contents={renderFilterContent(filterItem)}
+                    />
+                );
+            })}
         </aside>
     );
 };
