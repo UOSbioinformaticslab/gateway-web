@@ -807,7 +807,6 @@ export {
     getDataset,
     getTeamDataset,
     getDataUse,
-    getFilters,
     getKeywords,
     getCancerTypeFilters,
     getFormHydration,
