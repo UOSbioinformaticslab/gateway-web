@@ -4,6 +4,7 @@ import { AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { HomepageBannerNode } from "@/interfaces/Homepage";
 import Footer from "@/components/Footer";
+import { HDRGlobals } from "@/components/HDRGlobals";
 import Header from "@/components/Header";
 import { LightBox } from "@/components/LightBox";
 import NavigationEvents from "@/components/NavigationEvents";
@@ -11,10 +12,12 @@ import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
 import ProvidersDialog from "@/modules/ProvidersDialog";
 import { getHomePageBanner } from "@/utils/cms";
 import metaData from "@/utils/metadata";
+import packageJson from "@/../package.json";
 import {
     isAliasesEnabled,
     isSDEConciergeServiceEnquiryEnabled,
     isNhsSdeApplicationsEnabled,
+    isWidgetsEnabled,
 } from "@/flags";
 import ActionBarProvider from "@/providers/ActionBarProvider";
 import CohortRedirectProvider from "@/providers/CohortRedirectProvider";
@@ -33,13 +36,13 @@ export const metadata = metaData({
         "The Health Data Research Gateway is a portal enabling researchers and innovators in academia, industry and the NHS to search for and request access to UK health research data.",
 });
 
-export default async function RootLayout({
-    children,
-    params: { locale },
-}: {
-    params: { locale: string };
+export default async function RootLayout(props: {
+    params: Promise<{ locale: string }>;
     children: ReactNode;
 }) {
+    const { children, params } = props;
+    const { locale } = await params;
+
     let messages;
     let homePageBanner: HomepageBannerNode[] = [];
     try {
@@ -51,12 +54,15 @@ export default async function RootLayout({
     const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
     const includeBanners = process.env.NEXT_PUBLIC_INCLUDE_BANNERS === "true";
 
+    const { version } = packageJson;
+
     const features = {
         isSDEConciergeServiceEnquiryEnabled:
             (await isSDEConciergeServiceEnquiryEnabled()) as boolean,
         isAliasesEnabled: (await isAliasesEnabled()) as boolean,
         isNhsSdeApplicationsEnabled:
             (await isNhsSdeApplicationsEnabled()) as boolean,
+        isWidgetsEnabled: (await isWidgetsEnabled()) as boolean,
     };
 
     if (includeBanners) {
@@ -99,6 +105,7 @@ export default async function RootLayout({
                         </ThemeRegistry>
                     </SWRProvider>
                 </NextIntlClientProvider>
+                <HDRGlobals version={version} features={features} />
             </body>
         </html>
     );

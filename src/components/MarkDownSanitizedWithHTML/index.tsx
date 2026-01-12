@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Typography } from "@mui/material";
 import { SxProps } from "@mui/material/styles";
 import { generateHTML, JSONContent } from "@tiptap/react";
@@ -49,10 +49,12 @@ export const MarkDownSanitizedWithHtml = ({
             DOMPurify.sanitize(value)
         );
 
-        setIsLoaded(true);
-
         return sanitized;
     }, [content]);
+
+    useEffect(() => {
+        setIsLoaded(true);
+    }, [parsedContent]);
 
     const overrides = {
         ...(overrideLinks && {
@@ -60,7 +62,31 @@ export const MarkDownSanitizedWithHtml = ({
                 component: CustomLink,
             },
         }),
-        p: <Typography sx={{ mb: 2 }} />,
+        p: {
+            component: Typography,
+            props: { sx: { mb: 2 } },
+        },
+        h2: {
+            component: Typography,
+            props: {
+                variant: "h2",
+                sx: { fontWeight: 600 },
+            },
+        },
+        h3: {
+            component: Typography,
+            props: {
+                variant: "h3",
+                sx: { fontWeight: 600 },
+            },
+        },
+        h4: {
+            component: Typography,
+            props: {
+                variant: "h4",
+                sx: { fontWeight: 600 },
+            },
+        },
     };
 
     const Wrapper = wrapper as React.ElementType;
