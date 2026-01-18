@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Box } from '@mui/material';
 import { IntroText, SectionHeading } from './StudyFilter.styles';
-import Typography from '../Typography';
-import Box from '../Box';
+
 
 export const FilterHeader = () => {
 

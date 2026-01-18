@@ -134,6 +134,8 @@ export const colors = {
     darkGreen100: "#ADDAD9",
     yellow400: "#F4E751",
     yellow500: "#FFC40C",
+    blue400: "#00468C",
+    pink400: "#D10A6F",
 };
 
 const palette = {
