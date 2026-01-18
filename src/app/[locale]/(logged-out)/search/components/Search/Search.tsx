@@ -42,7 +42,7 @@ import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
 import SearchBar from "@/components/SearchBar";
-import StudyFilter from "@/components/StudyFilter";
+import StudyFilter from "../StudyFilter/StudyFilter";
 import FeasibilityEnquiryDialog from "@/modules/FeasibilityEnquiryDialog";
 import GeneralEnquirySidebar from "@/modules/GeneralEnquirySidebar";
 import PublicationSearchDialog from "@/modules/PublicationSearchDialog";
@@ -122,8 +122,7 @@ import ResultCardPublication from "../ResultCardPublication/ResultCardPublicatio
 import ResultCardTool from "../ResultCardTool/ResultCardTool";
 import ResultsList from "../ResultsList";
 import ResultsTable from "../ResultsTable";
-import { Filter } from "@mui/icons-material";
-import { FilterHeader } from "@/components/StudyFilter/FilterHeader";
+import { FilterHeader } from "../StudyFilter/FilterHeader";
 
 const TRANSLATION_PATH = "pages.search";
 const STATIC_FILTER_SOURCE = "source";

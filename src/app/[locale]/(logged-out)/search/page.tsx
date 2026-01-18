@@ -18,7 +18,7 @@ const SearchPage = async () => {
     const cohortDiscovery = await getCohortDiscovery();
     let cancerTypeFilters: { key: string; doc_count?: number }[] | undefined;
     try {
-        cancerTypeFilters = await getCancerTypeFilters(cookieStore);
+        cancerTypeFilters = await getCancerTypeFilters();
     } catch (error) {
         // If cancer type filters API fails, continue without it
         console.warn("Failed to fetch cancer type filters:", error);

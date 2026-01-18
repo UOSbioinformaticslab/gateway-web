@@ -282,24 +282,18 @@ async function getFilters(): Promise<Filter[]> {
     );
 }
 
-async function getKeywords(): Promise<Keyword[]> {
-async function getCancerTypeFilters(
-    cookieStore: ReadonlyRequestCookies
-): Promise<{ key: string; doc_count?: number }[]> {
+async function getCancerTypeFilters(): Promise<{ key: string; doc_count?: number }[]> {
     const cache: Cache = {
         tags: ["cancer_type_filters"],
     };
     // The get function already unwraps json.data, so response should be an array
     return get<{ key: string; doc_count?: number }[]>(
-        cookieStore,
         apis.cancerTypeFiltersV1UrlIP,
         { cache, suppressError: false }
     );
 }
 
-async function getKeywords(
-    cookieStore: ReadonlyRequestCookies
-): Promise<Keyword[]> {
+async function getKeywords(): Promise<Keyword[]> {
     const cache: Cache = {
         tags: ["keywords"],
     };
@@ -818,6 +812,7 @@ export {
     getTeamSummary,
     getTeamDatasetsSummary,
     getTool,
+    getFilters,
     getUser,
     getUserFromCookie,
     getDarSections,
