@@ -14,7 +14,19 @@ export const th = css({
     borderRight: `1px solid ${colors.grey300}`,
     ":last-child": {
         borderRight: 0,
+        borderTopRightRadius: 8,
+        borderBottomRightRadius: 8,
     },
+    ":first-of-type": {
+        borderTopLeftRadius: 8,
+        borderBottomLeftRadius: 8,
+    },
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    backgroundColor: colors.blue400,
+    '&:hover': { 
+        backgroundColor: '#e2e6ea' 
+    }
 });
 
 export const td = css({

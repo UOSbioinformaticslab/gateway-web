@@ -11,7 +11,7 @@ export const FormWrapper = styled(Box)(() => ({
     flexDirection: "column",
     justifyContent: "center",
     maxWidth: "100%",
-    width: "100%",
+    width: "auto",
     padding: 0,
     paddingBottom: 5,
     paddingTop: 0,

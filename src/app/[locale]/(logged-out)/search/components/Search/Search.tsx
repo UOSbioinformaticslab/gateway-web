@@ -950,7 +950,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                                 display: "flex",
                                                 justifyContent: "center",
                                                 width: "100%",
-                                                maxWidth: "70%",
+                                                maxWidth: "97%",
                                                 marginX: "auto",
                                             }}>
                                             <SearchBar

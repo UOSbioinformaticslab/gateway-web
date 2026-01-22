@@ -15,18 +15,20 @@ import { useCohortStatus } from "@/hooks/useCohortStatus";
 import useGet from "@/hooks/useGet";
 import apis from "@/config/apis";
 import { RouteName } from "@/consts/routeName";
-import { getDateRange } from "@/utils/search";
 import ActionDropdown from "../ActionDropdown";
+import { getDateRange, getPopulationSize } from "@/utils/search";
+import { formatTextDelimiter } from "@/utils/dataset";
 
 interface ResultTableProps {
     results: SearchResultDataset[];
     showLibraryModal: (props: { datasetId: number }) => void;
     cohortDiscovery: PageTemplatePromo;
 }
-
+const CONFORMS_TO_PATH = "metadata.accessibility.formatAndStandards.conformsTo";
 const PUBLISHER_NAME_PATH = "metadata.summary.publisher.name";
 const PUBLISHERS_ID = "metadata.summary.publisher.gatewayId";
-
+const ACCESS_SERVICE_PATH =
+    "metadata.accessibility.access.accessServiceCategory";
 const columnHelper = createColumnHelper<SearchResultDataset>();
 
 const getColumns = ({
@@ -60,7 +62,27 @@ const getColumns = ({
         meta: { isPinned: true, hasPinnedBorder: true },
         header: () => <span>{translations.metaDataLabel}</span>,
         minSize: 300,
-        size: 700,
+        size: 400,
+    }),
+     columnHelper.display({
+        id: "populationSize",
+        cell: ({ row: { original } }) => (
+            <div style={{ textAlign: "center" }}>
+                {getPopulationSize(
+                    original?.metadata,
+                    translations.populationSizeNotReported
+                )}
+            </div>
+        ),
+        header: () => (
+            <Tooltip
+                describeChild
+                title={translations.populationSizeTooltip}
+                tabIndex={0}>
+                {"Pop.Size"}
+            </Tooltip>
+        ),
+        size: 120,
     }),
 
     columnHelper.display({
@@ -123,25 +145,42 @@ const getColumns = ({
         ),
         size: 120,
     }),
-    columnHelper.display({
-        id: "actions",
-        meta: { isPinned: true },
-        cell: ({ row: { original } }) => {
-            return (
-                <div style={{ textAlign: "center" }}>
-                    <ActionDropdown
-                        result={original}
-                        showLibraryModal={showLibraryModal}
-                        mutateLibraries={mutateLibraries}
-                        isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
-                        cohortDiscovery={cohortDiscovery}
-                    />
-                </div>
-            );
-        },
-        header: () => <span>{translations.actionLabel}</span>,
+       columnHelper.display({
+        id: "accessService",
+        cell: ({ row: { original } }) => (
+            <div style={{ textAlign: "center" }}>
+                {get(original, ACCESS_SERVICE_PATH)}
+            </div>
+        ),
+        header: () => (
+            <Tooltip
+                describeChild
+                title={translations.accessServiceTooltip}
+                tabIndex={0}>
+                {translations.accessServiceLabel}
+            </Tooltip>
+        ),
+        minSize: 100,
         size: 120,
     }),
+      columnHelper.display({
+        id: "conformsTo",
+        cell: ({ row: { original } }) => (
+            <div style={{ textAlign: "center" }}>
+                {formatTextDelimiter(get(original, CONFORMS_TO_PATH))}
+            </div>
+        ),
+        header: () => (
+            <Tooltip
+                describeChild
+                title={translations.dataStandardTooltip}
+                tabIndex={0}>
+                {translations.dataStandardLabel}
+            </Tooltip>
+        ),
+        size: 180,
+    }),
+
 ];
 
 const RESULTS_TABLE_TRANSLATION_PATH = "pages.search.components.ResultsTable";
