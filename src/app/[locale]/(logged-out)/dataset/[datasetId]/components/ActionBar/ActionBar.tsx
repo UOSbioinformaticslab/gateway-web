@@ -233,31 +233,6 @@ const ActionBar = ({ dataset }: ActionBarProps) => {
                         desktop: "none",
                     },
                 }}>
-                <Button onClick={handleGeneralEnquiryClick}>
-                    <QuestionAnswerIcon
-                        sx={{
-                            pr: 1,
-                            display: { mobile: "none", tablet: "inline-block" },
-                        }}
-                    />
-                    {t("generalEnquiryButtonText")}
-                </Button>
-                <Button onClick={handleFeasibilityEnquiryClick}>
-                    <QuestionAnswerIcon
-                        sx={{
-                            pr: 1,
-                            display: { mobile: "none", tablet: "inline-block" },
-                        }}
-                    />
-                    {t("feasibilityEnquiryButtonText")}
-                </Button>
-                <Button
-                    onClick={handleStartDarRequest}
-                    variant="outlined"
-                    color="secondary">
-                    {t("submitApplication")}
-                </Button>
-
                 <Button
                     aria-label={t("downloadMetadata")}
                     variant="text"

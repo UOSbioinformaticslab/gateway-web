@@ -68,19 +68,19 @@ const SearchBar = ({
             elevation={0}
             variant="outlined"
             sx={{
-                p: 2,
-                mb: 3,
+                p: 1,
+                mb: 0,
                 bgcolor: '#f1f1f1',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 2,
+                gap: 1,
                 width: '100%',
                 flexWrap: 'nowrap',
             }}
         >
             <FormWrapper 
                 data-testid={TEST_ID_WRAPPER}
-                sx={{ flex: '0 0 50%', minWidth: 0 }}
+                sx={{ flex: '0 0 50%', minWidth: 0,marginTop: 1}}
             >
                 <SearchForm onSubmit={handleSubmit(submitAction)} role="search">
                     <InputWrapper

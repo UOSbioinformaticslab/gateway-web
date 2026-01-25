@@ -1694,7 +1694,11 @@
             }
         },
         "ActiveListSidebar": {
-            "bookmarks": "Bookmarks"
+            "bookmarks": "Bookmarks",
+            "overview": "Overview"
+        },
+        "FilterTags": {
+            "filterTags": "Filters & Tags"
         },
         "dialogs": {
             "DarEnquiryDialog": {

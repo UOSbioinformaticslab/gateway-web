@@ -61,7 +61,8 @@ function useSkipper() {
 
 const getCommonCellStyles = <T,>(
     column: Column<T>,
-    isHeaderPinned?: boolean
+    isHeaderPinned?: boolean,
+    isHeader?: boolean
 ): CSSProperties => {
     const {
         columnDef: { meta = {} },
@@ -73,6 +74,17 @@ const getCommonCellStyles = <T,>(
     };
 
     const shouldPin = isPinned || isHeaderPinned;
+    
+    if (isHeader && isHeaderPinned) {
+        return {
+            position: "sticky",
+            top: 0,
+            left: shouldPin ? `${column.getStart()}px` : undefined,
+            width: column.getSize(),
+            zIndex: shouldPin ? 1 : 1,
+        };
+    }
+    
     return {
         backgroundColor: "white",
         boxShadow: hasPinnedBorder ? `1px 0 ${colors.grey300}` : undefined,
@@ -81,7 +93,7 @@ const getCommonCellStyles = <T,>(
         opacity: shouldPin ? 0.95 : 1,
         position: shouldPin ? "sticky" : "relative",
         width: column.getSize(),
-        zIndex: shouldPin ? 1 : 0,
+        zIndex: 0,
     };
 };
 
@@ -150,7 +162,8 @@ function Table<T extends unknown>(props: TableProps<T>) {
         .filter(Boolean).length;
 
     return (
-        <table css={style ?? styles.table}>
+        <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '600px' }}>
+            <table css={style ?? styles.table}>
             {!hideHeader && (
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
@@ -160,10 +173,8 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                     css={styles.th}
                                     key={header.id}
                                     style={{
-                                        ...getCommonCellStyles(
-                                            header.column,
-                                            pinHeader
-                                        ),
+                                        position: 'sticky',
+                                        top: 0,
                                         cursor: 'pointer',
                                         fontWeight: 700,
                                         backgroundColor: colors.blue400,
@@ -173,6 +184,8 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                         borderRight: `1px solid ${colors.blue400}`,
                                         fontSize: '18px',
                                         padding: 3,
+                                        width: header.getSize(),
+                                        zIndex: 0,
                                     }}>
                                     <div className="whitespace-nowrap">
                                         {header.isPlaceholder
@@ -261,6 +274,7 @@ function Table<T extends unknown>(props: TableProps<T>) {
                 </tfoot>
             )}
         </table>
+        </div>
     );
 }
 

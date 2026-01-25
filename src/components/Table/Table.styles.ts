@@ -24,6 +24,9 @@ export const th = css({
     cursor: 'pointer',
     fontWeight: 'bold',
     backgroundColor: colors.blue400,
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
     '&:hover': { 
         backgroundColor: '#e2e6ea' 
     }

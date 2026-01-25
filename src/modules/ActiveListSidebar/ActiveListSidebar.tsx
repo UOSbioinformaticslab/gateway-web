@@ -11,7 +11,7 @@ import Button from "@/components/Button";
 import { ChevronThinIcon } from "@/consts/icons";
 import {
     ActiveLinkWrapper,
-    BookmarkText,
+    OverviewText,
     Wrapper,
 } from "./ActiveListSidebar.styles";
 
@@ -86,7 +86,7 @@ const ActiveListSidebar = ({
             {!isMobile && (
                 <Wrapper
                     sx={{ gridColumn: { tablet: "span 1", laptop: "span 1" } }}>
-                    <BookmarkText>{t("bookmarks")}</BookmarkText>
+                    <OverviewText variant="h3">{t("overview")}</OverviewText>
                     <ActiveLinkWrapper>
                         <ActiveList
                             items={items}
@@ -128,7 +128,7 @@ const ActiveListSidebar = ({
                             }}
                             variant="text"
                             endIcon={<ChevronThinIcon color="primary" />}>
-                            {t("bookmarks")}
+                            {t("overview")}
                         </Button>
                         <Menu
                             id="bookmark-menu"

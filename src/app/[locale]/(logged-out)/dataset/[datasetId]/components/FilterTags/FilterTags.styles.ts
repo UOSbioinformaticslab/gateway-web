@@ -4,7 +4,6 @@ import Typography from "@/components/Typography";
 import theme from "@/config/theme";
 
 export const Wrapper = styled(Box)(() => ({
-    position: "sticky",
     top: 0,
     padding: 0,
     zIndex: theme.zIndex.appBar,

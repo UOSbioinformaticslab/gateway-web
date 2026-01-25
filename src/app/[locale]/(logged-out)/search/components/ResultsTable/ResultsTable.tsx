@@ -232,6 +232,7 @@ const ResultTable = ({
             }}>
             <TableContainer>
                 <Table<SearchResultDataset>
+                    pinHeader={true}
                     style={{ background: "background.paper", borderRadius: 2 }}
                     columns={getColumns({
                         translations,

@@ -14,11 +14,13 @@ export const metadata = metaData(
 export interface LayoutDataItemProps {
     navigation: ReactNode;
     body: ReactNode;
+    panel?: ReactNode;
 }
 
 export default function LayoutDataItemPage({
     navigation,
     body,
+    panel,
 }: LayoutDataItemProps) {
     return (
         <BoxContainer
@@ -26,7 +28,7 @@ export default function LayoutDataItemPage({
                 gridTemplateColumns: {
                     mobile: "repeat(1, 1fr)",
                     tablet: "repeat(3, 1fr)",
-                    laptop: "repeat(5, 1fr)",
+                    laptop: "repeat(6, 1fr)",
                 },
             }}>
             {navigation}
@@ -38,6 +40,7 @@ export default function LayoutDataItemPage({
                 }}>
                 {body}
             </Box>
+            {panel}
         </BoxContainer>
     );
 }

@@ -16,10 +16,8 @@ import DatasetContent from "./components/DatasetContent";
 import DatasetMindMap from "./components/DatasetMindMap";
 import DatasetStats from "./components/DatasetStats";
 import GoogleRecommended from "./components/GoogleRecommended";
-import Linkages from "./components/Linkages";
-import Publications from "./components/Publications";
-import Sources from "./components/Sources";
 import { datasetFields } from "./config";
+import FilterTags from "./components/FilterTags";
 
 export const metadata = metaData({
     title: "Dataset",
@@ -118,11 +116,18 @@ export default async function DatasetItemPage({
                         {datasetStats && (
                             <Box sx={{ p: 0, gap: 2 }}>
                                 <Typography
-                                    variant="h2"
+                                    variant="h1"
                                     sx={{ pt: 0.5, pb: 0.5 }}>
                                     {
                                         datasetVersion.metadata?.metadata
                                             ?.summary?.title
+                                    }
+                                </Typography>
+                                <Typography
+                                    variant="h2"
+                                    sx={{ pt: 0.5, pb: 0.5 }}>
+                                    {
+                                       "Publisher:Neuro-Oncology Imaging Archive"
                                     }
                                 </Typography>
                                 <Box
@@ -130,18 +135,18 @@ export default async function DatasetItemPage({
                                         overflow: "hidden",
                                         p: 0,
                                     }}>
-                                    <DatasetStats data={datasetStats} />
+                                    
                                 </Box>
                             </Box>
                         )}
                         <BoxContainer
                             sx={{
                                 gridTemplateColumns: {
-                                    tablet: "2fr 1fr",
+                                    tablet: "1fr",
                                 },
                                 gap: {
                                     mobile: 1,
-                                    tablet: 2,
+                                    tablet: 1,
                                 },
                                 p: 0,
                             }}>
@@ -153,6 +158,7 @@ export default async function DatasetItemPage({
                                     gap: 2,
                                     overflow: "hidden",
                                 }}>
+                                <DatasetStats data={datasetStats} />
                                 <DatasetMindMap
                                     data={datasetVersion}
                                     teamId={data?.team_id}
@@ -182,23 +188,8 @@ export default async function DatasetItemPage({
                                     data={datasetVersion}
                                     populatedSections={populatedSections}
                                 />
-                            </Box>
-                            <Box
-                                sx={{
-                                    p: 0,
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: 2,
-                                }}>
-                                <Sources
-                                    data={datasetVersion.metadata.metadata}
-                                />
-                                {data?.linkages && (
-                                    <Linkages linkages={data.linkages} />
-                                )}
-
-                                <Publications data={data} />
-                            </Box>
+                             </Box>
+                            
                             <Box />
                         </BoxContainer>
 
@@ -212,6 +203,7 @@ export default async function DatasetItemPage({
                     </Box>
                 </>
             }
+            panel={ <FilterTags  data={data} />}
         />
     );
 }

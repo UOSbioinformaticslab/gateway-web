@@ -50,6 +50,15 @@ const datasetFields: DatasetSection[] = [
         ],
     },
     {
+        sectionName: "Structural Metadata",
+        fields: [
+            {
+                path: "metadata.metadata.structuralMetadata.tables",
+                type: FieldType.TAG_LIST,
+            },
+        ],
+    },
+        {
         sectionName: "Documentation",
         fields: [
             {
@@ -90,15 +99,6 @@ const datasetFields: DatasetSection[] = [
                 label: "Synthetic data web link",
                 tooltip:
                     "Website with information on your synthetic dataset creation, or the location where a synthetic version of the dataset can be accessed.",
-            },
-        ],
-    },
-    {
-        sectionName: "Structural Metadata",
-        fields: [
-            {
-                path: "metadata.metadata.structuralMetadata.tables",
-                type: FieldType.TAG_LIST,
             },
         ],
     },
@@ -198,6 +198,25 @@ const datasetFields: DatasetSection[] = [
             },
         ],
     },
+        {
+        sectionName: "Entity Relationship Diagrams",
+        fields: [
+            {
+                label: "Investigations",
+                path: "metadata.metadata.enrichmentAndLinkage.investigations",
+                type: FieldType.LIST,
+                tooltip:
+                    "Website address(es) which document information related to active projects utilising the Dataset and or BioSample(s).",
+            },
+            {
+                label: "Tools",
+                path: "metadata.metadata.enrichmentAndLinkage.tools",
+                type: FieldType.LIST,
+                tooltip:
+                    "URL(s) of any analysis tool(s) or models that have been created for this Dataset & BioSample and are available for further use.",
+            },
+        ],
+    },
     {
         sectionName: "Provenance",
         fields: [
@@ -243,6 +262,7 @@ const datasetFields: DatasetSection[] = [
             },
         ],
     },
+    
     {
         sectionName: "Observations",
         fields: [
@@ -260,26 +280,7 @@ const datasetFields: DatasetSection[] = [
                 type: FieldType.TAG,
             },
         ],
-    },
-    {
-        sectionName: "Enrichment and Linkage",
-        fields: [
-            {
-                label: "Investigations",
-                path: "metadata.metadata.enrichmentAndLinkage.investigations",
-                type: FieldType.LIST,
-                tooltip:
-                    "Website address(es) which document information related to active projects utilising the Dataset and or BioSample(s).",
-            },
-            {
-                label: "Tools",
-                path: "metadata.metadata.enrichmentAndLinkage.tools",
-                type: FieldType.LIST,
-                tooltip:
-                    "URL(s) of any analysis tool(s) or models that have been created for this Dataset & BioSample and are available for further use.",
-            },
-        ],
-    },
+    }
 ];
 
 export interface Observation {
