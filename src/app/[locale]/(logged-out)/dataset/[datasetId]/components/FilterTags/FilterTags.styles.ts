@@ -19,3 +19,9 @@ export const OverviewText = styled(Typography)(({ theme }) => ({
 export const ActiveLinkWrapper = styled(Box)(({ theme }) => ({
     padding: `0 ${theme.spacing(3)}`,
 }));
+export const KeywordWrapper = styled(Box)(() => ({
+    top: 3,
+    padding: 3,
+    zIndex: theme.zIndex.appBar,
+    backgroundColor: theme.palette.common.white,
+}));

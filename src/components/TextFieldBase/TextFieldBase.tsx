@@ -67,6 +67,9 @@ const TextFieldBase = <
         resetAction = null,
         ...inputProps
     } = props;
+    const { canCreate, ...safeInputProps } = inputProps as {
+        canCreate?: boolean;
+    };
     const Icon = icon;
     const {
         field: { ref, ...fieldProps },
@@ -143,7 +146,7 @@ const TextFieldBase = <
                 error={!!error}
                 {...fieldProps}
                 value={fieldProps.value ?? ""}
-                {...inputProps}
+                {...safeInputProps}
             />
         </FormInputWrapper>
     );
