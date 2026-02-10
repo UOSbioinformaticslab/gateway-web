@@ -25,7 +25,7 @@ export interface DatasetSection {
 
 const datasetFields: DatasetSection[] = [
     {
-        sectionName: "Keywords",
+        sectionName: "Project",
         fields: [
             {
                 path: "metadata.metadata.summary.keywords",

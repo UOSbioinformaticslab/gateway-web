@@ -212,25 +212,7 @@ const DatasetContent = ({
                                         alignItems: "center",
                                         p: 0,
                                     }}>
-                                    <Button
-                                        onClick={() =>
-                                            showModal({
-                                                title: "Demographics",
-                                                content: (
-                                                    <DemographicsAccordion
-                                                        data={get(
-                                                            data,
-                                                            section.fields[0]
-                                                                .path
-                                                        )}
-                                                    />
-                                                ),
-                                                showConfirm: false,
-                                                showCancel: false,
-                                            })
-                                        }>
-                                        Open table
-                                    </Button>
+                                
                                 </Box>
                             ) : section.sectionName ===
                               "Structural Metadata" ? (
