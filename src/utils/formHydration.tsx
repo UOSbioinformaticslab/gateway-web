@@ -59,15 +59,16 @@ const formSectionHasAllEmptyFields = (
 };
 
 const formGetFieldsCompletedCount = (
-    schemaFields: FormHydration[],
+    schemaFields: FormHydration[] | undefined,
     getValues: UseFormGetValues<FieldValues>,
     optionalFieldsOnly: boolean
 ) => {
+    const fields = schemaFields ?? [];
     let fieldCount = 0;
     let fieldsWithValue = 0;
 
     // Filter out hidden fields and any array fields
-    const allFields = schemaFields
+    const allFields = fields
         .filter(
             schemaField =>
                 !schemaField.field?.hidden &&
@@ -90,7 +91,7 @@ const formGetFieldsCompletedCount = (
         fieldsWithValue = nonEmptyCount;
     }
 
-    const arrayFields = schemaFields.filter(
+    const arrayFields = fields.filter(
         schemaField => schemaField?.is_array_form
     );
 
@@ -119,7 +120,7 @@ const formGetFieldsCompletedCount = (
         }
     });
 
-    return Math.round((fieldsWithValue / fieldCount) * 100);
+    return fieldCount === 0 ? 0 : Math.round((fieldsWithValue / fieldCount) * 100);
 };
 
 const formSectionHasEmptyOptionalFields = (
@@ -187,12 +188,16 @@ const formValidateSection = async (
 ) => {
     const allSectionFields = formGetAllSectionFields(schemaFields, section);
     const isArrayForm = allSectionFields[0]?.is_array_form;
-    const fields = isArrayForm
-        ? allSectionFields[0].title
+    const rawFields = isArrayForm
+        ? [allSectionFields[0]?.title]
         : allSectionFields
               .filter(schemaField => !schemaField?.field?.hidden)
               .map(field => field.title);
+    const fields = rawFields.filter(
+        (name): name is string => name != null && typeof name === "string"
+    );
 
+    if (fields.length === 0) return true;
     return await trigger(fields, { shouldFocus: false });
 };
 
@@ -200,10 +205,11 @@ const formIsSectionActive = (section: string, activeSectionName: string) =>
     section === activeSectionName;
 
 const hasVisibleFieldsForLocation = (
-    schemaFields: FormHydration[],
+    schemaFields: FormHydration[] | undefined,
     location: string
 ): boolean => {
-    const fieldsForLocation = schemaFields
+    const fields = schemaFields ?? [];
+    const fieldsForLocation = fields
         .filter(field => field.location)
         .filter(field => field.location?.startsWith(location))
         .some(field => !field?.field?.hidden);
@@ -259,9 +265,10 @@ const isFirstSection = (currentSectionIndex: number) =>
 const isLastSection = (formSections: string[], currentSectionIndex: number) =>
     formSections.length - 1 <= currentSectionIndex;
 
-const getFirstLocationValues = (schemaFields: FormHydration[]) => {
+const getFirstLocationValues = (schemaFields: FormHydration[] | undefined) => {
+    const fields = schemaFields ?? [];
     const locationSet = new Set<string>(
-        schemaFields
+        fields
             .filter(field => field.location)
             .map(({ location }) => location.split(".")[0])
     );
@@ -277,11 +284,47 @@ const renderFormHydrationField = (
     fileUploadFields?: FileUploadFields
 ) => {
     const componentType = inputComponents[component as ComponentTypes];
-    const { options } = rest;
+    const {
+        options,
+        selectOnFocus: _selectOnFocus,
+        clearOnBlur: _clearOnBlur,
+        handleHomeEndKeys: _handleHomeEndKeys,
+        ...safeRest
+    } = rest;
 
     if (!componentType) {
         return null;
     }
+
+    const autocompleteOnlyProps =
+        component === "Autocomplete"
+            ? {
+                  selectOnFocus: true,
+                  clearOnBlur: true,
+                  handleHomeEndKeys: true,
+                  multiple: true,
+                  isOptionEqualToValue: (
+                      option: {
+                          value: string | number;
+                          label: string;
+                      },
+                      value: string | number
+                  ) => option.value === value,
+                  getChipLabel: (
+                      options: {
+                          value: string | number;
+                          label: string;
+                      }[],
+                      selectedOption: {
+                          value: string | number;
+                          label: string;
+                      }
+                  ) =>
+                      options.find(option => option === selectedOption)?.label ||
+                      selectedOption?.value ||
+                      selectedOption,
+              }
+            : {};
 
     return (
         <InputWrapper
@@ -293,33 +336,9 @@ const renderFormHydrationField = (
             control={control}
             showClearButton={false}
             canCreate={component === "Autocomplete" && !options?.length}
-            selectOnFocus={component === "Autocomplete"}
-            clearOnBlur={component === "Autocomplete"}
-            handleHomeEndKeys={component === "Autocomplete"}
-            multiple={component === "Autocomplete"}
-            isOptionEqualToValue={(
-                option: {
-                    value: string | number;
-                    label: string;
-                },
-                value: string | number
-            ) => option.value === value}
-            getChipLabel={(
-                options: {
-                    value: string | number;
-                    label: string;
-                }[],
-                selectedOption: {
-                    value: string | number;
-                    label: string;
-                }
-            ) =>
-                options.find(option => option === selectedOption)?.label ||
-                selectedOption?.value ||
-                selectedOption
-            }
+            {...autocompleteOnlyProps}
             onFocus={() => setActiveField && setActiveField(name)}
-            {...rest}
+            {...safeRest}
             label={name || ""}
             {...fileUploadFields}
         />

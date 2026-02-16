@@ -89,6 +89,8 @@ const Select = <
     invertListItem = false,
     id,
     ariaLabel,
+    canCreate: _canCreate,
+    showClearButton: _showClearButton,
     ...rest
 }: SelectProps<TFieldValues, TName>) => {
     const {

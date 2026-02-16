@@ -2,6 +2,7 @@ import { get } from "lodash";
 import BoxContainer from "@/components/BoxContainer";
 import ProtectedAccountRoute from "@/components/ProtectedAccountRoute";
 import { DataStatus } from "@/consts/application";
+import { Defs } from "@/interfaces/V4Schema";
 import {
     getFormHydration,
     getSchemaFromTraser,
@@ -81,7 +82,15 @@ export default async function TeamDatasetPage({
     const dataCustodianId = isNotTeamId
         ? await getTeamIdFromPid(dataCustodianIdentifier || "")
         : dataCustodianIdentifier;
-    const { schema } = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
+    let schemadefs: Defs = {} as Defs;
+    try {
+        const result = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
+        if (result?.schema?.$defs) {
+            schemadefs = result.schema.$defs;
+        }
+    } catch {
+        // Schema service may be unavailable or return an error (e.g. unknown name/version)
+    }
 
     const formJSON = await getFormHydration(
         SCHEMA_NAME,
@@ -106,7 +115,7 @@ export default async function TeamDatasetPage({
                     teamId={Number(teamId)}
                     user={user}
                     defaultTeamId={Number(dataCustodianId)}
-                    schemadefs={schema.$defs}
+                    schemadefs={schemadefs}
                 />
             </BoxContainer>
         </ProtectedAccountRoute>

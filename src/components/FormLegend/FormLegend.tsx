@@ -62,7 +62,72 @@ const FormLegend = ({
 
                 return (
                     <Fragment key={item.name}>
-                     
+                        <ListItemButton
+                            sx={{
+                                marginLeft: removeMarginLeft
+                                    ? 0
+                                    : `${level * 16}px`,
+                            }}
+                            key={`${item.name}`}
+                            onClick={() =>
+                                handleClickItem &&
+                                (item.id
+                                    ? handleClickItem(item.id)
+                                    : handleClickItem(index))
+                            }>
+                            {Icon ? (
+                                <Icon
+                                    sx={{
+                                        mr: 1.25,
+                                        width: "18px",
+                                        height: "18px",
+                                        color:
+                                            item.status === LegendStatus.ACTIVE
+                                                ? colors.purple500
+                                                : colors.grey700,
+                                    }}
+                                />
+                            ) : (
+                                <LegendIcon
+                                    iconColour={getBackgroundColour(
+                                        item.status
+                                    )}>
+                                    {getIcon(item.status)}
+                                </LegendIcon>
+                            )}
+
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    p: 0,
+                                    width: "100%",
+                                    gap: 3,
+                                }}>
+                                <Typography
+                                    sx={{
+                                        fontWeight:
+                                            item.status === LegendStatus.ACTIVE
+                                                ? 600
+                                                : "normal",
+                                    }}>
+                                    {capitalise(splitCamelcase(item.name))}
+                                </Typography>
+
+                                {item.count !== undefined && (
+                                    <Typography
+                                        sx={{
+                                            fontWeight:
+                                                item.status ===
+                                                LegendStatus.ACTIVE
+                                                    ? 600
+                                                    : "normal",
+                                        }}>
+                                        ({item.count})
+                                    </Typography>
+                                )}
+                            </Box>
+                        </ListItemButton>
                         {item.subItems && (
                             <FormLegend
                                 items={item.subItems}

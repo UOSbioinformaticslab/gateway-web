@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import {
+    Fragment,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import {
     useForm,
     FormProvider,
@@ -97,8 +102,8 @@ interface CreateDatasetProps {
 
 type FormValues = Record<string, unknown>;
 
-const SCHEMA_NAME = "HDRUK";
-const SCHEMA_VERSION = "4.0.0";
+const SCHEMA_NAME = "CRUK";
+const SCHEMA_VERSION = "1.0.0";
 
 const getMetadata = (isDraft: boolean) =>
     isDraft
@@ -114,9 +119,7 @@ const CreateDataset = ({
     defaultTeamId,
     schemadefs,
 }: CreateDatasetProps) => {
-    const [formJSONDynamic, setFormJSONDynamic] = useState<
-        FormHydrationSchema | undefined
-    >();
+    const [formJSONDynamic, setFormJSONDynamic] = useState<FormHydrationSchema | undefined>();
 
     const [currentTeamId, setCurrentTeamId] = useState<number>(defaultTeamId);
 
@@ -142,8 +145,9 @@ const CreateDataset = ({
         return {
             ...base,
             validation:
-                base.validation?.filter(obj => obj.title !== "revision url") ||
-                [],
+                base.validation?.filter(
+                    obj => obj != null && obj.title !== "revision url"
+                ) || [],
         };
     }, [formJSON, formJSONDynamic]);
 
@@ -494,8 +498,8 @@ const CreateDataset = ({
                 hasVisibleFieldsForLocation(schemaFields, location)
             )
         )
-        .concat([SUBMISSON_FORM_SECTION]);
-
+     //   .concat([SUBMISSON_FORM_SECTION]);
+    console.log("formSections", formSections);
     const currentSectionIndex = selectedFormSection
         ? formSections.indexOf(selectedFormSection)
         : 0;
@@ -504,6 +508,7 @@ const CreateDataset = ({
     const [submissionRequested, setSubmissionRequested] = useState<boolean>(
         !!isEditing
     );
+   
 
     // When form loaded - select first form section with displayed fields
     useEffect(() => {
@@ -929,42 +934,55 @@ const CreateDataset = ({
                                                                     selectedFormSection
                                                                 )
                                                         )
-                                                        .map(fieldParent => {
-                                                            const {
-                                                                field,
-                                                                fields,
-                                                            } = fieldParent;
+                                                        .map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => {
+                                                                const {
+                                                                    field,
+                                                                    fields,
+                                                                } = fieldParent;
+                                                                const listKey = `${selectedFormSection}-${fieldParent.location ?? ""}-${fieldParent.title ?? field?.name ?? ""}-${index}`;
 
-                                                            return fields?.length ? (
-                                                                <FormFieldArray
-                                                                    schemadefs={
-                                                                        schemadefs
-                                                                    }
-                                                                    control={
-                                                                        control
-                                                                    }
-                                                                    formArrayValues={
-                                                                        getValues(
-                                                                            fieldParent.title
-                                                                        ) as unknown as FormValues[]
-                                                                    }
-                                                                    fieldParent={
-                                                                        fieldParent
-                                                                    }
-                                                                    setSelectedField={
-                                                                        updateGuidanceText
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                field &&
-                                                                    renderFormHydrationField(
-                                                                        field,
-                                                                        control,
-                                                                        undefined,
-                                                                        updateGuidanceText
-                                                                    )
-                                                            );
-                                                        })}
+                                                                return (
+                                                                    <Fragment
+                                                                        key={
+                                                                            listKey
+                                                                        }>
+                                                                        {fields?.length ? (
+                                                                            <FormFieldArray
+                                                                                schemadefs={
+                                                                                    schemadefs
+                                                                                }
+                                                                                control={
+                                                                                    control
+                                                                                }
+                                                                                formArrayValues={
+                                                                                    getValues(
+                                                                                        fieldParent.title
+                                                                                    ) as unknown as FormValues[]
+                                                                                }
+                                                                                fieldParent={
+                                                                                    fieldParent
+                                                                                }
+                                                                                setSelectedField={
+                                                                                    updateGuidanceText
+                                                                                }
+                                                                            />
+                                                                        ) : (
+                                                                            field &&
+                                                                            renderFormHydrationField(
+                                                                                field,
+                                                                                control,
+                                                                                undefined,
+                                                                                updateGuidanceText
+                                                                            )
+                                                                        )}
+                                                                    </Fragment>
+                                                                );
+                                                            }
+                                                        )}
                                             </Box>
                                         )}
                                     </Paper>

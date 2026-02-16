@@ -1,5 +1,6 @@
 import BoxContainer from "@/components/BoxContainer";
 import ProtectedAccountRoute from "@/components/ProtectedAccountRoute";
+import { Defs } from "@/interfaces/V4Schema";
 import {
     getFormHydration,
     getSchemaFromTraser,
@@ -33,7 +34,15 @@ export default async function CreateDatasetPage({
     const teamUser = getTeamUser(team?.users, user?.id);
     const permissions = getPermissions(user.roles, teamUser?.roles);
 
-    const { schema } = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
+    let schemadefs: Defs = {} as Defs;
+    try {
+        const result = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
+        if (result?.schema?.$defs) {
+            schemadefs = result.schema.$defs;
+        }
+    } catch {
+        // Schema service may be unavailable or return an error (e.g. unknown name/version)
+    }
 
     const formJSON = await getFormHydration(
         SCHEMA_NAME,
@@ -61,7 +70,7 @@ export default async function CreateDatasetPage({
                     teamId={Number(teamId)}
                     user={user}
                     defaultTeamId={teamId}
-                    schemadefs={schema.$defs}
+                    schemadefs={schemadefs}
                 />
             </BoxContainer>
         </ProtectedAccountRoute>
