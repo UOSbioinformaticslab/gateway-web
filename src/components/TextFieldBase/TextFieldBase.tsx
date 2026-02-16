@@ -67,6 +67,11 @@ const TextFieldBase = <
         resetAction = null,
         ...inputProps
     } = props;
+
+    if (name == null || name === "") {
+        return null;
+    }
+
     const { canCreate, ...safeInputProps } = inputProps as {
         canCreate?: boolean;
     };

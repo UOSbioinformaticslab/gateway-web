@@ -41,6 +41,7 @@ const FormInfoLabel = ({
 
             {!horizontalForm && info && (
                 <FormHelperText
+                    component="div"
                     id={`${name}-information`}
                     sx={{
                         fontSize: 13,

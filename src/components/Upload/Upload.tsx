@@ -16,6 +16,10 @@ export interface UploadProps extends InputProps {
     formControlSx?: SxProps;
     onFileChange?: (file: File) => void;
     onFocus?: () => void;
+    /** Passed by parent; not forwarded to DOM to avoid invalid attribute warning */
+    fileName?: string;
+    /** Passed by parent; not forwarded to DOM to avoid invalid attribute warning */
+    fileDownloadApiPath?: string;
 }
 
 const Upload = (props: UploadProps) => {
@@ -28,6 +32,8 @@ const Upload = (props: UploadProps) => {
         formControlSx,
         onFileChange,
         onFocus,
+        fileName,
+        fileDownloadApiPath,
         ...rest
     } = props;
 
