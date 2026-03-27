@@ -1,7 +1,7 @@
 const navItems = [
     {
         label: "About",
-        href: "/community/technology-ecosystem",
+        href: "/about",
     },
     {
         label: "CRUK Data Strategy",
@@ -9,7 +9,7 @@ const navItems = [
     },
     {
         label: "How we protect your data",
-        href: "/community/technology-ecosystem",
+        href: "/about/how-we-protect-your-data",
     },
     {
         label: "Data Custodian Area",
