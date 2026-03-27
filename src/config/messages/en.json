@@ -1014,6 +1014,44 @@
             },
             "newsEvents": {
                 "seeAllLink": "See all events"
+            },
+            "hero": {
+                "headline": "Accelerating Progress in Cancer Research",
+                "searchPlaceholder": "Search cancer research data & studies...",
+                "searchButton": "Search"
+            },
+            "finderPanel": {
+                "title": "What would you like to find today?",
+                "intro": "Welcome to the CRUK Data Hub, your gateway to data produced by research funded through Cancer Research UK",
+                "horizonsLink": "Explore Cancer Research Horizons Data Resources",
+                "browseSearchDatasets": "Browse or Search Datasets",
+                "browseSearchProjects": "Browse or Search Projects",
+                "browseSearchAssociatedTools": "Browse or Search Associated Tools",
+                "browseSearchAssociatedPublications": "Browse or Search Associated Publications"
+            },
+            "featuredResearch": {
+                "title": "Featured Research",
+                "viewAll": "View all studies",
+                "card1": {
+                    "title": "Genomics and Cancer Risk",
+                    "description": "Exploring genetic factors in cancer susceptibility"
+                },
+                "card2": {
+                    "title": "Immunotherapy Trials",
+                    "description": "New advances in cancer immunotherapy"
+                },
+                "card3": {
+                    "title": "AI in Cancer Detection",
+                    "description": "Harnessing AI for early cancer diagnosis"
+                }
+            },
+            "researchPartners": {
+                "title": "Our Research Partners"
+            },
+            "cta": {
+                "discoverData": "Discover Data",
+                "findStudies": "Find Studies",
+                "collaborate": "Collaborate for a Cure"
             }
         },
         "saved_searches": {
@@ -1618,7 +1656,9 @@
             "labels": {
                 "myAccount": "My Account",
                 "signIn": "Sign in",
-                "help": "Help"
+                "help": "Help",
+                "forResearchers": "For Researchers",
+                "joinUs": "Join Us"
             }
         },
         "Loading": {
