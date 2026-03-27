@@ -78,22 +78,37 @@ function Header() {
                             gap: 2.5,
                             flexShrink: 0,
                         }}>
-                        <Image
-                            src="/images/logos/logo.svg"
-                            priority
-                            width={110}
-                            height={50}
-                            alt="HDR UK Gateway"
-                        />
-                        <Typography
-                            variant="h1"
+                        <Link
+                            href="/"
                             sx={{
-                                color: colors.grey800,
-                                fontSize: { mobile: 18, tablet: 20 },
-                                fontWeight: 600,
+                                display: "inline-flex",
+                                lineHeight: 0,
                             }}>
-                            CRUK Data Hub
-                        </Typography>
+                            <Image
+                                src="/images/logos/logo.svg"
+                                priority
+                                width={110}
+                                height={50}
+                                alt="HDR UK Gateway"
+                            />
+                        </Link>
+                        <Link
+                            href="/"
+                            sx={{
+                                textDecoration: "none",
+                                color: colors.grey800,
+                                "&:hover": { textDecoration: "underline" },
+                            }}>
+                            <Typography
+                                variant="h1"
+                                sx={{
+                                    color: "inherit",
+                                    fontSize: { mobile: 18, tablet: 20 },
+                                    fontWeight: 600,
+                                }}>
+                                CRUK Data Hub
+                            </Typography>
+                        </Link>
                     </Box>
 
                     {/* Nav links (center) - desktop: text links */}
