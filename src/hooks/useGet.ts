@@ -55,7 +55,9 @@ const useGet = <T>(url: string | null, options?: Options<T>): Response<T> => {
 
             return data as T;
         } catch (error) {
-            console.error("Error fetching data:", error);
+            if (errorNotificationsOn) {
+                console.error("Error fetching data:", error);
+            }
             throw error;
         }
     };
