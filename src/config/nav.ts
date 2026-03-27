@@ -5,7 +5,7 @@ const navItems = [
     },
     {
         label: "CRUK Data Strategy",
-        href: "/community/technology-ecosystem",
+        href: "https://www.cancerresearchuk.org/for-researchers/our-research-strategy/research-data",
     },
     {
         label: "How we protect your data",
