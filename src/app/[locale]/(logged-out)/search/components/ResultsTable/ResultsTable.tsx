@@ -296,7 +296,7 @@ const ResultTable = ({
                 borderRadius: 2,
                 mb: 4,
             }}>
-            <TableContainer>
+            <TableContainer sx={{ width: "100%" }}>
                 <Table<SearchResultDataset>
                     variant="searchResults"
                     pinHeader={true}

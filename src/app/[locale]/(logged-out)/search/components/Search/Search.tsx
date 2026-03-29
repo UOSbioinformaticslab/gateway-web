@@ -837,25 +837,6 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                 }}>
                 <Box
                     sx={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                    }}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            flexDirection: "column",
-                            maxWidth: "70%",
-                            
-                            marginX: 1,
-                            flexGrow: 1,
-                        }}
-                    />
-                </Box>
-
-                <Box
-                    sx={{
                         display: "flex",
                         width: "100%",
                         position: "relative",
