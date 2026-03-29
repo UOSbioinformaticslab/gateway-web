@@ -82,10 +82,25 @@ const isHeaderBandOnlyColumn = (column: Column<unknown>) =>
     (column.columnDef.meta as { headerBandOnly?: boolean } | undefined)
         ?.headerBandOnly === true;
 
+type CellWidthOpts = { isSearchResults?: boolean; totalSize?: number };
+
+const cellWidth = (
+    column: Column<unknown>,
+    opts?: CellWidthOpts
+): number | string => {
+    const raw = column.getSize();
+    const total = opts?.totalSize ?? 0;
+    if (opts?.isSearchResults && total > 0) {
+        return `${(raw / total) * 100}%`;
+    }
+    return raw;
+};
+
 const getCommonCellStyles = <T,>(
     column: Column<T>,
     isHeaderPinned?: boolean,
-    isHeader?: boolean
+    isHeader?: boolean,
+    widthOpts?: CellWidthOpts
 ): CSSProperties => {
     const {
         columnDef: { meta = {} },
@@ -97,13 +112,14 @@ const getCommonCellStyles = <T,>(
     };
 
     const shouldPin = isPinned || isHeaderPinned;
+    const w = cellWidth(column as Column<unknown>, widthOpts);
 
     if (isHeader && isHeaderPinned) {
         return {
             position: "sticky",
             top: 0,
             left: shouldPin ? `${column.getStart()}px` : undefined,
-            width: column.getSize(),
+            width: w,
             zIndex: shouldPin ? Z_HEADER_PINNED : Z_HEADER,
         };
     }
@@ -114,7 +130,7 @@ const getCommonCellStyles = <T,>(
         left: shouldPin ? `${column.getStart()}px` : undefined,
         top: shouldPin ? 0 : undefined,
         position: shouldPin ? "sticky" : "relative",
-        width: column.getSize(),
+        width: w,
         zIndex: shouldPin ? Z_PINNED_BODY : Z_BODY,
     };
 };
@@ -196,6 +212,10 @@ function Table<T extends unknown>(props: TableProps<T>) {
 
     const headerGroup = table.getHeaderGroups()[0];
     const columnCount = headerGroup?.headers.length ?? 1;
+    const totalColumnSize = Math.max(table.getTotalSize(), 1);
+    const searchWidthOpts: CellWidthOpts | undefined = isSearchResults
+        ? { isSearchResults: true, totalSize: totalColumnSize }
+        : undefined;
 
     const hasFooterContent = !!table
         .getFooterGroups()
@@ -214,7 +234,12 @@ function Table<T extends unknown>(props: TableProps<T>) {
                             css={styles.td}
                             key={cell.id}
                             style={{
-                                ...getCommonCellStyles(cell.column),
+                                ...getCommonCellStyles(
+                                    cell.column,
+                                    undefined,
+                                    undefined,
+                                    searchWidthOpts
+                                ),
                             }}>
                             {flexRender(
                                 cell.column.columnDef.cell,
@@ -341,7 +366,12 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                     css={styles.tdDataBand}
                                     key={cell.id}
                                     style={{
-                                        ...getCommonCellStyles(cell.column),
+                                        ...getCommonCellStyles(
+                                            cell.column,
+                                            undefined,
+                                            undefined,
+                                            searchWidthOpts
+                                        ),
                                     }}
                                 />
                             );
@@ -351,7 +381,12 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                 css={styles.tdDataBand}
                                 key={cell.id}
                                 style={{
-                                    ...getCommonCellStyles(cell.column),
+                                    ...getCommonCellStyles(
+                                        cell.column,
+                                        undefined,
+                                        undefined,
+                                        searchWidthOpts
+                                    ),
                                 }}>
                                 {flexRender(
                                     cell.column.columnDef.cell,
@@ -390,11 +425,14 @@ function Table<T extends unknown>(props: TableProps<T>) {
     return (
         <div
             style={{
+                width: "100%",
                 overflowX: "auto",
                 overflowY: "auto",
                 maxHeight: "600px",
             }}>
-            <table css={style ?? styles.table}>
+            <table
+                css={style ?? styles.table}
+                style={isSearchResults ? { width: "100%", minWidth: "100%" } : undefined}>
                 {!hideHeader && (
                     <thead>
                         {table.getHeaderGroups().map(headerGroup => (
@@ -418,7 +456,9 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                             borderRight: `1px solid ${colors.blue400}`,
                                             fontSize: "18px",
                                             padding: 3,
-                                            width: header.getSize(),
+                                            width: isSearchResults
+                                                ? `${(header.column.getSize() / totalColumnSize) * 100}%`
+                                                : header.getSize(),
                                             zIndex: isPinnedMetaColumn(header.column)
                                                 ? Z_HEADER_PINNED
                                                 : Z_HEADER,
