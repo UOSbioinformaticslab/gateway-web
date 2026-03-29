@@ -35,8 +35,9 @@ const postFetch = async <T>(
                 ? {
                       "Content-Type": "application/json",
                       [sessionHeader]: sessionPrefix + session,
+                      "x-partner-context": "CRUK",
                   }
-                : {},
+                : { "x-partner-context": "CRUK" },
         });
 
         if (response.ok) {
@@ -91,8 +92,25 @@ const postFetch = async <T>(
             }
         }
     } catch (error) {
-        if (process.env.NODE_ENV === "development") {
-            console.error(error);
+        const sessionForLog = Cookies.get(sessionCookie) ?? "unknown";
+        const isNetworkFailure =
+            error instanceof TypeError &&
+            typeof (error as Error).message === "string" &&
+            ((error as Error).message === "Failed to fetch" ||
+                (error as Error).message.includes("Failed to fetch") ||
+                (error as Error).message.includes("NetworkError") ||
+                (error as Error).message.includes("Load failed"));
+
+        if (isNetworkFailure) {
+            if (process.env.NEXT_PUBLIC_LOG_LEVEL === "debug") {
+                logger.warn(
+                    { message: "Network request failed", url },
+                    sessionForLog,
+                    "post"
+                );
+            }
+        } else if (process.env.NODE_ENV === "development") {
+            logger.error(error, sessionForLog, "post");
         }
 
         if (errorNotificationsOn) {

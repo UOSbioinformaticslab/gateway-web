@@ -1,4 +1,4 @@
-import { TableContainer, Tooltip } from "@mui/material";
+import { Box, Stack, TableContainer, Tooltip, Typography } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import { get } from "lodash";
 import { useTranslations } from "next-intl";
@@ -19,10 +19,75 @@ import ActionDropdown from "../ActionDropdown";
 import { getDateRange, getPopulationSize } from "@/utils/search";
 import { formatTextDelimiter } from "@/utils/dataset";
 
+const ICON_OPTS = [
+    { url: "/images/icons/animal.webp", label: "Model Organism Study" },
+    { url: "/images/icons/background.webp", label: "Background Information" },
+    { url: "/images/icons/biobank.webp", label: "Samples Available" },
+    { url: "/images/icons/invitro.webp", label: "In Vitro Study" },
+    { url: "/images/icons/lab_results.webp", label: "Lab Results" },
+    { url: "/images/icons/longitudinal.webp", label: "Longitudinal Study" },
+    { url: "/images/icons/medical_imaging.webp", label: "Medical Imaging" },
+    { url: "/images/icons/omics.webp", label: "Omics" },
+    { url: "/images/icons/population.webp", label: "Patient Study" },
+    { url: "/images/icons/treatments.webp", label: "Treatments" },
+];
+
+function pickTitleBandIcons(row: SearchResultDataset) {
+    const id = Number(row._id) || 0;
+    const first = ICON_OPTS[id % ICON_OPTS.length];
+    const second = ICON_OPTS[(id + 4) % ICON_OPTS.length];
+    if (first.url === second.url) {
+        return [first];
+    }
+    return [first, second];
+}
+
+function TitleBandStudyIcons({ row }: { row: SearchResultDataset }) {
+    const icons = pickTitleBandIcons(row);
+    return (
+        <Stack direction="row" spacing={0.75} alignItems="center" useFlexGap>
+            {icons.map(opt => (
+                <Tooltip
+                    key={`${row._id}-${opt.url}`}
+                    title={opt.label}
+                    arrow
+                    placement="top"
+                    enterDelay={200}>
+                    <Box
+                        component="span"
+                        sx={{
+                            display: "inline-flex",
+                            lineHeight: 0,
+                            cursor: "default",
+                            verticalAlign: "middle",
+                        }}>
+                        <Box
+                            component="img"
+                            src={opt.url}
+                            alt={opt.label}
+                            sx={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 0,
+                                objectFit: "cover",
+                                border: "2px solid rgba(209, 10, 111, 0.35)",
+                                bgcolor: "#e8f4fc",
+                                display: "block",
+                            }}
+                        />
+                    </Box>
+                </Tooltip>
+            ))}
+        </Stack>
+    );
+}
+
 interface ResultTableProps {
     results: SearchResultDataset[];
     showLibraryModal: (props: { datasetId: number }) => void;
     cohortDiscovery: PageTemplatePromo;
+    /** When false, synopsis rows under each result are hidden. */
+    showSynopsis?: boolean;
 }
 const CONFORMS_TO_PATH = "metadata.accessibility.formatAndStandards.conformsTo";
 const PUBLISHER_NAME_PATH = "metadata.summary.publisher.name";
@@ -188,6 +253,7 @@ const ResultTable = ({
     results,
     showLibraryModal,
     cohortDiscovery,
+    showSynopsis = true,
 }: ResultTableProps) => {
     const t = useTranslations(RESULTS_TABLE_TRANSLATION_PATH);
     const { isLoggedIn, user } = useAuth();
@@ -232,8 +298,58 @@ const ResultTable = ({
             }}>
             <TableContainer>
                 <Table<SearchResultDataset>
+                    variant="searchResults"
                     pinHeader={true}
                     style={{ background: "background.paper", borderRadius: 2 }}
+                    showSynopsis={showSynopsis}
+                    renderSynopsis={row => {
+                        const highlight = row.highlight;
+                        const raw =
+                            highlight?.abstract?.[0] ??
+                            highlight?.description?.[0] ??
+                            get(row, "metadata.summary.abstract");
+                        if (
+                            raw == null ||
+                            String(raw).replace(/<[^>]*>/g, "").trim() === ""
+                        ) {
+                            return null;
+                        }
+                        return (
+                            <Typography
+                                variant="body1"
+                                component="div"
+                                sx={{
+                                    fontSize: "1.0625rem",
+                                    color: "text.secondary",
+                                    fontStyle: "italic",
+                                    lineHeight: 1.5,
+                                    "& strong": {
+                                        fontWeight: 700,
+                                        fontStyle: "italic",
+                                    },
+                                }}>
+                                <strong>Synopsis: </strong>
+                                <span
+                                    dangerouslySetInnerHTML={{
+                                        __html: String(raw),
+                                    }}
+                                />
+                            </Typography>
+                        );
+                    }}
+                    renderActionCell={row => (
+                        <ActionDropdown
+                            result={row}
+                            libraryData={libraryData ?? []}
+                            showLibraryModal={showLibraryModal}
+                            mutateLibraries={mutateLibraries}
+                            isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
+                            cohortDiscovery={cohortDiscovery}
+                        />
+                    )}
+                    renderTitleBandExtras={row => (
+                        <TitleBandStudyIcons row={row} />
+                    )}
                     columns={getColumns({
                         translations,
                         libraryData,

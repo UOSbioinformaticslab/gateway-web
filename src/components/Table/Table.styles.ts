@@ -33,9 +33,23 @@ export const th = css({
 });
 
 export const td = css({
-    padding: "5px 10px",
+    padding: "8px 12px",
+    fontSize: "1rem",
     borderBottom: `1px solid ${colors.grey300}`,
     borderRight: `1px solid ${colors.grey300}`,
+    ":last-child": {
+        borderRight: 0,
+    },
+});
+
+/** Data row cells — white band with comfortable padding (search results table). */
+export const tdDataBand = css({
+    padding: "14px 16px",
+    verticalAlign: "middle",
+    borderBottom: `1px solid ${colors.grey300}`,
+    borderRight: `1px solid ${colors.grey300}`,
+    color: colors.grey900,
+    fontSize: "1.0625rem",
     ":last-child": {
         borderRight: 0,
     },

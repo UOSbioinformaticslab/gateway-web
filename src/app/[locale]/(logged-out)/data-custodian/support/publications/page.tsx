@@ -1,23 +1,17 @@
-import { notFound } from "next/navigation";
-import { getContentPageByParentQuery } from "@/utils/cms";
 import metaData from "@/utils/metadata";
 import SupportPage from "../components/SupportPage";
+import UploadingPublicationsContent from "./UploadingPublicationsContent";
 
 export const metadata = metaData({
-    title: "Publications - Data Custodians",
-    description: "",
+    title: "Uploading Publications - Data Custodians",
+    description:
+        "Guidance for data custodians on uploading and managing publications in the CRUK Data Hub.",
 });
 
-export default async function PublicationsPage() {
-    const cmsPage = await getContentPageByParentQuery("GetContentPageQuery", {
-        id: "uploading-publications",
-        idType: "URI",
-        parentId: "/support",
-    });
-
-    if (!cmsPage) {
-        notFound();
-    }
-
-    return <SupportPage title={cmsPage?.title} content={cmsPage?.content} />;
+export default function PublicationsPage() {
+    return (
+        <SupportPage title="Uploading Publications">
+            <UploadingPublicationsContent />
+        </SupportPage>
+    );
 }

@@ -208,6 +208,20 @@
                 "title": "FAQs"
             }
         },
+        "help": {
+            "title": "Help",
+            "supportCentreHeading": "Support Centre",
+            "exploringDatahubTitle": "Exploring Datahub Page",
+            "exploringDatahubDescription": "Browse and access curated data resources for your research.",
+            "uploadingMetadataTitle": "Uploading Metadata",
+            "uploadingMetadataDescription": "Upload and manage your metadata quickly and correctly with the guidance provided in this section.",
+            "researcherFaqsTitle": "Researcher FAQs",
+            "researcherFaqsDescription": "Find answers to common questions about using the data hub.",
+            "dataUsesTitle": "Exploring Data Uses or Research Projects",
+            "darTitle": "Submitting Data Access Requests",
+            "publicationsTitle": "Uploading Publications",
+            "comingSoon": "Coming Soon..."
+        },
         "releases": {
             "noResults": "There are no releases for {year}",
             "heading": "Welcome to our Gateway release summary page!",
@@ -1100,7 +1114,7 @@
             "dataCustodianNetworksTooltip": "Discover networks of Data Custodians to learn about the resources available across a network e.g. the NHS England SDE Network or the Research Data Scotland Network.",
             "collectionsHeader": "Collections",
             "searchHeader": "Search the Gateway",
-            "searchExplainerDatasets": "Search, for example, by Dataset, SNOMED code, LOINC term, Read code, ICD10 code, MESH term, keywords",
+            "searchExplainerDatasets": "",
             "searchExplainerDataUse": "Search, for example, by project title, lay or technical summary, funders and sponsors, keywords",
             "searchExplainerPublications": "Search, for example, by Publication title, Publication DOI, journal name, authors, Dataset title, Dataset DOI, keywords",
             "searchExplainerCollections": "Search, for example, by Collection name, keywords",

@@ -1,4 +1,4 @@
-import { ListItem, ListItemText } from "@mui/material";
+import { Collapse, ListItem, ListItemText } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { SearchResultTool } from "@/interfaces/Search";
 import Box from "@/components/Box";
@@ -14,11 +14,16 @@ import { ToolDescription } from "./ResultCardTool.styles";
 
 interface ResultCardToolProps {
     result: SearchResultTool;
+    /** When false, the description synopsis is hidden. */
+    showSynopsis?: boolean;
 }
 
 const TRANSLATION_PATH = "pages.search.components.ResultCardTool";
 
-const ResultCardTool = ({ result }: ResultCardToolProps) => {
+const ResultCardTool = ({
+    result,
+    showSynopsis = true,
+}: ResultCardToolProps) => {
     const t = useTranslations(TRANSLATION_PATH);
     const { _id: toolId } = result;
 
@@ -76,18 +81,20 @@ const ResultCardTool = ({ result }: ResultCardToolProps) => {
                     </Box>
                 }
                 secondary={
-                    <ToolDescription
-                        maxLine={2}
-                        text={
-                            description ? (
-                                <MarkDownSanitizedWithHtml
-                                    content={description}
-                                />
-                            ) : (
-                                t("notAvailable")
-                            )
-                        }
-                    />
+                    <Collapse in={showSynopsis} timeout="auto" unmountOnExit>
+                        <ToolDescription
+                            maxLine={2}
+                            text={
+                                description ? (
+                                    <MarkDownSanitizedWithHtml
+                                        content={description}
+                                    />
+                                ) : (
+                                    t("notAvailable")
+                                )
+                            }
+                        />
+                    </Collapse>
                 }
             />
         </ListItem>

@@ -1,29 +1,17 @@
-import { notFound } from "next/navigation";
-import { getContentPageByParentQuery } from "@/utils/cms";
 import metaData from "@/utils/metadata";
-import "@/styles/wpStyles.css";
 import SupportPage from "../components/SupportPage";
+import DataUsesResearchProjectsContent from "./DataUsesResearchProjectsContent";
 
 export const metadata = metaData({
-    title: "Uploading Data Uses / Research Projects - Data Custodians",
-    description: "",
+    title: "Exploring Data Uses / Research Projects - Data Custodians",
+    description:
+        "The Data Use Register on the Cancer Data Hub: transparency, search, filters, and who uses it.",
 });
 
-const UploadingDataUsesProjectsPage = async () => {
-    const cmsPage = await getContentPageByParentQuery(
-        "UploadDataUsesProjects",
-        {
-            id: "uploading-data-uses-research-projects",
-            idType: "URI",
-            parentId: "/data-custodian-support",
-        }
+export default function UploadingDataUsesProjectsPage() {
+    return (
+        <SupportPage title="Exploring Data Uses / Research Projects">
+            <DataUsesResearchProjectsContent />
+        </SupportPage>
     );
-
-    if (!cmsPage) {
-        notFound();
-    }
-
-    return <SupportPage title={cmsPage?.title} content={cmsPage?.content} />;
-};
-
-export default UploadingDataUsesProjectsPage;
+}

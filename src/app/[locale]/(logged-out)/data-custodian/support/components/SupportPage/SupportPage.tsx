@@ -33,7 +33,6 @@ export default function SupportPage({
 
     return (
         <>
-            <Banner title={title} />
             <Container sx={{ background: "white", px: 10, py: 3 }}>
                 <BackButton
                     label={t("backToSupport")}
