@@ -35,9 +35,11 @@ const postFetch = async <T>(
                 ? {
                       "Content-Type": "application/json",
                       [sessionHeader]: sessionPrefix + session,
-                      "x-partner-context": "CRUK",
+                      // "x-partner-context": "CRUK",
                   }
-                : { "x-partner-context": "CRUK" },
+                : {
+                      // "x-partner-context": "CRUK",
+                  },
         });
 
         if (response.ok) {

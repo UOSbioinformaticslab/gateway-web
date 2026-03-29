@@ -77,7 +77,7 @@ const RegisterDialog = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-partner-context": "CRUK",
+                    // "x-partner-context": "CRUK",
                 },
                 body: JSON.stringify(registerData),
             });

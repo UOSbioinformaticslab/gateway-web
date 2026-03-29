@@ -28,7 +28,7 @@ const deleteRequest = async <T>(
             credentials: "include",
             headers: {
                 [sessionHeader]: sessionPrefix + session,
-                "x-partner-context": "CRUK",
+                // "x-partner-context": "CRUK",
             },
         });
 

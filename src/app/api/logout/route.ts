@@ -20,7 +20,7 @@ export async function GET() {
             headers: {
                 Authorization: `Bearer ${jwtToken}`,
                 [sessionHeader]: sessionPrefix + session,
-                "x-partner-context": "CRUK",
+                // "x-partner-context": "CRUK",
             },
         });
 

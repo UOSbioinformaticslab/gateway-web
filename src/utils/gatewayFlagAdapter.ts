@@ -33,7 +33,7 @@ const setCache = async (): Promise<Record<string, boolean>> => {
     try {
         const res = await fetch(apis.enabledFeatures, {
             headers: {
-                "x-partner-context": "CRUK",
+                // "x-partner-context": "CRUK",
             },
         });
         if (!res.ok) {
