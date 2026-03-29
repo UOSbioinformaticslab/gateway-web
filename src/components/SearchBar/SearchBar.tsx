@@ -3,6 +3,7 @@ import { FieldValues, useForm } from "react-hook-form";
 import theme, { colors } from "@/config/theme";
 import { SearchIcon } from "@/consts/icons";
 import {
+    ExplainerText,
     FormWrapper,
     InputWrapper,
     SearchForm,
@@ -29,6 +30,13 @@ interface SearchBarProps {
     queryName: string;
     queryPlaceholder: string;
     fullWidth?: boolean;
+    /** Explainer shown below the search field (e.g. search scope hint). */
+    explainerText?: string;
+    /** Disables the search input when true. */
+    isDisabled?: boolean;
+    /** When set with `onSynopsesToggle`, synopses visibility is controlled by the parent (e.g. search results). */
+    synopsesExpanded?: boolean;
+    onSynopsesToggle?: () => void;
 }
 export const TEST_ID_WRAPPER = "search-bar";
 export const TEST_ID_RESET_BUTTON = "reset-btn";
@@ -44,13 +52,23 @@ const SearchBar = ({
     queryName,
     queryPlaceholder,
     fullWidth = false,
+    explainerText,
+    isDisabled = false,
+    synopsesExpanded: synopsesExpandedProp,
+    onSynopsesToggle,
 }: SearchBarProps) => {
     const { control, handleSubmit, setValue } = useForm({
         defaultValues: { [queryName]: defaultValue },
     });
     const [cart, setCart] = useState([]);
     const [isDeepSearch, setIsDeepSearch] = useState(false);
-    const [showSynopsis, setShowSynopsis] = useState(true);
+    const [synopsesExpandedInternal, setSynopsesExpandedInternal] =
+        useState(true);
+    const isSynopsesControlled =
+        synopsesExpandedProp !== undefined && onSynopsesToggle !== undefined;
+    const synopsesExpanded = isSynopsesControlled
+        ? synopsesExpandedProp!
+        : synopsesExpandedInternal;
     const [showCartModal, setShowCartModal] = useState(false);
     const [sortConfig, setSortConfig] = useState({ column: 'dateAdded', direction: 'desc' });
     const handleSort = (column) => {
@@ -78,9 +96,9 @@ const SearchBar = ({
                 flexWrap: 'nowrap',
             }}
         >
-            <FormWrapper 
+            <FormWrapper
                 data-testid={TEST_ID_WRAPPER}
-                sx={{ flex: '0 0 50%', minWidth: 0,marginTop: 1}}
+                sx={{ flex: "0 0 50%", minWidth: 0, marginTop: 1 }}
             >
                 <SearchForm onSubmit={handleSubmit(submitAction)} role="search">
                     <InputWrapper
@@ -92,6 +110,7 @@ const SearchBar = ({
                             name={queryName}
                             label=""
                             placeholder={queryPlaceholder}
+                            disabled={isDisabled}
                             sx={{
                                 border: `2px solid ${theme.palette.greyCustom.main}`,
                             }}
@@ -107,6 +126,9 @@ const SearchBar = ({
                         />
                     </InputWrapper>
                 </SearchForm>
+                {explainerText ? (
+                    <ExplainerText sx={{ mt: 0.5 }}>{explainerText}</ExplainerText>
+                ) : null}
             </FormWrapper>
 
             {/* Cart Badge */}
@@ -150,10 +172,22 @@ const SearchBar = ({
 
             {/* Collapse/Expand Toggle */}
             <Button
-                onClick={() => setShowSynopsis(!showSynopsis)}
-                sx={{ ml: 'auto', textTransform: 'none', fontWeight: 'bold', flexShrink: 0 }}
+                type="button"
+                aria-expanded={synopsesExpanded}
+                aria-controls="search-results-synopses"
+                onClick={() =>
+                    isSynopsesControlled
+                        ? onSynopsesToggle!()
+                        : setSynopsesExpandedInternal(v => !v)
+                }
+                sx={{
+                    ml: "auto",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    flexShrink: 0,
+                }}
             >
-                {showSynopsis ? "Collapse Synopses" : "Expand Synopses"}
+                {synopsesExpanded ? "Collapse Synopses" : "Expand Synopses"}
             </Button>
         </Paper>
     );

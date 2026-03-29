@@ -1,25 +1,17 @@
-import { notFound } from "next/navigation";
-import { getContentPageByParentQuery } from "@/utils/cms";
 import metaData from "@/utils/metadata";
-import "@/styles/wpStyles.css";
 import SupportPage from "../components/SupportPage";
+import CohortDiscoverySupportContent from "./CohortDiscoverySupportContent";
 
 export const metadata = metaData({
-    title: "Onboarding to Cohort Discovery - Data Custodians",
-    description: "",
+    title: "Using Cohort Discovery - Data Custodians",
+    description:
+        "Find suitable cohorts for your research using advanced search tools.",
 });
-const CohortDiscoveryPage = async () => {
-    const cmsPage = await getContentPageByParentQuery("CohortDiscovery", {
-        id: "onboarding-to-cohort-discovery",
-        idType: "URI",
-        parentId: "/data-custodian-support",
-    });
 
-    if (!cmsPage) {
-        notFound();
-    }
-
-    return <SupportPage title={cmsPage?.title} content={cmsPage?.content} />;
-};
-
-export default CohortDiscoveryPage;
+export default function CohortDiscoveryPage() {
+    return (
+        <SupportPage title="Using Cohort Discovery">
+            <CohortDiscoverySupportContent />
+        </SupportPage>
+    );
+}

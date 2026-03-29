@@ -19,6 +19,38 @@ import navItems from "@/config/nav";
 import { colors } from "@/config/theme";
 import { MenuIcon } from "@/consts/icons";
 
+/** Strip locale prefix (e.g. /en) so paths match nav hrefs. */
+function normalizePathname(pathname: string | null): string {
+    if (!pathname) {
+        return "";
+    }
+    const segments = pathname.split("/").filter(Boolean);
+    if (segments[0] === "en") {
+        return `/${segments.slice(1).join("/")}`;
+    }
+    return pathname.startsWith("/") ? pathname : `/${pathname}`;
+}
+
+/**
+ * Pick the nav item that best matches the current path. Uses longest href so
+ * /about does not stay active on /about/how-we-protect-your-data.
+ */
+function getActiveNavHref(
+    path: string,
+    items: { href: string }[]
+): string | null {
+    const internal = items.filter(i => !i.href.startsWith("http"));
+    const matches = internal.filter(
+        item =>
+            path === item.href || path.startsWith(`${item.href}/`)
+    );
+    if (matches.length === 0) {
+        return null;
+    }
+    return matches.reduce((a, b) => (a.href.length >= b.href.length ? a : b))
+        .href;
+}
+
 function Header() {
     const pathname = usePathname();
     const HOTJAR_ID = process.env.NEXT_PUBLIC_HOTJAR_ID;
@@ -52,6 +84,9 @@ function Header() {
     const accountLinks = useAccountMenu();
 
     const focusOutline = `2px solid ${colors.purple500}`;
+
+    const pathNormalized = normalizePathname(pathname);
+    const activeNavHref = getActiveNavHref(pathNormalized, navItems);
 
     return (
         <AppBar
@@ -125,22 +160,18 @@ function Header() {
                         {navItems.map((item) => {
                             const isExternal = item.href.startsWith("http");
                             const isActive =
-                                !isExternal &&
-                                pathname != null &&
-                                (pathname === item.href ||
-                                    pathname.endsWith(item.href) ||
-                                    pathname.includes(item.href));
+                                !isExternal && activeNavHref === item.href;
                             return (
                                 <Link
                                     key={item.label}
                                     href={item.href}
                                     sx={{
-                                        color: colors.grey800,
+                                        color: colors.black,
                                         textDecoration: "none",
                                         px: 2,
                                         py: 1,
-                                        fontSize: 15,
-                                        fontWeight: 500,
+                                        fontSize: { tablet: 18, laptop: 19 },
+                                        fontWeight: 700,
                                         borderBottom: isActive
                                             ? `2px solid ${colors.red600}`
                                             : "2px solid transparent",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bookmark, BookmarkBorder } from "@mui/icons-material";
-import { ListItem, ListItemText } from "@mui/material";
+import { Collapse, ListItem, ListItemText } from "@mui/material";
 import { get } from "lodash";
 import { useTranslations } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -39,6 +39,8 @@ interface ResultCardProps {
     mutateLibraries: KeyedMutator<Library[]>;
     isCohortDiscoveryDisabled: boolean;
     cohortDiscovery: PageTemplatePromo;
+    /** When false, the abstract / highlight synopsis is hidden. */
+    showSynopsis?: boolean;
 }
 
 const TRANSLATION_PATH = "pages.search.components.ResultCard";
@@ -50,6 +52,7 @@ const ResultCard = ({
     mutateLibraries,
     isCohortDiscoveryDisabled,
     cohortDiscovery,
+    showSynopsis = true,
 }: ResultCardProps) => {
     const t = useTranslations(TRANSLATION_PATH);
     const pathname = usePathname();
@@ -413,15 +416,20 @@ const ResultCard = ({
                     }}
                     secondary={
                         <section aria-describedby={resultId}>
-                            <Highlight
-                                sx={{ mb: 1.5 }}
-                                component="div"
-                                variant="body2"
-                                color="text.gray"
-                                dangerouslySetInnerHTML={{
-                                    __html: formattedText,
-                                }}
-                            />
+                            <Collapse
+                                in={showSynopsis}
+                                timeout="auto"
+                                unmountOnExit>
+                                <Highlight
+                                    sx={{ mb: 1.5 }}
+                                    component="div"
+                                    variant="body2"
+                                    color="text.gray"
+                                    dangerouslySetInnerHTML={{
+                                        __html: formattedText,
+                                    }}
+                                />
+                            </Collapse>
                             <Box
                                 sx={{
                                     p: 0,

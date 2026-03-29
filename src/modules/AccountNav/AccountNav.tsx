@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Box, Skeleton } from "@mui/material";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
@@ -11,6 +12,7 @@ import useAccountMenu from "@/hooks/useAccountMenu";
 import useAuth from "@/hooks/useAuth";
 import useDialog from "@/hooks/useDialog";
 import { colors } from "@/config/theme";
+import { RouteName } from "@/consts/routeName";
 
 interface AccountNavProps {
     headerVariant?: "light" | "dark";
@@ -90,12 +92,11 @@ const AccountNav = ({ headerVariant = "dark" }: AccountNavProps) => {
                 size="medium"
                 variant="contained"
                 color="secondary"
+                component={Link}
+                href={`/${RouteName.HELP}`}
                 sx={{
                     color: "white",
-                }}
-                onClick={() =>
-                    showDialog(ProvidersDialog, { isProvidersDialog: true })
-                }>
+                }}>
                 {t("DesktopNav.labels.help")}
             </Button>
         </Box>

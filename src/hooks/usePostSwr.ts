@@ -42,17 +42,19 @@ const usePostSwr = <T>(
     const { data, error, mutate, isLoading } = useSWR<T>(
         shouldFetch ? [url, formData] : null,
         () => {
-            return apiService.postRequest<T>(url, formData, {
-                notificationOptions: {
-                    localeKey,
-                    itemName,
-                    errorNotificationsOn,
-                    successNotificationsOn,
-                    t,
-                    action,
-                },
-                withPagination,
-            });
+            return apiService
+                .postRequest<T>(url, formData, {
+                    notificationOptions: {
+                        localeKey,
+                        itemName,
+                        errorNotificationsOn,
+                        successNotificationsOn,
+                        t,
+                        action,
+                    },
+                    withPagination,
+                })
+                .catch(() => null as T | null);
         },
         {
             keepPreviousData,

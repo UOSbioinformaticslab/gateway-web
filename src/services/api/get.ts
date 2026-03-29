@@ -26,7 +26,10 @@ const getRequest = async <T>(
     try {
         const response = await fetch(url, {
             credentials: "include",
-            headers: { [sessionHeader]: sessionPrefix + session },
+            headers: {
+                [sessionHeader]: sessionPrefix + session,
+                "x-partner-context": "CRUK",
+            },
         });
 
         if (response.ok) {

@@ -26,7 +26,10 @@ const deleteRequest = async <T>(
         const response = await fetch(url, {
             method: "DELETE",
             credentials: "include",
-            headers: { [sessionHeader]: sessionPrefix + session },
+            headers: {
+                [sessionHeader]: sessionPrefix + session,
+                "x-partner-context": "CRUK",
+            },
         });
 
         if (response.ok) {

@@ -188,6 +188,8 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             ViewType.TABLE
     );
 
+    const [synopsesExpanded, setSynopsesExpanded] = useState(true);
+
     const updateQueryString = useCallback(
         (name: string, value: string) => {
             const params = new URLSearchParams(searchParams?.toString());
@@ -478,6 +480,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                         libraryData={libraryData}
                         isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
                         cohortDiscovery={cohortDiscovery}
+                        showSynopsis={synopsesExpanded}
                     /> 
                 ); */
                 return null;
@@ -486,6 +489,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                     <ResultCardPublication
                         result={result as SearchResultPublication}
                         key={resultId}
+                        showSynopsis={synopsesExpanded}
                     />
                 );
             case SearchCategory.COLLECTIONS:
@@ -501,7 +505,12 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                     />
                 );
             case SearchCategory.TOOLS:
-                return <ResultCardTool result={result as SearchResultTool} />;
+                return (
+                    <ResultCardTool
+                        result={result as SearchResultTool}
+                        showSynopsis={synopsesExpanded}
+                    />
+                );
             default:
                 return (
                     <ResultCardDataUse
@@ -526,6 +535,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                 results={data?.list as SearchResultDataset[]}
                 showLibraryModal={showLibraryModal}
                 cohortDiscovery={cohortDiscovery}
+                showSynopsis={synopsesExpanded}
             />
         ) : (
             <ResultsList
@@ -975,9 +985,18 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                                         ? queryParams.query
                                                         : undefined
                                                 }
+                                                synopsesExpanded={
+                                                    synopsesExpanded
+                                                }
+                                                onSynopsesToggle={() =>
+                                                    setSynopsesExpanded(
+                                                        v => !v
+                                                    )
+                                                }
                                             />
                                         </Box>
                                         <Box
+                                            id="search-results-synopses"
                                             component="section"
                                             aria-describedby="result-summary"
                                             aria-label="results list"

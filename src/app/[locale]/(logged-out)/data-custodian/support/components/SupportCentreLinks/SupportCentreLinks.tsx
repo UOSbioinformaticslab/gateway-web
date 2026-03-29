@@ -27,18 +27,6 @@ export default function MeetTheTeam() {
 
     const data = [
         {
-            heading: t("gettingStartedTitle"),
-            link: RouteName.DATA_CUSTODIAN_GETTING_STARTED,
-            icon: <DataCustodiansIcon aria-hidden="true" focusable="false" />,
-        },
-        {
-            heading: t("metadataOnboardingTitle"),
-            link: RouteName.DATA_CUSTODIAN_METADATA_ONBOARDING,
-            icon: (
-                <MetadataOnboardingIcon aria-hidden="true" focusable="false" />
-            ),
-        },
-        {
             heading: t("uploadingDataUsesProjectsTitle"),
             link: RouteName.DATA_CUSTODIAN_UPLOADING_DATAUSES_PROJECTS,
             icon: <DataUseIcon aria-hidden="true" focusable="false" />,
@@ -69,23 +57,12 @@ export default function MeetTheTeam() {
             icon: (
                 <DataAccessRequestIcon aria-hidden="true" focusable="false" />
             ),
-        },
-        {
-            heading: t("theAllianceTitle"),
-            link: RouteName.DATA_CUSTODIAN_THE_ALLIANCE,
-            icon: <TheAllianceIcon aria-hidden="true" focusable="false" />,
-        },
-        {
-            heading: t("faqsTitle"),
-            link: RouteName.DATA_CUSTODIAN_FAQS,
-            icon: <QuizOutlinedIcon aria-hidden="true" focusable="false" />,
-        },
+        }
     ];
 
     return (
         <>
-            <Banner title={t("title")} />
-            <Container sx={{ background: "white", p: 10 }}>
+            <Container sx={{ background: "white", p: 10 , mt: "20px"}}>
                 <Grid
                     container
                     columnSpacing={6}

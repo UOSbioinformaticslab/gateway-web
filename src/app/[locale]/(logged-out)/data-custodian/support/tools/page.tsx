@@ -1,23 +1,17 @@
-import { notFound } from "next/navigation";
-import { getContentPageByParentQuery } from "@/utils/cms";
 import metaData from "@/utils/metadata";
 import SupportPage from "../components/SupportPage";
+import UploadingAnalysisScriptsContent from "./UploadingAnalysisScriptsContent";
 
 export const metadata = metaData({
-    title: "Tools - Data Custodians",
-    description: "",
+    title: "Uploading Analysis Scripts and Software - Data Custodians",
+    description:
+        "Guidance for uploading analysis scripts, software, and tools in the CRUK Data Hub.",
 });
 
-export default async function Tools() {
-    const cmsPage = await getContentPageByParentQuery("GetContentPageQuery", {
-        id: "tools",
-        idType: "URI",
-        parentId: "/support",
-    });
-
-    if (!cmsPage) {
-        notFound();
-    }
-
-    return <SupportPage title={cmsPage?.title} content={cmsPage?.content} />;
+export default function ToolsPage() {
+    return (
+        <SupportPage title="Uploading Analysis Scripts and Software">
+            <UploadingAnalysisScriptsContent />
+        </SupportPage>
+    );
 }

@@ -6,24 +6,21 @@ import {
     useReactTable,
     ColumnDef,
     Column,
+    Row,
 } from "@tanstack/react-table";
 import { colors } from "@/config/theme";
-import ActionDropdown from "@/app/[locale]/(logged-out)/search/components/ActionDropdown";
 import * as styles from "./Table.styles";
-import { IconButton, Stack, Typography, Collapse, Box } from "@mui/material";
-import { r } from "msw/lib/glossary-2792c6da";
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import { IconButton, Stack, Collapse, Box } from "@mui/material";
 
 interface OnUpdateProps {
     rowIndex: number;
     columnId: string;
     value: unknown;
 }
+
+export type TableVariant = "default" | "searchResults";
 
 interface TableProps<T> {
     defaultColumn?: {
@@ -40,12 +37,24 @@ interface TableProps<T> {
     hideHeader?: boolean;
     pinHeader?: boolean;
     style?: CSSProperties;
+    /** Dataset search table: extra header band, synopsis row, actions column. */
+    variant?: TableVariant;
+    /** When set, synopsis rows use this visibility (e.g. linked to search "Collapse Synopses"). */
+    showSynopsis?: boolean;
+    /** Renders synopsis body for each row; return null to omit the synopsis band. */
+    renderSynopsis?: (row: T) => React.ReactNode;
+    /** Renders the actions column (e.g. ActionDropdown). Required when variant is searchResults. */
+    renderActionCell?: (row: T) => React.ReactNode;
+    /** Icons or chips shown inline immediately after the title in the top band (search results). */
+    renderTitleBandExtras?: (row: T) => React.ReactNode;
 }
 
+/** Top band background (icons + title + actions) per reference layout. */
+const ROW_HEADER_BAND_BG = "#f0f4f8";
+const SECTION_RULE = "#e8ecf0";
 function useSkipper() {
     const [shouldSkip, setShouldSkip] = useState(true);
 
-    // Wrap a function with this to skip a pagination reset temporarily
     const skip = useCallback(() => {
         setShouldSkip(false);
     }, []);
@@ -58,6 +67,20 @@ function useSkipper() {
 
     return [shouldSkip, skip] as const;
 }
+
+/** Body sticky cells must stay below thead so scrolled row content does not paint over headers. */
+const Z_HEADER = 3;
+const Z_HEADER_PINNED = 4;
+const Z_PINNED_BODY = 1;
+const Z_BODY = 0;
+
+const isPinnedMetaColumn = (column: Column<unknown>) =>
+    (column.columnDef.meta as { isPinned?: boolean } | undefined)?.isPinned ===
+    true;
+
+const isHeaderBandOnlyColumn = (column: Column<unknown>) =>
+    (column.columnDef.meta as { headerBandOnly?: boolean } | undefined)
+        ?.headerBandOnly === true;
 
 const getCommonCellStyles = <T,>(
     column: Column<T>,
@@ -74,28 +97,31 @@ const getCommonCellStyles = <T,>(
     };
 
     const shouldPin = isPinned || isHeaderPinned;
-    
+
     if (isHeader && isHeaderPinned) {
         return {
             position: "sticky",
             top: 0,
             left: shouldPin ? `${column.getStart()}px` : undefined,
             width: column.getSize(),
-            zIndex: shouldPin ? 1 : 1,
+            zIndex: shouldPin ? Z_HEADER_PINNED : Z_HEADER,
         };
     }
-    
+
     return {
         backgroundColor: "white",
         boxShadow: hasPinnedBorder ? `1px 0 ${colors.grey300}` : undefined,
         left: shouldPin ? `${column.getStart()}px` : undefined,
         top: shouldPin ? 0 : undefined,
-        opacity: shouldPin ? 0.95 : 1,
         position: shouldPin ? "sticky" : "relative",
         width: column.getSize(),
-        zIndex: 0,
+        zIndex: shouldPin ? Z_PINNED_BODY : Z_BODY,
     };
 };
+
+function getVisibleCellById<T>(row: Row<T>, id: string) {
+    return row.getVisibleCells().find(c => c.column.id === id);
+}
 
 function Table<T extends unknown>(props: TableProps<T>) {
     const {
@@ -104,10 +130,19 @@ function Table<T extends unknown>(props: TableProps<T>) {
         onUpdate,
         defaultColumn,
         hideHeader,
-        pinHeader,
         style,
+        showSynopsis: showSynopsisProp,
+        renderSynopsis,
+        variant = "default",
+        renderActionCell,
+        renderTitleBandExtras,
     } = props;
-    const [showSynopsis, setShowSynopsis] = useState(true);
+    const isSearchResults = variant === "searchResults";
+    const blockDivider = colors.grey300;
+
+    const [showSynopsisFallback] = useState(true);
+    const showSynopsis =
+        showSynopsisProp !== undefined ? showSynopsisProp : showSynopsisFallback;
     const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
     const table = useReactTable(
         {
@@ -124,7 +159,6 @@ function Table<T extends unknown>(props: TableProps<T>) {
                 ) => {
                     if (typeof onUpdate !== "function") return;
 
-                    // Skip page index reset until after next rerender
                     skipAutoResetPageIndex();
 
                     const newData = rows.map((row, index) => {
@@ -142,16 +176,26 @@ function Table<T extends unknown>(props: TableProps<T>) {
             hideHeader: false,
         },
         hooks => {
-            hooks.visibleColumns.push(columns => [
+            if (!isSearchResults) {
+                return;
+            }
+            hooks.visibleColumns.push(cols => [
                 {
                     id: "checkinout",
                     Header: "CheckIn/Out",
-                    Cell: ({ row }) => <ActionDropdown {...row} />,
+                    Cell: ({ row }) =>
+                        renderActionCell
+                            ? renderActionCell(row.original)
+                            : null,
+                    meta: { headerBandOnly: true },
                 },
-                ...columns,
+                ...cols,
             ]);
         }
     );
+
+    const headerGroup = table.getHeaderGroups()[0];
+    const columnCount = headerGroup?.headers.length ?? 1;
 
     const hasFooterContent = !!table
         .getFooterGroups()
@@ -161,119 +205,261 @@ function Table<T extends unknown>(props: TableProps<T>) {
         .flat()
         .filter(Boolean).length;
 
-    return (
-        <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '600px' }}>
-            <table css={style ?? styles.table}>
-            {!hideHeader && (
-                <thead>
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                                <th
-                                    css={styles.th}
-                                    key={header.id}
-                                    style={{
-                                        position: 'sticky',
-                                        top: 0,
-                                        cursor: 'pointer',
-                                        fontWeight: 700,
-                                        backgroundColor: colors.blue400,
-                                        borderRadius: 2,
-                                        color: 'white',
-                                        borderBottom: `1px solid ${colors.blue400}`,
-                                        borderRight: `1px solid ${colors.blue400}`,
-                                        fontSize: '18px',
-                                        padding: 3,
-                                        width: header.getSize(),
-                                        zIndex: 0,
-                                    }}>
-                                    <div className="whitespace-nowrap">
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
-                                    </div>
-                                </th>
-                            ))}
-                        </tr>
+    const renderBodyRow = (row: Row<T>) => {
+        if (!isSearchResults) {
+            return (
+                <tr key={row.id}>
+                    {row.getVisibleCells().map(cell => (
+                        <td
+                            css={styles.td}
+                            key={cell.id}
+                            style={{
+                                ...getCommonCellStyles(cell.column),
+                            }}>
+                            {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                            )}
+                        </td>
                     ))}
-                </thead>
-            )}
-            <tbody>
-                {table.getRowModel().rows.map(row => (
-                    <React.Fragment key={row.id}>
-                        <tr key={`${row.id}-spacer`}>
-                            <td colSpan={columns.length + 1} style={{ height: '8px', backgroundColor: colors.grey100 }}>
-                                <Stack direction="row" alignItems="center" spacing={2}>
-                                    {/* Actions */}
-                                    <Stack direction="row">
-                                        <IconButton onClick={() => {}} >
-                                            <FavoriteIcon /> 
-                                        </IconButton>
-                                        <IconButton onClick={() => {}}>
-                                            <ShoppingCartIcon />
-                                        </IconButton>
-                                    </Stack>
+                </tr>
+            );
+        }
 
-                                    {/* Title Link */}
-                                    {flexRender(
-                                        row.getVisibleCells()[0].column.columnDef.cell,
-                                        row.getVisibleCells()[0].getContext()
-                                    )}
+        const titleCell = getVisibleCellById(row, "title");
+        const actionCell = getVisibleCellById(row, "checkinout");
+        const synopsisNode = renderSynopsis?.(row.original);
+        const hasSynopsis = synopsisNode != null;
+
+        return (
+            <React.Fragment key={row.id}>
+                <tr>
+                    <td
+                        colSpan={columnCount}
+                        style={{
+                            padding: 0,
+                            borderBottom: `1px solid ${SECTION_RULE}`,
+                            backgroundColor: ROW_HEADER_BAND_BG,
+                        }}>
+                        <Stack
+                            direction="row"
+                            alignItems="center"
+                            spacing={1.5}
+                            sx={{
+                                px: 2,
+                                py: 1.5,
+                                flexWrap: "nowrap",
+                                minWidth: 0,
+                                width: "100%",
+                            }}>
+                            <Stack direction="row" spacing={0.5} flexShrink={0}>
+                                <IconButton
+                                    size="small"
+                                    aria-label="Favourite"
+                                    sx={{
+                                        color: colors.grey600,
+                                        border: `1px solid ${colors.grey300}`,
+                                        borderRadius: 1,
+                                    }}>
+                                    <FavoriteBorderIcon fontSize="medium" />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
+                                    aria-label="Cart"
+                                    sx={{
+                                        color: colors.grey600,
+                                        border: `1px solid ${colors.grey300}`,
+                                        borderRadius: 1,
+                                    }}>
+                                    <ShoppingCartOutlinedIcon fontSize="medium" />
+                                </IconButton>
+                            </Stack>
+                            {titleCell && (
+                                <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    spacing={1.5}
+                                    sx={{
+                                        flex: "1 1 auto",
+                                        minWidth: 0,
+                                        justifyContent: "flex-start",
+                                    }}>
+                                    <Box
+                                        sx={{
+                                            flex: "0 1 auto",
+                                            minWidth: 0,
+                                            maxWidth: "100%",
+                                            fontWeight: 600,
+                                            "& a": {
+                                                fontWeight: 600,
+                                                fontSize: "1.125rem",
+                                                color: colors.purple500,
+                                                textDecoration: "none",
+                                            },
+                                            "& a:hover": {
+                                                textDecoration: "underline",
+                                            },
+                                        }}>
+                                        {flexRender(
+                                            titleCell.column.columnDef.cell,
+                                            titleCell.getContext()
+                                        )}
+                                    </Box>
+                                    {renderTitleBandExtras ? (
+                                        <Box
+                                            sx={{
+                                                flexShrink: 0,
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}>
+                                            {renderTitleBandExtras(row.original)}
+                                        </Box>
+                                    ) : null}
                                 </Stack>
-                            </td>
-                        </tr>
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
+                            )}
+                            {actionCell && (
+                                <Box flexShrink={0} sx={{ ml: "auto" }}>
+                                    {flexRender(
+                                        actionCell.column.columnDef.cell,
+                                        actionCell.getContext()
+                                    )}
+                                </Box>
+                            )}
+                        </Stack>
+                    </td>
+                </tr>
+                <tr
+                    style={{
+                        borderBottom: hasSynopsis
+                            ? `1px solid ${SECTION_RULE}`
+                            : `2px solid ${blockDivider}`,
+                    }}>
+                    {row.getVisibleCells().map(cell => {
+                        if (isHeaderBandOnlyColumn(cell.column)) {
+                            return (
                                 <td
-                                    css={styles.td}
+                                    css={styles.tdDataBand}
                                     key={cell.id}
                                     style={{
                                         ...getCommonCellStyles(cell.column),
-                                    }}>
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext()
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                        <tr key={`${row.id}-spacer-bottom`}>
-                            <td style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                                 <Collapse in={showSynopsis} timeout="auto" unmountOnExit>
-                                                <Box sx={{ margin: 1, p: 2, fontStyle: 'italic', borderRadius: 1 }}>
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        <strong>Synopsis: </strong>{"This dataset explores Understanding Metastasis in Prostate Cancer with a cohort of 25494 subjects. The primary focus includes analyzing longitudinal markers and response variations to established protocols. Data collection began in 2024"}
-                                                    </Typography>
-                                                </Box>
-                                            </Collapse>
+                                    }}
+                                />
+                            );
+                        }
+                        return (
+                            <td
+                                css={styles.tdDataBand}
+                                key={cell.id}
+                                style={{
+                                    ...getCommonCellStyles(cell.column),
+                                }}>
+                                {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext()
+                                )}
                             </td>
-                        </tr>
-                    </React.Fragment>
-                ))}
-            </tbody>
-            {hasFooterContent && (
-                <tfoot>
-                    {table.getFooterGroups().map(footerGroup => (
-                        <tr key={footerGroup.id}>
-                            {footerGroup.headers.map(header => (
-                                <th key={header.id}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                              header.column.columnDef.footer,
-                                              header.getContext()
-                                          )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </tfoot>
-            )}
-        </table>
+                        );
+                    })}
+                </tr>
+                {synopsisNode != null && (
+                    <tr>
+                        <td
+                            colSpan={columnCount}
+                            style={{
+                                padding: 0,
+                                borderTop: `1px solid ${SECTION_RULE}`,
+                                borderBottom: `2px solid ${blockDivider}`,
+                                backgroundColor: colors.white,
+                            }}>
+                            <Collapse in={showSynopsis} timeout="auto" unmountOnExit>
+                                <Box
+                                    sx={{
+                                        px: 2.5,
+                                        py: 2,
+                                    }}>
+                                    {synopsisNode}
+                                </Box>
+                            </Collapse>
+                        </td>
+                    </tr>
+                )}
+            </React.Fragment>
+        );
+    };
+
+    return (
+        <div
+            style={{
+                overflowX: "auto",
+                overflowY: "auto",
+                maxHeight: "600px",
+            }}>
+            <table css={style ?? styles.table}>
+                {!hideHeader && (
+                    <thead>
+                        {table.getHeaderGroups().map(headerGroup => (
+                            <tr key={headerGroup.id}>
+                                {headerGroup.headers.map(header => (
+                                    <th
+                                        css={styles.th}
+                                        key={header.id}
+                                        style={{
+                                            position: "sticky",
+                                            top: 0,
+                                            left: isPinnedMetaColumn(header.column)
+                                                ? `${header.column.getStart()}px`
+                                                : undefined,
+                                            cursor: "pointer",
+                                            fontWeight: 700,
+                                            backgroundColor: colors.blue400,
+                                            borderRadius: 2,
+                                            color: "white",
+                                            borderBottom: `1px solid ${colors.blue400}`,
+                                            borderRight: `1px solid ${colors.blue400}`,
+                                            fontSize: "18px",
+                                            padding: 3,
+                                            width: header.getSize(),
+                                            zIndex: isPinnedMetaColumn(header.column)
+                                                ? Z_HEADER_PINNED
+                                                : Z_HEADER,
+                                        }}>
+                                        <div className="whitespace-nowrap">
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext()
+                                                  )}
+                                        </div>
+                                    </th>
+                                ))}
+                            </tr>
+                        ))}
+                    </thead>
+                )}
+                <tbody>
+                    {table.getRowModel().rows.map(row => renderBodyRow(row))}
+                </tbody>
+                {hasFooterContent && (
+                    <tfoot>
+                        {table.getFooterGroups().map(footerGroup => (
+                            <tr key={footerGroup.id}>
+                                {footerGroup.headers.map(header => (
+                                    <th key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef.footer,
+                                                  header.getContext()
+                                              )}
+                                    </th>
+                                ))}
+                            </tr>
+                        ))}
+                    </tfoot>
+                )}
+            </table>
         </div>
     );
 }

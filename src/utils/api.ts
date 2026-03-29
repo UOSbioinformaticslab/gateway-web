@@ -83,6 +83,7 @@ async function get<T>(
             ...headers,
             Authorization: `Bearer ${jwt?.value}`,
             [sessionHeader]: sessionPrefix + session,
+            "x-partner-context": "CRUK",
         },
         ...nextConfig,
     });
@@ -146,6 +147,7 @@ async function patch<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
+            "x-partner-context": "CRUK",
         },
         body: JSON.stringify(payload),
     });
@@ -195,6 +197,7 @@ async function put<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
+            "x-partner-context": "CRUK",
         },
         body: JSON.stringify(payload),
     });
@@ -244,6 +247,7 @@ async function post<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
+            "x-partner-context": "CRUK",
         },
         body: JSON.stringify(payload),
     });

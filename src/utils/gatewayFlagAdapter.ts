@@ -31,7 +31,11 @@ const flattenFlags = (
 
 const setCache = async (): Promise<Record<string, boolean>> => {
     try {
-        const res = await fetch(apis.enabledFeatures);
+        const res = await fetch(apis.enabledFeatures, {
+            headers: {
+                "x-partner-context": "CRUK",
+            },
+        });
         if (!res.ok) {
             console.error(`Failed to fetch feature flags: ${res.statusText}`);
             return {};

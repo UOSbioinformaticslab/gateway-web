@@ -1,4 +1,3 @@
-import Banner from "@/components/Banner";
 import Container from "@/components/Container";
 import metaData from "@/utils/metadata";
 
@@ -13,8 +12,10 @@ const AboutPage = () => {
             <Container
                 sx={{
                     background: "white",
+                    mt: "20px",
+                    pt: { mobile: 6, tablet: 8, desktop: 10 },
+                    pb: { mobile: 5, tablet: 6, desktop: 8 },
                     px: { mobile: 3, tablet: 6, desktop: 8 },
-                    py: { mobile: 4, tablet: 6 },
                     color: "#1E2A4A",
                     fontSize: 18,
                     lineHeight: 1.7,
