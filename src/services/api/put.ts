@@ -32,7 +32,7 @@ const putRequest = async <T>(
             headers: {
                 "Content-Type": "application/json",
                 [sessionHeader]: sessionPrefix + session,
-                "x-partner-context": "CRUK",
+                // "x-partner-context": "CRUK",
             },
         });
 

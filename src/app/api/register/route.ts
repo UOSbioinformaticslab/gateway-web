@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
             headers: {
                 "Content-Type": "application/json",
                 [sessionHeader]: sessionPrefix + session,
-                "x-partner-context": "CRUK",
+                // "x-partner-context": "CRUK",
             },
             body: JSON.stringify({
                 email,

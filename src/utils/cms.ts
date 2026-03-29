@@ -110,7 +110,7 @@ async function fetchCMS(
     const headers = {
         "Content-Type": "application/json",
         [sessionHeader]: sessionPrefix + session,
-        "x-partner-context": "CRUK",
+        // "x-partner-context": "CRUK",
     };
 
     const res = await fetch(apis.wordPressApiUrl, {
