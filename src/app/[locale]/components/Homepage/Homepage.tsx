@@ -17,12 +17,6 @@ import useAuth from "@/hooks/useAuth";
 import useDialog from "@/hooks/useDialog";
 import ProvidersDialog from "@/modules/ProvidersDialog";
 
-const FEATURED_CARD_IMAGES = [
-    StaticImages.LANDING_PAGE.datasets,
-    StaticImages.LANDING_PAGE.data_uses,
-    StaticImages.LANDING_PAGE.analysis_scripts_software,
-];
-
 const PANEL_ITEMS: { labelKey: string; href: string; loggedInOnly?: boolean; span2?: boolean }[] = [
     {
         labelKey: "finderPanel.browseSearchDatasets",
@@ -196,98 +190,69 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                 </Container>
             </Box>
 
-            {/* Featured Research */}
-            <Box sx={{ bgcolor: "#fff", py: { mobile: 4, tablet: 6 } }}>
+            {/* Feature research panel */}
+            <Box sx={{ bgcolor: "#fff", py: { mobile: 3, tablet: 4 } }}>
                 <Container>
-                    <Box
+                    <Link
+                        href={`/search?type=${SearchCategory.DATASETS}`}
                         sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            flexWrap: "wrap",
-                            gap: 2,
-                            mb: 3,
+                            textDecoration: "none",
+                            display: "block",
+                            color: "inherit",
                         }}>
-                        <Typography
-                            variant="h2"
+                        <Box
                             sx={{
-                                fontWeight: 700,
-                                color: colors.grey800,
-                                fontSize: { mobile: 24, tablet: 28 },
+                                border: `1px solid ${colors.grey300}`,
+                                borderRadius: 1,
+                                overflow: "hidden",
+                                display: "flex",
+                                alignItems: "stretch",
+                                backgroundColor: "#fff",
+                                minHeight: { mobile: 84, tablet: 96 },
+                                "&:hover": {
+                                    boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                                },
                             }}>
-                            {t("featuredResearch.title")}
-                        </Typography>
-                        <Link
-                            href="/search"
-                            sx={{
-                                color: colors.purple500,
-                                fontWeight: 600,
-                                "&:hover": { textDecoration: "underline" },
-                            }}>
-                            {t("featuredResearch.viewAll")} &gt;
-                        </Link>
-                    </Box>
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: {
-                                mobile: "1fr",
-                                tablet: "repeat(3, 1fr)",
-                            },
-                            gap: 3,
-                        }}>
-                        {[1, 2, 3].map(i => (
-                            <Link
-                                key={i}
-                                href="/search"
+                            <Box
                                 sx={{
-                                    textDecoration: "none",
-                                    color: "inherit",
-                                    display: "block",
-                                    borderRadius: 2,
-                                    overflow: "hidden",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                                    transition: "box-shadow 0.2s",
-                                    "&:hover": {
-                                        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                                    },
+                                    position: "relative",
+                                    width: { mobile: 110, tablet: 150 },
+                                    flexShrink: 0,
+                                    backgroundColor: colors.grey100,
                                 }}>
-                                <Box
+                                <Image
+                                    src="/images/home-scientist.png"
+                                    alt=""
+                                    fill
+                                    sizes="150px"
+                                    style={{
+                                        objectFit: "cover",
+                                        objectPosition: "left center",
+                                    }}
+                                />
+                            </Box>
+                            <Box
+                                sx={{
+                                    flexGrow: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    px: { mobile: 2, tablet: 4 },
+                                    py: { mobile: 2, tablet: 2.5 },
+                                    textAlign: "center",
+                                }}>
+                                <Typography
                                     sx={{
-                                        position: "relative",
-                                        height: 180,
-                                        bgcolor: colors.darkGreen50,
+                                        fontWeight: 700,
+                                        color: colors.purple500,
+                                        fontSize: { mobile: 16, tablet: 18 },
+                                        lineHeight: 1.2,
                                     }}>
-                                    <Image
-                                        src={FEATURED_CARD_IMAGES[i - 1]}
-                                        alt=""
-                                        fill
-                                        style={{ objectFit: "cover" }}
-                                        sizes="(max-width: 640px) 100vw, 33vw"
-                                    />
-                                </Box>
-                                <Box sx={{ p: 2 }}>
-                                    <Typography
-                                        variant="h3"
-                                        sx={{
-                                            fontWeight: 700,
-                                            fontSize: 18,
-                                            mb: 1,
-                                            color: colors.grey800,
-                                        }}>
-                                        {t(`featuredResearch.card${i}.title`)}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ color: colors.grey700 }}>
-                                        {t(
-                                            `featuredResearch.card${i}.description`
-                                        )}
-                                    </Typography>
-                                </Box>
-                            </Link>
-                        ))}
-                    </Box>
+                                    {t("finderPanel.horizonsLink")}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Link>
                 </Container>
             </Box>
 
