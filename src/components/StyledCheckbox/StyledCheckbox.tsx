@@ -13,12 +13,15 @@ export interface StyledCheckboxProps extends MuiCheckboxProps {
     size?: "small" | "medium" | "large";
     iconSx?: SxProps;
     stopPropagation?: boolean;
+    /** Consumed by form field wrappers; must not reach the DOM. */
+    formControlSx?: SxProps;
 }
 
 const StyledCheckbox = ({
     size = "small",
     iconSx,
     stopPropagation,
+    formControlSx: _formControlSx,
     ...rest
 }: StyledCheckboxProps) => {
     return (

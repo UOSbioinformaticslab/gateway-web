@@ -37,9 +37,7 @@ const postFetch = async <T>(
                       [sessionHeader]: sessionPrefix + session,
                       // "x-partner-context": "CRUK",
                   }
-                : {
-                      // "x-partner-context": "CRUK",
-                  },
+                : {},
         });
 
         if (response.ok) {
