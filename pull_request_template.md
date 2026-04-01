@@ -1,5 +1,3 @@
-## Screenshots (if relevant)
-
 ## Describe your changes
 
 ## Issue ticket link
