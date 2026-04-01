@@ -36,6 +36,57 @@ const PANEL_ITEMS: { labelKey: string; href: string; loggedInOnly?: boolean; spa
     },
 ];
 
+const RESEARCH_PARTNERS: {
+    name: string;
+    href: string;
+    logoSrc: string;
+    logoWidth: number;
+    logoHeight: number;
+}[] = [
+    {
+        name: "Cancer Research UK",
+        href: "https://www.cancerresearchuk.org/",
+        logoSrc: "/images/icons/cruk-logo.svg",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+    {
+        name: "Cancer Research Horizons",
+        href: "https://www.cancerresearchhorizons.com/",
+        logoSrc: "/images/partners/crh.png",
+        logoWidth: 200,
+        logoHeight: 44,
+    },
+    {
+        name: "University of Sussex",
+        href: "https://bioinformaticslab.sussex.ac.uk/",
+        logoSrc: "/images/partners/sussex.svg",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+    {
+        name: "University of Oxford",
+        href: "https://www.oncology.ox.ac.uk/",
+        logoSrc: "/images/partners/oxford.svg",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+    {
+        name: "HDR UK",
+        href: "https://healthdatagateway.org/en",
+        logoSrc: "/images/partners/hdruk.svg",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+    {
+        name: "Biobanking UK",
+        href: "https://www.biobankinguk.org/",
+        logoSrc: "/images/partners/biobank.png",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+];
+
 interface HomePageProps {
     cmsContent: PageTemplateHome;
 }
@@ -156,13 +207,14 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                             };
                             const cardSx = {
                                 bgcolor: "#fff",
-                                color: colors.grey800,
+                                color: colors.purple500,
                                 borderRadius: 2,
                                 py: 2,
                                 px: 2,
                                 textAlign: "center" as const,
-                                fontWeight: 600,
-                                fontSize: 15,
+                                fontWeight: 700,
+                                fontSize: { mobile: 16, tablet: 18 },
+                                lineHeight: 1.2,
                                 boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                                 transition: "box-shadow 0.2s",
                                 "&:hover": {
@@ -202,32 +254,36 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                         }}>
                         <Box
                             sx={{
+                                p: 0,
                                 border: `1px solid ${colors.grey300}`,
                                 borderRadius: 1,
                                 overflow: "hidden",
                                 display: "flex",
                                 alignItems: "stretch",
                                 backgroundColor: "#fff",
-                                minHeight: { mobile: 84, tablet: 96 },
+                                minHeight: { mobile: 120, tablet: 140 },
+                                boxShadow: "0 1px 0 rgba(0,0,0,0.04)",
                                 "&:hover": {
-                                    boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                                    boxShadow: "0 3px 14px rgba(0,0,0,0.10)",
                                 },
                             }}>
                             <Box
                                 sx={{
+                                    p: 0,
                                     position: "relative",
-                                    width: { mobile: 110, tablet: 150 },
+                                    width: { mobile: 170, tablet: 280, desktop: 340 },
                                     flexShrink: 0,
                                     backgroundColor: colors.grey100,
                                 }}>
                                 <Image
-                                    src="/images/home-scientist.png"
+                                    src="/images/crh.png"
                                     alt=""
                                     fill
                                     sizes="150px"
                                     style={{
                                         objectFit: "cover",
                                         objectPosition: "left center",
+                                        display: "block",
                                     }}
                                 />
                             </Box>
@@ -237,15 +293,15 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    px: { mobile: 2, tablet: 4 },
-                                    py: { mobile: 2, tablet: 2.5 },
+                                    px: { mobile: 2, tablet: 6 },
+                                    py: 0,
                                     textAlign: "center",
                                 }}>
                                 <Typography
                                     sx={{
                                         fontWeight: 700,
-                                        color: colors.purple500,
-                                        fontSize: { mobile: 16, tablet: 18 },
+                                        color: colors.blue400,
+                                        fontSize: { mobile: 16, tablet: 18, desktop: 20 },
                                         lineHeight: 1.2,
                                     }}>
                                     {t("finderPanel.horizonsLink")}
@@ -271,31 +327,47 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                     </Typography>
                     <Box
                         sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: 3,
-                            alignItems: "center",
-                            justifyContent: { mobile: "center", tablet: "flex-start" },
+                            display: "grid",
+                            gridTemplateColumns: {
+                                mobile: "1fr",
+                                tablet: "repeat(2, 1fr)",
+                                desktop: "repeat(3, 1fr)",
+                            },
+                            gap: 2,
                         }}>
-                        {logosFormatted.map(logo => (
+                        {RESEARCH_PARTNERS.map(partner => (
                             <Link
-                                key={logo.alt}
-                                href={logo.websiteUrl}
+                                key={`${partner.href}-${partner.name}`}
+                                href={partner.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 sx={{
+                                    textDecoration: "none",
                                     display: "flex",
                                     alignItems: "center",
-                                    minHeight: 50,
-                                    maxWidth: 160,
-                                    "&:hover": { opacity: 0.85 },
+                                    justifyContent: "center",
+                                    textAlign: "center",
+                                    minHeight: 68,
+                                    px: 2,
+                                    py: 1,
+                                    border: `1px solid ${colors.grey300}`,
+                                    backgroundColor: colors.white,
+                                    borderRadius: 1,
+                                    "&:hover": {
+                                        boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                                    },
                                 }}>
                                 <Image
-                                    src={logo.imageSrc}
-                                    alt={logo.alt}
-                                    width={140}
-                                    height={50}
-                                    style={{ objectFit: "contain" }}
+                                    src={partner.logoSrc}
+                                    alt={partner.name}
+                                    width={partner.logoWidth}
+                                    height={partner.logoHeight}
+                                    style={{
+                                        objectFit: "contain",
+                                        maxWidth: "100%",
+                                        maxHeight: 46,
+                                        height: "auto",
+                                    }}
                                 />
                             </Link>
                         ))}

@@ -30,7 +30,7 @@ interface ResultRowProps {
     result: SearchResultDataset;
     libraryData?: Library[];
     showLibraryModal: (props: { datasetId: number }) => void;
-    mutateLibraries: KeyedMutator<Library[]>;
+    mutateLibraries: KeyedMutator<Library[] | undefined>;
     isCohortDiscoveryDisabled: boolean;
     cohortDiscovery: PageTemplatePromo;
 }

@@ -10,9 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { colors } from "@/config/theme";
 import * as styles from "./Table.styles";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import { IconButton, Stack, Collapse, Box } from "@mui/material";
+import { Stack, Collapse, Box } from "@mui/material";
 
 interface OnUpdateProps {
     rowIndex: number;
@@ -277,28 +275,6 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                 minWidth: 0,
                                 width: "100%",
                             }}>
-                            <Stack direction="row" spacing={0.5} flexShrink={0}>
-                                <IconButton
-                                    size="small"
-                                    aria-label="Favourite"
-                                    sx={{
-                                        color: colors.grey600,
-                                        border: `1px solid ${colors.grey300}`,
-                                        borderRadius: 1,
-                                    }}>
-                                    <FavoriteBorderIcon fontSize="medium" />
-                                </IconButton>
-                                <IconButton
-                                    size="small"
-                                    aria-label="Cart"
-                                    sx={{
-                                        color: colors.grey600,
-                                        border: `1px solid ${colors.grey300}`,
-                                        borderRadius: 1,
-                                    }}>
-                                    <ShoppingCartOutlinedIcon fontSize="medium" />
-                                </IconButton>
-                            </Stack>
                             {titleCell && (
                                 <Stack
                                     direction="row"
@@ -455,7 +431,8 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                             borderBottom: `1px solid ${colors.blue400}`,
                                             borderRight: `1px solid ${colors.blue400}`,
                                             fontSize: "18px",
-                                            padding: 3,
+                                            padding: "6px 12px",
+                                            lineHeight: 1.1,
                                             width: isSearchResults
                                                 ? `${(header.column.getSize() / totalColumnSize) * 100}%`
                                                 : header.getSize(),

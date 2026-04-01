@@ -535,6 +535,7 @@ async function getSchemaFromTraser(
             cache: {
                 tags: [`traser-schema-${schemaName}-${schemaVersion}`],
             },
+            suppressError: true,
             serveRaw: true,
         }
     );

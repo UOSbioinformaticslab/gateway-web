@@ -27,10 +27,10 @@ import { getLastSplitPart } from "./string";
 type FormValues = Record<string, unknown>;
 
 const formGetAllSectionFields = (
-    schemaFields: FormHydration[],
+    schemaFields: FormHydration[] | undefined,
     section: string
 ) =>
-    schemaFields
+    (schemaFields ?? [])
         .filter(schemaField => !schemaField.field?.hidden)
         .filter(({ location }) => location && location.startsWith(section));
 

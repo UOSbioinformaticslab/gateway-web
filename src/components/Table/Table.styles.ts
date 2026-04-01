@@ -9,7 +9,7 @@ export const table = css({
 });
 
 export const th = css({
-    padding: 10,
+    padding: 0,
     borderBottom: `1px solid ${colors.grey300}`,
     borderRight: `1px solid ${colors.grey300}`,
     ":last-child": {
