@@ -106,7 +106,7 @@ const getColumns = ({
     translations: { [id: string]: string };
     libraryData?: Library[];
     showLibraryModal: (props: { datasetId: number }) => void;
-    mutateLibraries: KeyedMutator<Library[]>;
+    mutateLibraries: KeyedMutator<Library[] | undefined>;
     isCohortDiscoveryDisabled: boolean;
     cohortDiscovery: PageTemplatePromo;
 }) => [
@@ -125,7 +125,7 @@ const getColumns = ({
             );
         },
         meta: { isPinned: true, hasPinnedBorder: true },
-        header: () => <span>{translations.metaDataLabel}</span>,
+        header: () => <span>Lead Researcher</span>,
         minSize: 300,
         size: 400,
     }),
@@ -144,7 +144,7 @@ const getColumns = ({
                 describeChild
                 title={translations.populationSizeTooltip}
                 tabIndex={0}>
-                {"Pop.Size"}
+                <span>Pop. Size</span>
             </Tooltip>
         ),
         size: 120,
@@ -171,26 +171,19 @@ const getColumns = ({
                                 });
                             }}>
                             <EllipsisLineLimit
-                                text={get(original, PUBLISHER_NAME_PATH)}
+                                text={String(get(original, PUBLISHER_NAME_PATH) ?? "")}
                             />
                         </Link>
                     )}
                     {!isNumber && (
                         <EllipsisLineLimit
-                            text={get(original, PUBLISHER_NAME_PATH)}
+                            text={String(get(original, PUBLISHER_NAME_PATH) ?? "")}
                         />
                     )}
                 </div>
             );
         },
-        header: () => (
-            <Tooltip
-                describeChild
-                title={translations.dataProviderTooltip}
-                tabIndex={0}>
-                <span>{translations.dataProviderLabel}</span>
-            </Tooltip>
-        ),
+        header: () => <span>Accessibility</span>,
         size: 400,
     }),
     columnHelper.display({
@@ -200,14 +193,7 @@ const getColumns = ({
                 {getDateRange(info.row.original?.metadata)}
             </div>
         ),
-        header: () => (
-            <Tooltip
-                describeChild
-                title={translations.dateRangePublisherTooltip}
-                tabIndex={0}>
-                <span>{translations.dateRangePublisherLabel}</span>
-            </Tooltip>
-        ),
+        header: () => <span>Earliest Data</span>,
         size: 120,
     }),
        columnHelper.display({
@@ -217,14 +203,7 @@ const getColumns = ({
                 {get(original, ACCESS_SERVICE_PATH)}
             </div>
         ),
-        header: () => (
-            <Tooltip
-                describeChild
-                title={translations.accessServiceTooltip}
-                tabIndex={0}>
-                {translations.accessServiceLabel}
-            </Tooltip>
-        ),
+        header: () => <span>Start Date</span>,
         minSize: 100,
         size: 120,
     }),
@@ -235,14 +214,7 @@ const getColumns = ({
                 {formatTextDelimiter(get(original, CONFORMS_TO_PATH))}
             </div>
         ),
-        header: () => (
-            <Tooltip
-                describeChild
-                title={translations.dataStandardTooltip}
-                tabIndex={0}>
-                {translations.dataStandardLabel}
-            </Tooltip>
-        ),
+        header: () => <span>Updated</span>,
         size: 180,
     }),
 

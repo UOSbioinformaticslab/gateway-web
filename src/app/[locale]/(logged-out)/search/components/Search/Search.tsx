@@ -108,6 +108,7 @@ import { FILTER_TYPE_MAPPING } from "@/consts/search";
 import {
     cleanSearchFilters,
     getAllSelectedFilters,
+    isQueryEmpty,
     pickOnlyFilters,
 } from "@/utils/filters";
 import { getAllParams, getSaveSearchFilters } from "@/utils/search";
@@ -243,6 +244,8 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         [FILTER_STUDY]: getParamArray(FILTER_STUDY),
     });
 
+    const showDatasetFilterPanel = queryParams.type === SearchCategory.DATASETS;
+
     const [datasetNamesArray, setDatasetNamesArray] = useState<string[]>([]);
 
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
@@ -339,6 +342,12 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         queryParams
     );
 
+    const hasSearchCriteria = useMemo(() => {
+        const hasQuery = !!queryParams.query && queryParams.query.trim() !== "";
+        const hasFilters = !isQueryEmpty(selectedFilters);
+        return hasQuery || hasFilters;
+    }, [queryParams.query, selectedFilters]);
+
     const {
         data,
         isLoading: isSearching,
@@ -361,7 +370,8 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             shouldFetch:
                 forceSearch ||
                 queryParams.type !== SearchCategory.PUBLICATIONS ||
-                queryParams.source === GATEWAY_SOURCE_FIELD ||
+                (queryParams.source === GATEWAY_SOURCE_FIELD &&
+                    hasSearchCriteria) ||
                 (queryParams.source === EUROPE_PMC_SOURCE_FIELD &&
                     !!queryParams.query),
         }
@@ -676,6 +686,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         showDialog(PublicationSearchDialogMemoised);
     console.log(setPostLoginActionCookie);
     const filterPanel = useMemo(() => {
+        if (!showDatasetFilterPanel) return null;
         return (
             <FilterPanel
                 selectedFilters={selectedFilters}
@@ -727,6 +738,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             />
         );
     }, [
+        cancerTypeFilters,
         data?.aggregations,
         europePmcModalAction,
         filters,
@@ -735,6 +747,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         resetQueryParamState,
         schema.$defs,
         selectedFilters,
+        showDatasetFilterPanel,
         updatePath,
         updatePathMultiple,
     ]);
@@ -806,7 +819,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
     return (
         <>
             {/* Filter Drawer */}
-            {isMobile && (
+            {showDatasetFilterPanel && isMobile && (
                 <Drawer
                     anchor="top"
                     open={filterDrawerOpen}
@@ -864,14 +877,16 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                     "aria-label": "filter controls",
                                     role: "region",
                                 })}>
-                                <FilterChips
-                                    selectedFilters={selectedFilters}
-                                    handleDelete={removeFilter}
-                                    filterCategory={
-                                        FILTER_TYPE_MAPPING[queryParams.type]
-                                    }
-                                />
-                                {isMobile && (
+                                {showDatasetFilterPanel && (
+                                    <FilterChips
+                                        selectedFilters={selectedFilters}
+                                        handleDelete={removeFilter}
+                                        filterCategory={
+                                            FILTER_TYPE_MAPPING[queryParams.type]
+                                        }
+                                    />
+                                )}
+                                {showDatasetFilterPanel && isMobile && (
                                     <Button
                                         variant="outlined"
                                         color="secondary"
@@ -923,19 +938,25 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                         )}
      
                                         <Box>
-                                       <FilterHeader />
-                                            </Box>
-                                        <Box mb={2}
-                                        >
-                                        
-                                        <StudyFilter
-                                            filterData={undefined}
-                                            onFilterChange={(selectedFilters) => {
-                                                // Handle filter changes - integrate with existing filter system
-                                                console.log("Selected filters:", Array.from(selectedFilters));
-                                            }}
-                                        />
+                                            <FilterHeader />
                                         </Box>
+                                        {queryParams.type ===
+                                            SearchCategory.DATASETS && (
+                                            <Box mb={2}>
+                                                <StudyFilter
+                                                    filterData={undefined}
+                                                    onFilterChange={selectedFilters => {
+                                                        // eslint-disable-next-line no-console
+                                                        console.log(
+                                                            "Selected filters:",
+                                                            Array.from(
+                                                                selectedFilters as Set<unknown>
+                                                            )
+                                                        );
+                                                    }}
+                                                />
+                                            </Box>
+                                        )}
                                                                            <Box
                                             sx={{
                                                 display: "flex",
