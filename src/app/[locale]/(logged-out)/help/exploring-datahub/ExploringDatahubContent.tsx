@@ -2,20 +2,14 @@ import { Box, Divider, Typography } from "@mui/material";
 import Image from "next/image";
 import Container from "@/components/Container";
 
-/** Screenshots from the reference help content ([CodeSandbox](https://kx8gr6.csb.app/)). */
 const IMG = {
-    keySearch:
-        "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/oucY-Key_Search.png",
-    panelSearch:
-        "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/KMeB-Pannel_Sear.png",
-    sort: "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/hElS-Sort.png",
-    syn: "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/Xwvs-Syn.png",
-    autoFilter:
-        "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/m9F--Auto_Filter.png",
-    manualFilters:
-        "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/B4MS-Manual_Filters.png",
-    resetFilters:
-        "https://uploads.codesandbox.io/uploads/user/user_MRFF7emEZNqyRP6JAfTik4/WdJE-Reset_Filters.png",
+    keySearch: "/images/help/exploring-datahub/key-search.png",
+    panelSearch: "/images/help/exploring-datahub/panel-search.png",
+    sort: "/images/help/exploring-datahub/sort.png",
+    syn: "/images/help/exploring-datahub/synopsis.png",
+    autoFilter: "/images/help/exploring-datahub/auto-filter.png",
+    manualFilters: "/images/help/exploring-datahub/manual-filters.png",
+    resetFilters: "/images/help/exploring-datahub/reset-filters.png",
 } as const;
 
 function DocImage({ src, alt }: { src: string; alt: string }) {
