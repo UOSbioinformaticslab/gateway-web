@@ -20,10 +20,12 @@ const MOBILE_SCROLL_OFFSET = 60;
 
 const ActiveListSidebar = ({
     items,
+    footer,
 }: {
     items: {
         label: string;
     }[];
+    footer?: React.ReactNode;
 }) => {
     const t = useTranslations(TRANSLATION_PATH);
 
@@ -92,7 +94,9 @@ const ActiveListSidebar = ({
                             items={items}
                             handleClick={handleScroll}
                             activeItem={activeItem}
+                            variant="sidebar"
                         />
+                        {footer && <Box sx={{ mt: 2 }}>{footer}</Box>}
                     </ActiveLinkWrapper>
                 </Wrapper>
             )}

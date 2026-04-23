@@ -215,8 +215,14 @@ const FilterLogicSummary = ({
 }) => {
     // Utility references passed down conceptually or imported
     const handleReset = useCallback(() => {
-        const filters = Array.from(selectedFilters);
-        const autoMessage = calculateLogicMessage(filters);
+        const filters = Array.from(selectedFilters).map(id => ({ id }));
+        const autoMessage = calculateLogicMessage({
+            filters,
+            filterType,
+            plusParents,
+            includeParents,
+            getMessage,
+        });
         setLogicMessage(autoMessage);
         setIsMessageManuallyEdited(false);
     }, [selectedFilters, setLogicMessage, setIsMessageManuallyEdited]);
@@ -801,7 +807,9 @@ const FilterCategoryCard = ({
     const [activePanel, setActivePanel] = useState<string | null>('cancer');
     const [helpOpen, setHelpOpen] = useState(false);
 
-    const [selectedFilters, setSelectedFilters] = useState(new Set());
+    const [selectedFilters, setSelectedFilters] = useState<Set<string>>(
+        () => new Set<string>()
+    );
     const [logicMessage, setLogicMessage] = useState("");
     const [isMessageManuallyEdited, setIsMessageManuallyEdited] = useState(false);
 
@@ -815,8 +823,14 @@ const FilterCategoryCard = ({
     // Effect: Update Logic Message
     useEffect(() => {
         if (!isMessageManuallyEdited) {
-            const filters = Array.from(selectedFilters);
-            const newMessage = calculateLogicMessage(filters);
+            const filters = Array.from(selectedFilters).map(id => ({ id }));
+            const newMessage = calculateLogicMessage({
+                filters,
+                filterType,
+                plusParents,
+                includeParents,
+                getMessage,
+            });
             setLogicMessage(newMessage);
         }
     }, [selectedFilters, isMessageManuallyEdited]);

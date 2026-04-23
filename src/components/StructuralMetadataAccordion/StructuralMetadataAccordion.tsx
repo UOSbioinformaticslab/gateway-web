@@ -9,6 +9,7 @@ import {
     TableContainer,
 } from "@mui/material";
 import { flatMap, groupBy, map } from "lodash";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
     StructuralMetadata,
@@ -58,11 +59,15 @@ const TRANSLATION_PATH = "components.StructuralMetadataAccordion";
 
 const StructuralMetadataAccordion = ({
     metadata,
+    expandedNames,
+    onExpandedNamesChange,
 }: {
     metadata:
         | StructuralMetadata
         | StructuralMetadata[]
         | StructuralMetadataPublicSchema;
+    expandedNames?: Set<string>;
+    onExpandedNamesChange?: (next: Set<string>) => void;
 }) => {
     const t = useTranslations(TRANSLATION_PATH);
 
@@ -90,11 +95,31 @@ const StructuralMetadataAccordion = ({
     }
 
     const formattedMetadata = formatMetadata(tableData);
+
+    const [internalExpanded, setInternalExpanded] = useState<Set<string>>(
+        () => new Set<string>()
+    );
+
+    const effectiveExpanded = expandedNames ?? internalExpanded;
+    const setEffectiveExpanded = (next: Set<string>) => {
+        if (onExpandedNamesChange) onExpandedNamesChange(next);
+        else setInternalExpanded(next);
+    };
+
+    const toggle = (name: string) => {
+        const next = new Set(effectiveExpanded);
+        if (next.has(name)) next.delete(name);
+        else next.add(name);
+        setEffectiveExpanded(next);
+    };
+
     return (
         <>
             {formattedMetadata.map(item => (
                 <Accordion
                     key={item.name}
+                    expanded={effectiveExpanded.has(item.name)}
+                    onChange={() => toggle(item.name)}
                     heading={
                         <Box
                             sx={{

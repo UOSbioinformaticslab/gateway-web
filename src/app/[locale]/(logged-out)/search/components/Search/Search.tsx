@@ -539,8 +539,21 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         onContinue: () => mutateLibraries(),
     });
 
-    const renderResults = () =>
-        resultsView === ViewType.TABLE && !isMobile && !isTabletOrLaptop ? (
+    const renderResults = () => {
+        // Dataset cards for list view are currently not implemented (renderResultCard returns null),
+        // so on smaller breakpoints we must keep the table visible to avoid an empty results area.
+        if (queryParams.type === SearchCategory.DATASETS) {
+            return (
+                <ResultsTable
+                    results={data?.list as SearchResultDataset[]}
+                    showLibraryModal={showLibraryModal}
+                    cohortDiscovery={cohortDiscovery}
+                    showSynopsis={synopsesExpanded}
+                />
+            );
+        }
+
+        return resultsView === ViewType.TABLE && !isMobile && !isTabletOrLaptop ? (
             <ResultsTable
                 results={data?.list as SearchResultDataset[]}
                 showLibraryModal={showLibraryModal}
@@ -558,6 +571,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                 {data?.list.map(result => renderResultCard(result))}
             </ResultsList>
         );
+    };
 
     const handleSaveSubmit = ({ name }: SaveSearchValues) => {
         saveSearchQuery({
@@ -807,13 +821,16 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
 
     const mainContentStyles = {
         flexGrow: 1,
+        flexBasis: 0,
+        minWidth: 0,
         transition: theme.transitions.create("margin", {
             easing,
             duration,
         }),
         marginLeft: filterSidebarOpen || isMobile ? 0 : `-280px`,
         padding: `0 ${theme.spacing(2)}`,
-        width: `calc(100% - ${filterSidebarWidth}px)`,
+        width: "100%",
+        maxWidth: "100%",
     };
 
     return (
