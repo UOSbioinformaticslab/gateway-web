@@ -233,41 +233,7 @@ const ActionBar = ({ dataset }: ActionBarProps) => {
                         desktop: "none",
                     },
                 }}>
-                <Button
-                    aria-label={t("downloadMetadata")}
-                    variant="text"
-                    startIcon={
-                        <DownloadIcon
-                            sx={{
-                                fill: "primary",
-                            }}
-                        />
-                    }
-                    endIcon={
-                        <ChevronThinIcon
-                            fontSize="medium"
-                            style={{ color: "primary" }}
-                            sx={{
-                                display: {
-                                    mobile: "none",
-                                    tablet: "inline-block",
-                                },
-                            }}
-                        />
-                    }
-                    sx={{
-                        bgcolor: colors.grey200,
-                        ml: { mobile: 0, desktop: 2 },
-                    }}
-                    onClick={handleOpenDropdownMenu}>
-                    {t("downloadMetadata")}
-                </Button>
-                <MenuDropdown
-                    handleClose={() => setAnchorElement(null)}
-                    menuItems={menuItems}
-                    anchorElement={anchorElement}
-                    title="downloads"
-                />
+                {/* Download data button hidden for now */}
             </Box>
         </ActionBarWrapper>
     );

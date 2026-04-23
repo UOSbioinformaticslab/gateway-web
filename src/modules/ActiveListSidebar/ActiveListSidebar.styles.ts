@@ -12,11 +12,15 @@ export const Wrapper = styled(Box)(() => ({
 }));
 
 export const OverviewText = styled(Typography)(({ theme }) => ({
-    padding: `${theme.spacing(3)} ${theme.spacing(1)}`,
+    padding: `${theme.spacing(2.5)} ${theme.spacing(1.5)}`,
+    color: theme.palette.primary.main,
+    fontWeight: 800,
     borderBottom: `1px solid ${theme.palette.greyCustom.main}`,
-    margin: `0 ${theme.spacing(2)}`,
+    margin: `0 ${theme.spacing(1.5)}`,
 }));
 
 export const ActiveLinkWrapper = styled(Box)(({ theme }) => ({
-    padding: `0 ${theme.spacing(3)}`,
+    padding: `${theme.spacing(1.5)} ${theme.spacing(1.5)} ${theme.spacing(
+        2
+    )}`,
 }));
