@@ -3,7 +3,7 @@
   "version": "2.28.1",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "ts-lint": "tsc --noEmit --incremental --watch",
     "start": "next start",

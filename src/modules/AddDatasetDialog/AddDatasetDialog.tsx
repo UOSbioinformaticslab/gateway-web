@@ -3,7 +3,7 @@
 import MuiDialogActions from "@mui/material/DialogActions";
 import MuiDialogContent from "@mui/material/DialogContent";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
 import Typography from "@/components/Typography";
@@ -21,7 +21,9 @@ const AddDatasetDialog = ({ teamId }: AddDatasetDialogProps) => {
     const { hideDialog } = useDialog();
     const t = useTranslations(TRANSLATION_PATH);
 
-    const DATASET_ROUTE = `/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${RouteName.DATASETS}`;
+    const params = useParams<{ locale?: string }>();
+    const locale = params?.locale || RouteName.EN;
+    const DATASET_ROUTE = `/${locale}/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${RouteName.DATASETS}`;
 
     const handleManual = () => {
         hideDialog();

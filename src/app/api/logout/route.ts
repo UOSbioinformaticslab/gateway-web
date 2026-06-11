@@ -7,6 +7,7 @@ import { sessionHeader, sessionPrefix } from "@/config/session";
 import { extractSubdomain } from "@/utils/general";
 import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 export async function GET() {
     const session = await getSessionCookie();
@@ -20,7 +21,7 @@ export async function GET() {
             headers: {
                 Authorization: `Bearer ${jwtToken}`,
                 [sessionHeader]: sessionPrefix + session,
-                // "x-partner-context": "CRUK",
+                ...getPartnerHeaders(),
             },
         });
 

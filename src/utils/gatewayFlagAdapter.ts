@@ -1,5 +1,6 @@
 import type { Adapter } from "@vercel/flags";
 import apis from "@/config/apis";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 let cache: Record<string, boolean> | null = null;
 let cacheTimestamp: number | null = null;
@@ -33,7 +34,7 @@ const setCache = async (): Promise<Record<string, boolean>> => {
     try {
         const res = await fetch(apis.enabledFeatures, {
             headers: {
-                // "x-partner-context": "CRUK",
+                ...getPartnerHeaders(),
             },
         });
         if (!res.ok) {

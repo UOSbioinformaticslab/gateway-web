@@ -276,6 +276,143 @@ const getFirstLocationValues = (schemaFields: FormHydration[] | undefined) => {
     return Array.from(locationSet);
 };
 
+const getFormHydrationFieldHeaderProps = ({
+    title,
+    description,
+    field,
+}: {
+    title: string;
+    description?: string | null;
+    field?: { label?: string | null };
+}) => {
+    const trimmedDescription = description?.trim();
+
+    if (!trimmedDescription) {
+        return { show: false as const, title, description: undefined };
+    }
+
+    const trimmedLabel = field?.label?.trim();
+
+    return {
+        show: true as const,
+        title,
+        description:
+            trimmedLabel && trimmedDescription === trimmedLabel
+                ? undefined
+                : trimmedDescription,
+    };
+};
+
+const ASSOCIATED_PROJECT_GRANTS_SECTION = "Associated Project Grants";
+
+const SUMMARY_SECTION = "summary";
+const DOCUMENTATION_SECTION = "documentation";
+const SUMMARY_DATA_CUSTODIAN_PREFIX = `${SUMMARY_SECTION}.dataCustodian.`;
+
+const SUMMARY_DATA_CUSTODIAN_ACCORDION_LOCATIONS = new Set([
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}identifier`,
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}name`,
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}description`,
+]);
+
+const isPanelOnlyFormField = (location?: string) =>
+    location?.startsWith(`${ASSOCIATED_PROJECT_GRANTS_SECTION}.`) ||
+    location?.startsWith(`${SUMMARY_SECTION}.`) ||
+    location?.startsWith(`${DOCUMENTATION_SECTION}.`);
+
+const isSummaryDataCustodianAccordionField = (location?: string) =>
+    !!location && SUMMARY_DATA_CUSTODIAN_ACCORDION_LOCATIONS.has(location);
+
+const SUMMARY_STANDALONE_ACCORDION_LOCATIONS = new Set([
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}contactPoint`,
+    `${SUMMARY_SECTION}.keywords`,
+    `${SUMMARY_SECTION}.datasetAliases`,
+]);
+
+const isSummaryStandaloneAccordionField = (location?: string) =>
+    !!location && SUMMARY_STANDALONE_ACCORDION_LOCATIONS.has(location);
+
+const DOCUMENTATION_STANDALONE_ACCORDION_LOCATIONS = new Set([
+    `${DOCUMENTATION_SECTION}.associatedMedia`,
+]);
+
+const isDocumentationStandaloneAccordionField = (location?: string) =>
+    !!location && DOCUMENTATION_STANDALONE_ACCORDION_LOCATIONS.has(location);
+
+const getAssociatedProjectGrantsGuidance = (
+    schemaFields: FormHydration[]
+) =>
+    schemaFields.find(
+        ({ location }) => location === ASSOCIATED_PROJECT_GRANTS_SECTION
+    )?.guidance;
+
+const getSummarySectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const summarySection = schemaFields.find(
+        ({ location }) => location === SUMMARY_SECTION
+    );
+
+    if (!summarySection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(summarySection);
+};
+
+const getSummarySectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === SUMMARY_SECTION)?.guidance;
+
+const getDocumentationSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const documentationSection = schemaFields.find(
+        ({ location }) => location === DOCUMENTATION_SECTION
+    );
+
+    if (!documentationSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(documentationSection);
+};
+
+const getDocumentationSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === DOCUMENTATION_SECTION)
+        ?.guidance;
+
+const getWelcomeSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === INITIAL_FORM_SECTION)
+        ?.guidance;
+
+const withFormHydrationFieldPanelContent = (
+    field: FormHydrationField,
+    fieldParent: Pick<FormHydration, "title" | "description" | "field">
+): FormHydrationField => {
+    const header = getFormHydrationFieldHeaderProps(fieldParent);
+
+    if (!header.show) {
+        return field;
+    }
+
+    const description = fieldParent.description?.trim();
+
+    return {
+        ...field,
+        ...(description && !field.info ? { info: description } : {}),
+    };
+};
+
+const withFormHydrationPanelOnlyFieldContent = (
+    field: FormHydrationField,
+    fieldParent: Pick<FormHydration, "title" | "description" | "field">
+): FormHydrationField => {
+    const title = fieldParent.title?.trim();
+    const description = fieldParent.description?.trim();
+
+    return {
+        ...field,
+        ...(title ? { label: title } : {}),
+        ...(description && !field.info ? { info: description } : {}),
+    };
+};
+
 const renderFormHydrationField = (
     { name, required, component, placeholder, ...rest }: FormHydrationField,
     control: Control<FormValues>,
@@ -296,9 +433,12 @@ const renderFormHydrationField = (
         return null;
     }
 
+    const fieldOptions = options ?? [];
+
     const autocompleteOnlyProps =
         component === "Autocomplete"
             ? {
+                  options: fieldOptions,
                   selectOnFocus: true,
                   clearOnBlur: true,
                   handleHomeEndKeys: true,
@@ -326,6 +466,9 @@ const renderFormHydrationField = (
               }
             : {};
 
+    const selectOnlyProps =
+        component === "Select" ? { options: fieldOptions } : {};
+
     return (
         <InputWrapper
             name={nameOverride || name}
@@ -335,11 +478,12 @@ const renderFormHydrationField = (
             required={required}
             control={control}
             showClearButton={false}
-            canCreate={component === "Autocomplete" && !options?.length}
+            canCreate={component === "Autocomplete" && !fieldOptions.length}
             {...autocompleteOnlyProps}
+            {...selectOnlyProps}
             onFocus={() => setActiveField && setActiveField(name)}
             {...safeRest}
-            label={name || ""}
+            label={(safeRest.label as string | undefined) ?? name ?? ""}
             {...fileUploadFields}
         />
     );
@@ -599,6 +743,19 @@ export {
     isFirstSection,
     getFirstLocationValues,
     hasVisibleFieldsForLocation,
+    getFormHydrationFieldHeaderProps,
+    isPanelOnlyFormField,
+    isSummaryDataCustodianAccordionField,
+    isSummaryStandaloneAccordionField,
+    isDocumentationStandaloneAccordionField,
+    getAssociatedProjectGrantsGuidance,
+    getSummarySectionHeaderProps,
+    getSummarySectionGuidance,
+    getDocumentationSectionHeaderProps,
+    getDocumentationSectionGuidance,
+    getWelcomeSectionGuidance,
+    withFormHydrationFieldPanelContent,
+    withFormHydrationPanelOnlyFieldContent,
     renderFormHydrationField,
     formatValidationItems,
     formGetFieldsCompletedCount,

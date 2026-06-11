@@ -1,16 +1,11 @@
 import BoxContainer from "@/components/BoxContainer";
 import ProtectedAccountRoute from "@/components/ProtectedAccountRoute";
 import { Defs } from "@/interfaces/V4Schema";
-import {
-    getFormHydration,
-    getSchemaFromTraser,
-    getTeam,
-    getUser,
-} from "@/utils/api";
+import { getSchemaFromTraser, getTeam, getUser } from "@/utils/api";
 import metaData, { noFollowRobots } from "@/utils/metadata";
 import { getPermissions } from "@/utils/permissions";
 import { getTeamUser } from "@/utils/user";
-import CreateDataset from "../components/CreateDataset";
+import CreateDatasetPageClient from "../components/CreateDataset/CreateDatasetPageClient";
 
 export const metadata = metaData(
     {
@@ -44,29 +39,12 @@ export default async function CreateDatasetPage({
         // Schema service may be unavailable or return an error (e.g. unknown name/version)
     }
 
-    const formJSON = await getFormHydration(
-        SCHEMA_NAME,
-        SCHEMA_VERSION,
-        [],
-        teamId
-    );
-
-    if (formJSON) {
-        // here be dragons
-        // for some reason reeact-form-hook does not like Organisation Logo containing a space...
-        // its not even used in the form... we just store it then and pass it back to the api... its just not happy about it.. the poor thing...
-        const orgImage = formJSON.defaultValues["Organisation Logo"] as string;
-        if (orgImage) {
-            formJSON.defaultValues["Organisation Logo"] = encodeURI(orgImage);
-        }
-    }
     return (
         <ProtectedAccountRoute
             permissions={permissions}
             pagePermissions={["datasets.create"]}>
             <BoxContainer sx={{ mt: "14px" }}>
-                <CreateDataset
-                    formJSON={formJSON}
+                <CreateDatasetPageClient
                     teamId={Number(teamId)}
                     user={user}
                     defaultTeamId={teamId}
