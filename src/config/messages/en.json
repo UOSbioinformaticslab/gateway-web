@@ -521,6 +521,7 @@
                             "guidance": "Guidance",
                             "next": "Next",
                             "previous": "Previous",
+                            "metadataSections": "Metadata Sections",
                             "welcomeMessage": "Guide to Uploading and Modifying Metadata",
                             "legendIntro": "You will see a legend to help you as you on-board your dataset metadata",
                             "toolTipText": "This has automatically been populated with the name of this Team. To change this, start typing or select a Data Custodian from the drop down list.",

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { FileUpload } from "@/interfaces/FileUpload";
 import Box from "@/components/Box";
 import Button from "@/components/Button";
@@ -30,6 +30,8 @@ const UploadDataset = ({ teamId, teamPid }: UploadDatasetProps) => {
     const [errorMessage, SetErrorMessage] = useState<string>("");
 
     const { push } = useRouter();
+    const params = useParams<{ locale?: string }>();
+    const locale = params?.locale || RouteName.EN;
 
     const checkIfPidMatches = (file: unknown) => {
         SetErrorMessage("");
@@ -58,7 +60,7 @@ const UploadDataset = ({ teamId, teamPid }: UploadDatasetProps) => {
     const [isUploading, setIsUploading] = useState<boolean>(false);
 
     const FILE_UPLOAD_URL = `${apis.fileUploadV1Url}?entity_flag=dataset-from-upload&team_id=${teamId}`;
-    const REDIRECT_URL = `/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${RouteName.DATASETS}?tab=DRAFT`;
+    const REDIRECT_URL = `/${locale}/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${RouteName.DATASETS}?tab=DRAFT`;
 
     return (
         <>

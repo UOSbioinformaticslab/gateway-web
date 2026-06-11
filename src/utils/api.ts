@@ -49,6 +49,7 @@ import {
 import { getUserFromToken } from "@/utils/cookies";
 import { getSessionCookie } from "./getSessionCookie";
 import { logger } from "./logger";
+import { getPartnerHeaders } from "./partnerHeaders";
 import { revalidateCache } from "./revalidateCache";
 
 type Payload<T> = T | (() => BodyInit & T);
@@ -83,7 +84,7 @@ async function get<T>(
             ...headers,
             Authorization: `Bearer ${jwt?.value}`,
             [sessionHeader]: sessionPrefix + session,
-            // "x-partner-context": "CRUK",
+            ...getPartnerHeaders(),
         },
         ...nextConfig,
     });
@@ -147,7 +148,7 @@ async function patch<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
-            // "x-partner-context": "CRUK",
+            ...getPartnerHeaders(),
         },
         body: JSON.stringify(payload),
     });
@@ -197,7 +198,7 @@ async function put<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
-            // "x-partner-context": "CRUK",
+            ...getPartnerHeaders(),
         },
         body: JSON.stringify(payload),
     });
@@ -247,7 +248,7 @@ async function post<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
-            // "x-partner-context": "CRUK",
+            ...getPartnerHeaders(),
         },
         body: JSON.stringify(payload),
     });

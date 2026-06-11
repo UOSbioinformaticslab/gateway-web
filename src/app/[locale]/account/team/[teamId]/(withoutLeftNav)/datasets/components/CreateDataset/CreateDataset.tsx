@@ -1,11 +1,7 @@
 "use client";
 
-import {
-    Fragment,
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
     useForm,
     FormProvider,
@@ -54,13 +50,13 @@ import apis from "@/config/apis";
 import theme from "@/config/theme";
 import { DataStatus } from "@/consts/application";
 import {
-    DATA_CUSTODIAN_FIELDS,
-    DATA_CUSTODIAN_ID,
+    TEAM_ID_FIELD,
     DATA_CUSTODIAN_NAME,
     DATASET_TYPE,
     INITIAL_FORM_SECTION,
     PATIENT_PATHWAY_DESCRIPTION,
     STRUCTURAL_METADATA_FORM_SECTION,
+    DATASET_FILTERS_FORM_SECTION,
     SUBMISSON_FORM_SECTION,
 } from "@/consts/createDataset";
 import { ArrowBackIosNewIcon, ArrowForwardIosIcon } from "@/consts/icons";
@@ -82,22 +78,47 @@ import {
     isFirstSection,
     isLastSection,
     mapFormFieldsForSubmission,
-    renderFormHydrationField,
+    getAssociatedProjectGrantsGuidance,
+    getFormHydrationFieldHeaderProps,
+    getSummarySectionHeaderProps,
+    getSummarySectionGuidance,
+    getDocumentationSectionHeaderProps,
+    getDocumentationSectionGuidance,
+    getWelcomeSectionGuidance,
+    isSummaryDataCustodianAccordionField,
+    isSummaryStandaloneAccordionField,
+    isDocumentationStandaloneAccordionField,
     formatValidationItems,
 } from "@/utils/formHydration";
+import FormHydrationAccordionSection from "./FormHydrationAccordionSection";
+import FormHydrationFieldHeader from "./FormHydrationFieldHeader";
+import FormHydrationFieldItem from "./FormHydrationFieldItem";
 import { capitalise, decodeHtmlEntity, splitCamelcase } from "@/utils/general";
 import IntroScreen from "../IntroScreen";
 import StructuralMetadataSection from "../StructuralMetadata";
 import SubmissionScreen from "../SubmissionScreen";
 import { FormFooter, FormFooterItem } from "./CreateDataset.styles";
-import FormFieldArray from "./FormFieldArray";
+
+const DatasetFiltersSection = dynamic(
+    () => import("../DatasetFilters"),
+    { loading: () => <Loading /> }
+);
+
+const DatasetFiltersGuidancePanel = dynamic(
+    () => import("../DatasetFilters/DatasetFiltersGuidancePanel"),
+    { loading: () => <Loading /> }
+);
 
 interface CreateDatasetProps {
-    formJSON: FormHydrationSchema;
+    formJSON?: FormHydrationSchema;
     teamId: number;
     user: AuthUser;
     defaultTeamId: number;
     schemadefs: Defs;
+}
+
+interface CreateDatasetFormProps extends Omit<CreateDatasetProps, "formJSON"> {
+    formJSON: FormHydrationSchema;
 }
 
 type FormValues = Record<string, unknown>;
@@ -112,15 +133,13 @@ const getMetadata = (isDraft: boolean) =>
 
 const today = getToday();
 
-const CreateDataset = ({
+const CreateDatasetForm = ({
     formJSON,
     teamId,
     user,
     defaultTeamId,
     schemadefs,
-}: CreateDatasetProps) => {
-    const [formJSONDynamic, setFormJSONDynamic] = useState<FormHydrationSchema | undefined>();
-
+}: CreateDatasetFormProps) => {
     const [currentTeamId, setCurrentTeamId] = useState<number>(defaultTeamId);
 
     const [searchName, setSearchName] = useState("");
@@ -134,7 +153,6 @@ const CreateDataset = ({
     );
 
     const currentFormJSON = useMemo(() => {
-        const base = formJSONDynamic || formJSON;
         // here be dragons
         // the validation rule around urls is strict.
         // as it should be, the below question is not a user visible question, one the api populates behind the scenes..
@@ -143,20 +161,22 @@ const CreateDataset = ({
         // as this value is defaulted behind the scenes and the user has no control over it, remove the validation from the frontend.
 
         return {
-            ...base,
+            ...formJSON,
+            schema_fields: formJSON.schema_fields ?? [],
             validation:
-                base.validation?.filter(
+                formJSON.validation?.filter(
                     obj => obj != null && obj.title !== "revision url"
                 ) || [],
+            defaultValues: formJSON.defaultValues ?? {},
         };
-    }, [formJSON, formJSONDynamic]);
+    }, [formJSON]);
 
     const teamOptions = useMemo(() => {
         const defaultOption =
-            !!currentFormJSON.defaultValues[DATA_CUSTODIAN_ID] &&
+            !!currentFormJSON.defaultValues[TEAM_ID_FIELD] &&
             !!currentFormJSON.defaultValues[DATA_CUSTODIAN_NAME]
                 ? {
-                      value: currentFormJSON.defaultValues[DATA_CUSTODIAN_ID],
+                      value: currentFormJSON.defaultValues[TEAM_ID_FIELD],
                       label: currentFormJSON.defaultValues[DATA_CUSTODIAN_NAME],
                   }
                 : {};
@@ -181,9 +201,11 @@ const CreateDataset = ({
     );
 
     const params = useParams<{
+        locale: string;
         teamId: string;
         datasetId: string;
     }>();
+    const locale = params?.locale || RouteName.EN;
 
     const searchParams = useSearchParams();
 
@@ -202,7 +224,7 @@ const CreateDataset = ({
     );
 
     const [finishedLoadingExisting, setFinishedLoadingExisting] =
-        useState<boolean>();
+        useState<boolean>(() => !params?.datasetId);
 
     const { push } = useRouter();
 
@@ -220,8 +242,23 @@ const CreateDataset = ({
     const [structuralMetadata, setStructuralMetadata] = useState<
         StructuralMetadata[]
     >([]);
+    const [datasetFilterIds, setDatasetFilterIds] = useState<Set<string>>(
+        () => new Set()
+    );
 
-    const schemaFields = currentFormJSON.schema_fields;
+    const handleDatasetFilterChange = useCallback((id: string) => {
+        setDatasetFilterIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    }, []);
+
+    const schemaFields = currentFormJSON.schema_fields ?? [];
 
     const defaultFormValues = {
         ...currentFormJSON.defaultValues,
@@ -229,15 +266,18 @@ const CreateDataset = ({
         "Dataset Version": "1.0.0",
         "revision version": "1.0.0",
         "revision url": "http://www.example.com/",
-        identifier: defaultTeamId,
+        team_id: defaultTeamId,
+        identifier: "",
         "Metadata Issued Datetime": today,
         "Last Modified Datetime": today,
-        "Name of Data Custodian": "--",
-        "Dataset population size": -1,
+        "Name of Data Custodian": "",
+        "Dataset population size": "",
         "Follow-up": null,
-        "contact point":
-            currentFormJSON.defaultValues.contact_point || user?.email, // this is a hidden field and goes no where but it is summary.dataCustodian.contact_point
-        "Contact point": user?.email, // summary.contact_point
+        "contact point": "",
+        "Contact point": "",
+        "Dataset & BioSample alias": "",
+        "Lead Researcher": "",
+        "Lead Research Institute": "",
     };
 
     useEffect(() => {
@@ -360,7 +400,7 @@ const CreateDataset = ({
         formState,
     } = methods;
 
-    const watchId = watch(DATA_CUSTODIAN_ID);
+    const watchId = watch(TEAM_ID_FIELD);
     const watchType = watch(DATASET_TYPE);
 
     const {
@@ -415,61 +455,11 @@ const CreateDataset = ({
     //    if an identifier, and not a persistent identifier
     const watchIdIsNumber = !Number.isNaN(Number(watchId));
 
-    const { data: formJSONUpdated } = useGet<FormHydrationSchema>(
-        `${apis.formHydrationV1Url}?name=${SCHEMA_NAME}&version=${SCHEMA_VERSION}&dataTypes=${watchType}&team_id=${watchId}`,
-        {
-            shouldFetch: watchIdIsNumber,
-        }
-    );
-
     useEffect(() => {
-        if (!watchId) return;
+        if (!watchId || !watchIdIsNumber) return;
         setCurrentTeamId(watchId);
-    }, [watchId]);
-
-    const updateDataCustodian = (formJSONUpdated: FormHydrationSchema) => {
-        const custodianOverrides = DATA_CUSTODIAN_FIELDS.reduce((acc, key) => {
-            acc[key] = formJSONUpdated.defaultValues[key];
-            return acc;
-        }, {});
-
-        const defaultFormValues = {
-            ...getValues(),
-            ...custodianOverrides,
-        };
-
-        reset(defaultFormValues);
-    };
-
-    useEffect(() => {
-        if (formJSONUpdated) {
-            // here be dragons
-            // for some reason reeact-form-hook does not like Organisation Logo containing a space...
-            // its not even used in the form... we just store it then and pass it back to the api... its just not happy about it.. the poor thing...
-
-            const orgImage = formJSONUpdated.defaultValues[
-                "Organisation Logo"
-            ] as string;
-            if (orgImage) {
-                formJSONUpdated.defaultValues["Organisation Logo"] =
-                    encodeURI(orgImage);
-            }
-            formJSONUpdated.defaultValues = {
-                ...formJSONUpdated.defaultValues,
-                // the formhydration default values come from a gwd 2.0 dm
-                // The subtypes are more than likely not correct, but we know there
-                // correct from the original call as its gone through traser
-                // so do the old switcharoo
-                "Dataset type": formJSON.defaultValues["Dataset type"],
-                "Dataset Type Array":
-                    formJSON.defaultValues["Dataset Type Array"],
-            };
-            setFormJSONDynamic(formJSONUpdated);
-            updateDataCustodian(formJSONUpdated);
-        } else {
-            setFormJSONDynamic(undefined);
-        }
-    }, [formJSONUpdated]);
+        setValue(TEAM_ID_FIELD, watchId);
+    }, [watchId, watchIdIsNumber, setValue]);
 
     useEffect(() => {
         if (!isEditing) {
@@ -492,17 +482,49 @@ const CreateDataset = ({
         }
     }, [existingFormData, isEditing]);
 
-    const formSections = [INITIAL_FORM_SECTION]
-        .concat(
-            getFirstLocationValues(schemaFields).filter(location =>
-                hasVisibleFieldsForLocation(schemaFields, location)
-            )
-        )
-     //   .concat([SUBMISSON_FORM_SECTION]);
-    console.log("formSections", formSections);
+    const formSections = useMemo(
+        () =>
+            [INITIAL_FORM_SECTION].concat(
+                getFirstLocationValues(schemaFields).filter(location => {
+                    if (location === DATASET_FILTERS_FORM_SECTION) {
+                        return schemaFields.some(
+                            field => field.location === location
+                        );
+                    }
+                    return hasVisibleFieldsForLocation(schemaFields, location);
+                })
+            ),
+        [schemaFields]
+    );
     const currentSectionIndex = selectedFormSection
         ? formSections.indexOf(selectedFormSection)
         : 0;
+
+    const visibleFieldsInSelectedSection = useMemo(() => {
+        if (!selectedFormSection || currentSectionIndex <= 0) {
+            return [];
+        }
+
+        return schemaFields.filter(
+            schemaField =>
+                !schemaField.field?.hidden &&
+                schemaField.location?.startsWith(selectedFormSection)
+        );
+    }, [schemaFields, selectedFormSection, currentSectionIndex]);
+
+    const hideSectionTitle = useMemo(() => {
+        if (visibleFieldsInSelectedSection.length !== 1) {
+            return false;
+        }
+
+        const [fieldParent] = visibleFieldsInSelectedSection;
+
+        if (fieldParent.fields?.length) {
+            return false;
+        }
+
+        return getFormHydrationFieldHeaderProps(fieldParent).show;
+    }, [visibleFieldsInSelectedSection]);
 
     const [legendItems, setLegendItems] = useState<LegendItem[]>([]);
     const [submissionRequested, setSubmissionRequested] = useState<boolean>(
@@ -687,7 +709,7 @@ const CreateDataset = ({
 
             if (formPostRequest !== null) {
                 push(
-                    `/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${
+                    `/${locale}/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${
                         RouteName.DATASETS
                     }?tab=${saveAsDraft ? "DRAFT " : "ACTIVE"}`
                 );
@@ -768,25 +790,203 @@ const CreateDataset = ({
         );
     }, [getValues, schemaFields, watchAll]);
 
+    const formatGuidance = (guidance?: string) =>
+        guidance?.replaceAll("\\n", "\n");
+
     const updateGuidanceText = (fieldName: string, fieldArrayName?: string) => {
+        const grantsGuidance = formatGuidance(
+            getAssociatedProjectGrantsGuidance(schemaFields)
+        );
+        const summaryGuidance = formatGuidance(
+            getSummarySectionGuidance(schemaFields)
+        );
+
         if (fieldArrayName) {
+            const fieldSchema = currentFormJSON.schema_fields
+                .find(field => field.title === fieldArrayName)
+                ?.fields?.find(field => field.title === fieldName);
+
+            if (fieldSchema?.location?.startsWith("Associated Project Grants.")) {
+                const fieldGuidance = formatGuidance(fieldSchema?.guidance);
+                setGuidanceText(
+                    fieldGuidance?.trim() ? fieldGuidance : grantsGuidance
+                );
+                return;
+            }
+
+            setGuidanceText(formatGuidance(fieldSchema?.guidance));
+            return;
+        }
+
+        const fieldSchema = currentFormJSON.schema_fields.find(
+            field => field.title === fieldName
+        );
+
+        if (fieldSchema?.location?.startsWith("Associated Project Grants.")) {
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
             setGuidanceText(
-                currentFormJSON.schema_fields
-                    .find(field => field.title === fieldArrayName)
-                    ?.fields?.find(field => field.title === fieldName)
-                    ?.guidance?.replaceAll("\\n", "\n")
+                fieldGuidance?.trim() ? fieldGuidance : grantsGuidance
             );
-        } else {
+            return;
+        }
+
+        if (fieldSchema?.location?.startsWith("summary.")) {
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
             setGuidanceText(
-                currentFormJSON.schema_fields
-                    .find(field => field.title === fieldName)
-                    ?.guidance?.replaceAll("\\n", "\n")
+                fieldGuidance?.trim() ? fieldGuidance : summaryGuidance
+            );
+            return;
+        }
+
+        const documentationGuidance = formatGuidance(
+            getDocumentationSectionGuidance(schemaFields)
+        );
+
+        if (fieldSchema?.location?.startsWith("documentation.")) {
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
+            setGuidanceText(
+                fieldGuidance?.trim() ? fieldGuidance : documentationGuidance
+            );
+            return;
+        }
+
+        setGuidanceText(formatGuidance(fieldSchema?.guidance));
+    };
+
+    useEffect(() => {
+        if (selectedFormSection === INITIAL_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(getWelcomeSectionGuidance(schemaFields))
+            );
+            return;
+        }
+
+        if (selectedFormSection === "Dataset Version") {
+            const datasetVersionGuidance = schemaFields.find(
+                field => field.title === "Dataset Version"
+            )?.guidance;
+            setGuidanceText(formatGuidance(datasetVersionGuidance));
+            return;
+        }
+
+        if (selectedFormSection === DATASET_FILTERS_FORM_SECTION) {
+            const datasetFiltersGuidance = schemaFields.find(
+                field => field.title === "Dataset Filters"
+            )?.guidance;
+            setGuidanceText(formatGuidance(datasetFiltersGuidance));
+            return;
+        }
+
+        if (selectedFormSection === "Associated Project Grants") {
+            setGuidanceText(
+                formatGuidance(getAssociatedProjectGrantsGuidance(schemaFields))
+            );
+            return;
+        }
+
+        if (selectedFormSection === "summary") {
+            setGuidanceText(
+                formatGuidance(getSummarySectionGuidance(schemaFields))
+            );
+            return;
+        }
+
+        if (selectedFormSection === "documentation") {
+            setGuidanceText(
+                formatGuidance(getDocumentationSectionGuidance(schemaFields))
             );
         }
-    };
+    }, [selectedFormSection, schemaFields]);
 
     const isStructuralMetadataSection =
         selectedFormSection === STRUCTURAL_METADATA_FORM_SECTION;
+
+    const isDatasetFiltersSection =
+        selectedFormSection === DATASET_FILTERS_FORM_SECTION;
+
+    const summarySectionHeader = useMemo(
+        () => getSummarySectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const documentationSectionHeader = useMemo(
+        () => getDocumentationSectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const visibleSummarySectionFields = useMemo(() => {
+        if (selectedFormSection !== "summary") {
+            return null;
+        }
+
+        const visible = schemaFields.filter(
+            schemaField =>
+                !schemaField.field?.hidden &&
+                schemaField.location?.startsWith("summary") &&
+                schemaField.location !== "summary"
+        );
+
+        const beforeCustodian: typeof visible = [];
+        const dataCustodian: typeof visible = [];
+        const afterCustodian: typeof visible = [];
+        let seenCustodianAccordion = false;
+
+        visible.forEach(field => {
+            if (isSummaryDataCustodianAccordionField(field.location)) {
+                dataCustodian.push(field);
+                seenCustodianAccordion = true;
+                return;
+            }
+
+            if (!seenCustodianAccordion) {
+                beforeCustodian.push(field);
+            } else {
+                afterCustodian.push(field);
+            }
+        });
+
+        return {
+            beforeCustodian,
+            dataCustodian,
+            afterCustodian,
+        };
+    }, [schemaFields, selectedFormSection]);
+
+    const visibleDocumentationSectionFields = useMemo(() => {
+        if (selectedFormSection !== "documentation") {
+            return null;
+        }
+
+        const visible = schemaFields.filter(
+            schemaField =>
+                !schemaField.field?.hidden &&
+                schemaField.location?.startsWith("documentation.") &&
+                schemaField.location !== "documentation"
+        );
+
+        const beforeAccordion: typeof visible = [];
+        const accordion: typeof visible = [];
+        const afterAccordion: typeof visible = [];
+
+        visible.forEach(field => {
+            if (isDocumentationStandaloneAccordionField(field.location)) {
+                accordion.push(field);
+                return;
+            }
+
+            if (accordion.length === 0) {
+                beforeAccordion.push(field);
+            } else {
+                afterAccordion.push(field);
+            }
+        });
+
+        return {
+            beforeAccordion,
+            accordion,
+            afterAccordion,
+        };
+    }, [schemaFields, selectedFormSection]);
 
     useUnsavedChanges({
         shouldConfirmLeave: formState.isDirty,
@@ -825,7 +1025,7 @@ const CreateDataset = ({
     return (
         <>
             <Link
-                href={`/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${
+                href={`/${locale}/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${
                     RouteName.DATASETS
                 }?tab=${isDraft ? "DRAFT " : "ACTIVE"}`}
                 underline="hover"
@@ -849,32 +1049,54 @@ const CreateDataset = ({
             />
 
             <Box sx={{ display: "flex", flexDirection: "row", p: 0 }}>
-                <Box
-                    sx={{
-                        flex: 1,
-                        padding: theme.spacing(1),
-                    }}>
-                    <FormLegend
-                        items={legendItems}
-                        handleClickItem={handleLegendClick}
-                        offsetTop={navbarHeight}
-                    />
+                <Box sx={{ flex: 1, p: 0 }}>
+                    <Paper
+                        sx={{
+                            mt: 1.25,
+                            mb: 1.25,
+                            p: 2,
+                            backgroundColor: "white",
+                        }}>
+                        <FormLegend
+                            title={t("metadataSections")}
+                            items={legendItems}
+                            handleClickItem={handleLegendClick}
+                            offsetTop={navbarHeight}
+                        />
+                    </Paper>
                 </Box>
 
                 {currentSectionIndex === 0 && (
-                    <IntroScreen
-                        defaultValue={watchType || []}
-                        setDatasetType={(value: string) => {
-                            setValue(DATASET_TYPE, value);
-                        }}
-                        teamOptions={teamOptions}
-                        handleOnUserInputChange={handleOnUserInputChange}
-                        setDataCustodian={(value: number) =>
-                            setValue(DATA_CUSTODIAN_ID, value)
-                        }
-                        defaultTeamId={currentTeamId}
-                        isLoadingTeams={isLoadingTeams}
-                    />
+                    <>
+                        <IntroScreen
+                            teamOptions={teamOptions}
+                            handleOnUserInputChange={handleOnUserInputChange}
+                            setDataCustodian={(value: number) =>
+                                setValue(TEAM_ID_FIELD, value)
+                            }
+                            defaultTeamId={currentTeamId}
+                            isLoadingTeams={isLoadingTeams}
+                        />
+                        <Paper
+                            sx={{
+                                flex: 1,
+                                mt: 1.25,
+                                mb: 1.25,
+                                p: 2,
+                                backgroundColor: "white",
+                                wordBreak: "break-word",
+                            }}>
+                            <Typography variant="h2">
+                                {t("guidance")}
+                            </Typography>
+
+                            {guidanceText && (
+                                <MarkDownSanitizedWithHtml
+                                    content={guidanceText}
+                                />
+                            )}
+                        </Paper>
+                    </>
                 )}
 
                 {currentSectionIndex < formSections.length - 1 &&
@@ -885,17 +1107,54 @@ const CreateDataset = ({
                                 <Form>
                                     <Paper
                                         sx={{
-                                            marginTop: "10px",
-                                            marginBottom: "10px",
-                                            padding: 2,
+                                            mt: 1.25,
+                                            mb: 1.25,
+                                            p: 2,
+                                            backgroundColor: "white",
                                         }}>
-                                        <Typography variant="h2">
-                                            {capitalise(
-                                                splitCamelcase(
-                                                    selectedFormSection
-                                                )
-                                            )}
-                                        </Typography>
+                                        {!hideSectionTitle &&
+                                            !isDatasetFiltersSection &&
+                                            (summarySectionHeader?.show &&
+                                            selectedFormSection === "summary" ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        summarySectionHeader.title
+                                                    }
+                                                    description={
+                                                        summarySectionHeader.description
+                                                    }
+                                                />
+                                            ) : documentationSectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  "documentation" ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        documentationSectionHeader.title
+                                                    }
+                                                    description={
+                                                        documentationSectionHeader.description
+                                                    }
+                                                />
+                                            ) : (
+                                                <Typography variant="h2">
+                                                    {capitalise(
+                                                        splitCamelcase(
+                                                            selectedFormSection
+                                                        )
+                                                    )}
+                                                </Typography>
+                                            ))}
+
+                                        {isDatasetFiltersSection && (
+                                            <DatasetFiltersSection
+                                                selectedFilters={
+                                                    datasetFilterIds
+                                                }
+                                                onFilterChange={
+                                                    handleDatasetFilterChange
+                                                }
+                                            />
+                                        )}
 
                                         {isStructuralMetadataSection && (
                                             <StructuralMetadataSection
@@ -918,9 +1177,226 @@ const CreateDataset = ({
                                             />
                                         )}
 
-                                        {currentSectionIndex > 0 && (
+                                        {currentSectionIndex > 0 &&
+                                            !isDatasetFiltersSection &&
+                                            !isStructuralMetadataSection && (
                                             <Box sx={{ p: 0 }}>
-                                                {selectedFormSection &&
+                                                {selectedFormSection ===
+                                                    "summary" &&
+                                                visibleSummarySectionFields ? (
+                                                    <>
+                                                        {visibleSummarySectionFields.beforeCustodian.map(
+                                                            (fieldParent, index) => (
+                                                                <FormHydrationFieldItem
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    fieldParent={
+                                                                        fieldParent
+                                                                    }
+                                                                    selectedFormSection={
+                                                                        selectedFormSection
+                                                                    }
+                                                                    index={index}
+                                                                    control={control}
+                                                                    schemadefs={
+                                                                        schemadefs
+                                                                    }
+                                                                    getValues={getValues}
+                                                                    updateGuidanceText={
+                                                                        updateGuidanceText
+                                                                    }
+                                                                />
+                                                            )
+                                                        )}
+                                                        {visibleSummarySectionFields
+                                                            .dataCustodian.length >
+                                                            0 && (
+                                                            <FormHydrationAccordionSection title="Dataset Custodian">
+                                                                {visibleSummarySectionFields.dataCustodian.map(
+                                                                    (
+                                                                        fieldParent,
+                                                                        index
+                                                                    ) => (
+                                                                        <FormHydrationFieldItem
+                                                                            key={`${fieldParent.location}-${index}`}
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={
+                                                                                index
+                                                                            }
+                                                                            control={
+                                                                                control
+                                                                            }
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                        />
+                                                                    )
+                                                                )}
+                                                            </FormHydrationAccordionSection>
+                                                        )}
+                                                        {visibleSummarySectionFields.afterCustodian.map(
+                                                            (fieldParent, index) =>
+                                                                isSummaryStandaloneAccordionField(
+                                                                    fieldParent.location
+                                                                ) ? (
+                                                                    <FormHydrationAccordionSection
+                                                                        key={`${fieldParent.location}-${index}`}
+                                                                        title={
+                                                                            fieldParent.title
+                                                                        }>
+                                                                        <FormHydrationFieldItem
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={index}
+                                                                            control={control}
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                        />
+                                                                    </FormHydrationAccordionSection>
+                                                                ) : (
+                                                                    <FormHydrationFieldItem
+                                                                        key={`${fieldParent.location}-${index}`}
+                                                                        fieldParent={
+                                                                            fieldParent
+                                                                        }
+                                                                        selectedFormSection={
+                                                                            selectedFormSection
+                                                                        }
+                                                                        index={index}
+                                                                        control={control}
+                                                                        schemadefs={
+                                                                            schemadefs
+                                                                        }
+                                                                        getValues={getValues}
+                                                                        updateGuidanceText={
+                                                                            updateGuidanceText
+                                                                        }
+                                                                    />
+                                                                )
+                                                        )}
+                                                    </>
+                                                ) : selectedFormSection ===
+                                                      "documentation" &&
+                                                  visibleDocumentationSectionFields ? (
+                                                    <>
+                                                        {visibleDocumentationSectionFields.beforeAccordion.map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => (
+                                                                <FormHydrationFieldItem
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    fieldParent={
+                                                                        fieldParent
+                                                                    }
+                                                                    selectedFormSection={
+                                                                        selectedFormSection
+                                                                    }
+                                                                    index={index}
+                                                                    control={
+                                                                        control
+                                                                    }
+                                                                    schemadefs={
+                                                                        schemadefs
+                                                                    }
+                                                                    getValues={
+                                                                        getValues
+                                                                    }
+                                                                    updateGuidanceText={
+                                                                        updateGuidanceText
+                                                                    }
+                                                                />
+                                                            )
+                                                        )}
+                                                        {visibleDocumentationSectionFields.accordion.map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => (
+                                                                <FormHydrationAccordionSection
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    title={
+                                                                        fieldParent.title
+                                                                    }>
+                                                                    <FormHydrationFieldItem
+                                                                        fieldParent={
+                                                                            fieldParent
+                                                                        }
+                                                                        selectedFormSection={
+                                                                            selectedFormSection
+                                                                        }
+                                                                        index={
+                                                                            index
+                                                                        }
+                                                                        control={
+                                                                            control
+                                                                        }
+                                                                        schemadefs={
+                                                                            schemadefs
+                                                                        }
+                                                                        getValues={
+                                                                            getValues
+                                                                        }
+                                                                        updateGuidanceText={
+                                                                            updateGuidanceText
+                                                                        }
+                                                                    />
+                                                                </FormHydrationAccordionSection>
+                                                            )
+                                                        )}
+                                                        {visibleDocumentationSectionFields.afterAccordion.map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => (
+                                                                <FormHydrationFieldItem
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    fieldParent={
+                                                                        fieldParent
+                                                                    }
+                                                                    selectedFormSection={
+                                                                        selectedFormSection
+                                                                    }
+                                                                    index={index}
+                                                                    control={
+                                                                        control
+                                                                    }
+                                                                    schemadefs={
+                                                                        schemadefs
+                                                                    }
+                                                                    getValues={
+                                                                        getValues
+                                                                    }
+                                                                    updateGuidanceText={
+                                                                        updateGuidanceText
+                                                                    }
+                                                                />
+                                                            )
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    selectedFormSection &&
                                                     schemaFields
                                                         .filter(
                                                             schemaField =>
@@ -938,51 +1414,32 @@ const CreateDataset = ({
                                                             (
                                                                 fieldParent,
                                                                 index
-                                                            ) => {
-                                                                const {
-                                                                    field,
-                                                                    fields,
-                                                                } = fieldParent;
-                                                                const listKey = `${selectedFormSection}-${fieldParent.location ?? ""}-${fieldParent.title ?? field?.name ?? ""}-${index}`;
-
-                                                                return (
-                                                                    <Fragment
-                                                                        key={
-                                                                            listKey
-                                                                        }>
-                                                                        {fields?.length ? (
-                                                                            <FormFieldArray
-                                                                                schemadefs={
-                                                                                    schemadefs
-                                                                                }
-                                                                                control={
-                                                                                    control
-                                                                                }
-                                                                                formArrayValues={
-                                                                                    getValues(
-                                                                                        fieldParent.title
-                                                                                    ) as unknown as FormValues[]
-                                                                                }
-                                                                                fieldParent={
-                                                                                    fieldParent
-                                                                                }
-                                                                                setSelectedField={
-                                                                                    updateGuidanceText
-                                                                                }
-                                                                            />
-                                                                        ) : (
-                                                                            field &&
-                                                                            renderFormHydrationField(
-                                                                                field,
-                                                                                control,
-                                                                                undefined,
-                                                                                updateGuidanceText
-                                                                            )
-                                                                        )}
-                                                                    </Fragment>
-                                                                );
-                                                            }
-                                                        )}
+                                                            ) => (
+                                                                <FormHydrationFieldItem
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    fieldParent={
+                                                                        fieldParent
+                                                                    }
+                                                                    selectedFormSection={
+                                                                        selectedFormSection
+                                                                    }
+                                                                    index={index}
+                                                                    control={
+                                                                        control
+                                                                    }
+                                                                    schemadefs={
+                                                                        schemadefs
+                                                                    }
+                                                                    getValues={
+                                                                        getValues
+                                                                    }
+                                                                    updateGuidanceText={
+                                                                        updateGuidanceText
+                                                                    }
+                                                                />
+                                                            )
+                                                        )
+                                                )}
                                             </Box>
                                         )}
                                     </Paper>
@@ -991,21 +1448,33 @@ const CreateDataset = ({
                         </Box>
                         {currentSectionIndex > 0 && (
                             <Paper
-                                style={{
+                                sx={{
                                     flex: 1,
-                                    alignItems: "center",
-                                    padding: theme.spacing(2),
-                                    margin: theme.spacing(1.25),
+                                    mt: 1.25,
+                                    mb: 1.25,
+                                    p: 2,
+                                    backgroundColor: "white",
                                     wordBreak: "break-word",
                                 }}>
-                                <Typography variant="h2">
-                                    {t("guidance")}
-                                </Typography>
-
-                                {guidanceText && (
-                                    <MarkDownSanitizedWithHtml
-                                        content={guidanceText}
+                                {isDatasetFiltersSection ? (
+                                    <DatasetFiltersGuidancePanel
+                                        selectedFilters={datasetFilterIds}
+                                        onRemoveFilter={
+                                            handleDatasetFilterChange
+                                        }
                                     />
+                                ) : (
+                                    <>
+                                        <Typography variant="h2">
+                                            {t("guidance")}
+                                        </Typography>
+
+                                        {guidanceText && (
+                                            <MarkDownSanitizedWithHtml
+                                                content={guidanceText}
+                                            />
+                                        )}
+                                    </>
                                 )}
                             </Paper>
                         )}
@@ -1058,6 +1527,74 @@ const CreateDataset = ({
                 </FormFooter>
             </Box>
         </>
+    );
+};
+
+const CreateDataset = ({
+    formJSON: formJSONProp,
+    teamId,
+    user,
+    defaultTeamId,
+    schemadefs,
+}: CreateDatasetProps) => {
+    const [formJSON, setFormJSON] = useState<FormHydrationSchema | undefined>(
+        formJSONProp
+    );
+    const [formLoadError, setFormLoadError] = useState(false);
+
+    useEffect(() => {
+        if (formJSONProp) {
+            setFormJSON(formJSONProp);
+            return;
+        }
+
+        let cancelled = false;
+
+        fetch(`/api/form-hydration?teamId=${teamId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load form schema");
+                }
+                return response.json() as Promise<FormHydrationSchema>;
+            })
+            .then(data => {
+                if (!cancelled) {
+                    setFormJSON(data);
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setFormLoadError(true);
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [formJSONProp, teamId]);
+
+    if (formLoadError) {
+        return (
+            <Box sx={{ p: 2 }}>
+                <Typography variant="h2">
+                    Unable to load the dataset form. Please refresh the page.
+                </Typography>
+            </Box>
+        );
+    }
+
+    if (!formJSON) {
+        return <Loading />;
+    }
+
+    return (
+        <CreateDatasetForm
+            formJSON={formJSON}
+            teamId={teamId}
+            user={user}
+            defaultTeamId={defaultTeamId}
+            schemadefs={schemadefs}
+        />
     );
 };
 

@@ -7,6 +7,7 @@ import { sessionHeader, sessionPrefix } from "@/config/session";
 import { extractSubdomain } from "@/utils/general";
 import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 export async function POST(request: NextRequest) {
     const session = await getSessionCookie();
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
             headers: {
                 "Content-Type": "application/json",
                 [sessionHeader]: sessionPrefix + session,
+                ...getPartnerHeaders(),
             },
             body: JSON.stringify({ email, password }),
         });

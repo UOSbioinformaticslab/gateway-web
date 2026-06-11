@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { sessionCookie, sessionHeader, sessionPrefix } from "@/config/session";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 import { errorNotification } from "./utils";
 
 const CONTENT_TYPE_EXCEL =
@@ -28,7 +29,7 @@ const getRequest = async <T>(
             credentials: "include",
             headers: {
                 [sessionHeader]: sessionPrefix + session,
-                // "x-partner-context": "CRUK",
+                ...getPartnerHeaders(),
             },
         });
 
