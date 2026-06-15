@@ -12,6 +12,7 @@ import theme, { colors } from "@/config/theme";
 import { DeleteForeverOutlinedIcon } from "@/consts/icons";
 import { ImageValidationError } from "@/consts/image";
 import { validateImageDimensions } from "@/utils/imageValidation";
+import { formatFieldError } from "@/utils/formatFieldErrorMessage";
 import { sanitiseString } from "@/utils/sanitiseString";
 import Button from "../Button";
 import FormInputWrapper from "../FormInputWrapper";
@@ -224,13 +225,7 @@ const UploadFile = ({
             : (get(uploadError, "value.filename") as unknown as FieldError);
 
         if (filenameError) {
-            return {
-                type: filenameError.type,
-                message: filenameError?.message?.replace(
-                    /^.*?(?=\s(?:is|should))/,
-                    fieldName
-                ),
-            };
+            return formatFieldError(filenameError, fieldName);
         }
 
         return undefined;

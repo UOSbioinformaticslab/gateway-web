@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Control, useFieldArray, useFormState } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import {
@@ -23,9 +23,11 @@ import {
 import {
     getFormHydrationFieldHeaderProps,
     renderFormHydrationField,
+    withFormHydrationPanelOnlyFieldContent,
 } from "@/utils/formHydration";
 import DatasetTypeFormFieldRow from "./DatasetTypeFormFieldRow";
 import FormHydrationFieldHeader from "./FormHydrationFieldHeader";
+import FormHydrationFieldPanel from "./FormHydrationFieldPanel";
 
 type FieldValues = {
     [key: string]: string | number | Option[] | boolean | null | undefined;
@@ -47,6 +49,8 @@ interface CreateDatasetProps {
     hideGroupTitle?: boolean;
     /** Hide per-row remove and the append “add” control (single-row groups). */
     hideArrayMutators?: boolean;
+    /** Render each array field inside a bordered panel (label + description above input). */
+    useFieldPanels?: boolean;
 }
 
 const FormFieldArray = ({
@@ -58,6 +62,7 @@ const FormFieldArray = ({
     patchLeafField,
     hideGroupTitle = false,
     hideArrayMutators = false,
+    useFieldPanels = false,
 }: CreateDatasetProps) => {
     const { errors } = useFormState({ control, name: fieldParent.title });
 
@@ -68,10 +73,12 @@ const FormFieldArray = ({
         `${PAGES}.${ACCOUNT}.${TEAM}.${DATASETS}.${COMPONENTS}.CreateDataset`
     );
 
-    const { append, remove } = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control,
         name: fieldParent.title,
     });
+
+    const hasInitializedDefaultRow = useRef(false);
 
     const generateEmptyArrayFields = useMemo(() => {
         return fieldParent?.fields?.reduce<FieldValues>((acc, field) => {
@@ -79,6 +86,23 @@ const FormFieldArray = ({
             return acc;
         }, {});
     }, [fieldParent]);
+
+    useEffect(() => {
+        if (!hideArrayMutators || isDatasetType || hasInitializedDefaultRow.current) {
+            return;
+        }
+
+        if (fields.length === 0 && generateEmptyArrayFields) {
+            hasInitializedDefaultRow.current = true;
+            append(generateEmptyArrayFields);
+        }
+    }, [
+        hideArrayMutators,
+        isDatasetType,
+        fields.length,
+        append,
+        generateEmptyArrayFields,
+    ]);
 
     const groupHeader = getFormHydrationFieldHeaderProps({
         title: fieldParent.title.replace(" Array", ""),
@@ -132,9 +156,9 @@ const FormFieldArray = ({
                 ))}
 
             {!isDatasetType &&
-                formArrayValues?.map((field, index) => (
+                fields.map((field, index) => (
                     <Box
-                        key={`${fieldParent.title}${field.id}`}
+                        key={field.id}
                         sx={{ mb: theme.spacing(3) }}>
                         {Object.entries(field)
                             .filter(([key]) => key !== "id")
@@ -158,17 +182,36 @@ const FormFieldArray = ({
                                 return (
                                     <React.Fragment key={key}>
                                         {leafField &&
-                                            renderFormHydrationField(
-                                                leafField,
-                                                control,
-                                                `${fieldParent.title}.${index}.${pathSuffix}`,
-                                                (fieldTest: string) =>
-                                                    setSelectedField &&
-                                                    setSelectedField(
-                                                        fieldTest,
-                                                        fieldParent.title
-                                                    )
-                                            )}
+                                            (useFieldPanels && arrayField ? (
+                                                <FormHydrationFieldPanel>
+                                                    {renderFormHydrationField(
+                                                        withFormHydrationPanelOnlyFieldContent(
+                                                            leafField,
+                                                            arrayField
+                                                        ),
+                                                        control,
+                                                        `${fieldParent.title}.${index}.${pathSuffix}`,
+                                                        (fieldTest: string) =>
+                                                            setSelectedField &&
+                                                            setSelectedField(
+                                                                fieldTest,
+                                                                fieldParent.title
+                                                            )
+                                                    )}
+                                                </FormHydrationFieldPanel>
+                                            ) : (
+                                                renderFormHydrationField(
+                                                    leafField,
+                                                    control,
+                                                    `${fieldParent.title}.${index}.${pathSuffix}`,
+                                                    (fieldTest: string) =>
+                                                        setSelectedField &&
+                                                        setSelectedField(
+                                                            fieldTest,
+                                                            fieldParent.title
+                                                        )
+                                                )
+                                            ))}
                                     </React.Fragment>
                                 );
                             })}

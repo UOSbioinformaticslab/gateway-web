@@ -602,6 +602,51 @@ const formHydrationResponse = {
             }
           },
           {
+            "title": "Structural Metadata",
+            "is_array_form": false,
+            "description": "",
+            "location": "structuralMetadata",
+            "guidance": "**Table Guidelines**\\n\\nPlease identify each of the tables in the dataset. When you fill in information for the first table, a new box will automatically be added to the end.",
+            "field": {
+              "component": "TextField",
+              "name": "Structural Metadata",
+              "placeholder": "",
+              "label": "Structural Metadata",
+              "required": false,
+              "hidden": true
+            }
+          },
+          {
+            "title": "Upload File of Structural Metadata.",
+            "is_array_form": false,
+            "description": "If you've done this before you can upload a .csv or single-sheeted .xls file here, and then edit it below. Alternatively manually create your table below.",
+            "location": "structuralMetadata.upload",
+            "guidance": "",
+            "field": {
+              "component": "TextField",
+              "name": "Upload File of Structural Metadata.",
+              "placeholder": "",
+              "label": "Upload File of Structural Metadata.",
+              "required": false,
+              "hidden": true
+            }
+          },
+          {
+            "title": "Review Structural Metadata",
+            "is_array_form": false,
+            "description": "Edit cells directly. Type in the ghost rows to add new entries.",
+            "location": "structuralMetadata.review",
+            "guidance": "",
+            "field": {
+              "component": "TextField",
+              "name": "Review Structural Metadata",
+              "placeholder": "",
+              "label": "Review Structural Metadata",
+              "required": false,
+              "hidden": true
+            }
+          },
+          {
             "title": "Synthetic data web links",
             "is_array_form": false,
             "description": "Please provide the website address(es) with information on your synthetic dataset creation, or the location where a synthetic version of the dataset can be accessed.\\n- Please split your existing list of citations into separate fields.\\n- To add multiple entries, select from the drop-down list, or add to the drop-down. Click the 'x' symbol to remove any entries.\\n- **Example**: https://www.pioneerdatahub.co.uk/dataset/synthetic-dataset-patients-at-risk-of-sudden-death-hypertrophic-cardiomyopathy/",
@@ -616,6 +661,76 @@ const formHydrationResponse = {
               "hidden": false,
               "freeSolo": true
             }
+          },
+          {
+            "title": "Other data types",
+            "is_array_form": false,
+            "description": "",
+            "location": "Other.data.types",
+            "guidance": "Datasets often now include audio-visual data such as recordings and images. Please list, describe and identify the format.",
+            "field": {
+              "component": "TextField",
+              "name": "Other data types",
+              "placeholder": "",
+              "label": "Other data types",
+              "required": false,
+              "hidden": true
+            }
+          },
+          {
+            "title": "Non-tabular data types Array",
+            "is_array_form": true,
+            "required": false,
+            "description": null,
+            "location": "Other.data.types.nonTabularDataTypes",
+            "guidance": "",
+            "fields": [
+              {
+                "title": "Title",
+                "is_array_form": false,
+                "description": null,
+                "location": "Other.data.types.nonTabularDataTypes.title",
+                "guidance": "",
+                "field": {
+                  "component": "TextField",
+                  "name": "Title",
+                  "label": "Title",
+                  "placeholder": "Mammograms, Patient recordings",
+                  "required": true,
+                  "hidden": false
+                }
+              },
+              {
+                "title": "Data description",
+                "is_array_form": false,
+                "description": null,
+                "location": "Other.data.types.nonTabularDataTypes.description",
+                "guidance": "",
+                "field": {
+                  "component": "TextField",
+                  "name": "Data description",
+                  "label": "Data description",
+                  "placeholder": "2D images of both normal and malignant breasts, audio-tapes of oncology consultations",
+                  "required": true,
+                  "hidden": false
+                }
+              },
+              {
+                "title": "Format",
+                "is_array_form": false,
+                "description": "Format drawn from https://www.iana.org/assignments/media-types/media-types.xhtml.",
+                "location": "Other.data.types.nonTabularDataTypes.format",
+                "guidance": "",
+                "field": {
+                  "component": "TextField",
+                  "name": "Format",
+                  "label": "Format",
+                  "placeholder": "Enter value...",
+                  "required": true,
+                  "hidden": false
+                }
+              }
+            ]
           },
         {
           "title": "Geographic coverage",
@@ -855,68 +970,6 @@ const formHydrationResponse = {
             "limit": 10000,
             "required": false,
             "hidden": false
-          }
-        },
-        {
-          "title": "Purpose of dataset collection",
-          "is_array_form": false,
-          "description": "Please indicate the purpose(s) that the dataset was collected.",
-          "location": "provenance.origin.purpose",
-          "guidance": "- **Research cohort**: Data collected for a defined group of people.\\n- **Study**: Data collected for a specific research study.\\n- **Disease registry**: Data collected as part of a disease registry.\\n- **Trial**: Data collected for as part of a clinical trial.\\n- **Care**: Data collected as part of routine clinical care.\\n- **Audit**: Data collected as part of an audit programme.\\n- **Administrative**: Data collected for administrative and management information purposes.\\n- **Financial**: Data collected either for payments or for billing.\\n- **Statutory**: Data collected in compliance with statutory requirements.\\n- **Other**: Data collected for other purpose.",
-          "field": {
-            "component": "Autocomplete",
-            "options": [
-              {
-                "label": "Research cohort",
-                "value": "Research cohort"
-              },
-              {
-                "label": "Study",
-                "value": "Study"
-              },
-              {
-                "label": "Disease registry",
-                "value": "Disease registry"
-              },
-              {
-                "label": "Trial",
-                "value": "Trial"
-              },
-              {
-                "label": "Care",
-                "value": "Care"
-              },
-              {
-                "label": "Audit",
-                "value": "Audit"
-              },
-              {
-                "label": "Administrative",
-                "value": "Administrative"
-              },
-              {
-                "label": "Financial",
-                "value": "Financial"
-              },
-              {
-                "label": "Statutory",
-                "value": "Statutory"
-              },
-              {
-                "label": "Other",
-                "value": "Other"
-              },
-              {
-                "label": null,
-                "value": null
-              }
-            ],
-            "name": "Purpose of dataset collection",
-            "label": "Please indicate the purpose(s) that the dataset was collected.",
-            "placeholder": null,
-            "required": false,
-            "hidden": false,
-            "freeSolo": false
           }
         },
         {
@@ -5274,6 +5327,35 @@ const formHydrationResponse = {
               "format": "url"
             }
           ]
+        },
+        {
+          "title": "Non-tabular data types Array",
+          "required": false,
+          "minItems": 0,
+          "type": "array",
+          "items": [
+            {
+              "title": "Title",
+              "required": true,
+              "type": "string",
+              "min": 1,
+              "max": 255
+            },
+            {
+              "title": "Data description",
+              "required": true,
+              "type": "string",
+              "min": 1,
+              "max": 1000
+            },
+            {
+              "title": "Format",
+              "required": true,
+              "type": "string",
+              "min": 1,
+              "max": 255
+            },
+            null]
         },
         {
           "title": "Observations Array",

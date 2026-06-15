@@ -12,6 +12,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { get, omit } from "lodash";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Divider } from "@mui/material";
 import { buildYup } from "schema-to-yup";
 import { AuthUser } from "@/interfaces/AuthUser";
 import {
@@ -47,7 +48,7 @@ import usePut from "@/hooks/usePut";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import notificationService from "@/services/notification";
 import apis from "@/config/apis";
-import theme from "@/config/theme";
+import theme, { colors } from "@/config/theme";
 import { DataStatus } from "@/consts/application";
 import {
     TEAM_ID_FIELD,
@@ -57,6 +58,7 @@ import {
     PATIENT_PATHWAY_DESCRIPTION,
     STRUCTURAL_METADATA_FORM_SECTION,
     DATASET_FILTERS_FORM_SECTION,
+    OTHER_DATA_TYPES_FORM_SECTION,
     SUBMISSON_FORM_SECTION,
 } from "@/consts/createDataset";
 import { ArrowBackIosNewIcon, ArrowForwardIosIcon } from "@/consts/icons";
@@ -513,6 +515,13 @@ const CreateDatasetForm = ({
     }, [schemaFields, selectedFormSection, currentSectionIndex]);
 
     const hideSectionTitle = useMemo(() => {
+        if (
+            selectedFormSection === STRUCTURAL_METADATA_FORM_SECTION ||
+            selectedFormSection === OTHER_DATA_TYPES_FORM_SECTION
+        ) {
+            return false;
+        }
+
         if (visibleFieldsInSelectedSection.length !== 1) {
             return false;
         }
@@ -524,7 +533,7 @@ const CreateDatasetForm = ({
         }
 
         return getFormHydrationFieldHeaderProps(fieldParent).show;
-    }, [visibleFieldsInSelectedSection]);
+    }, [visibleFieldsInSelectedSection, selectedFormSection]);
 
     const [legendItems, setLegendItems] = useState<LegendItem[]>([]);
     const [submissionRequested, setSubmissionRequested] = useState<boolean>(
@@ -877,6 +886,22 @@ const CreateDatasetForm = ({
             return;
         }
 
+        if (selectedFormSection === STRUCTURAL_METADATA_FORM_SECTION) {
+            const structuralMetadataGuidance = schemaFields.find(
+                field => field.location === STRUCTURAL_METADATA_FORM_SECTION
+            )?.guidance;
+            setGuidanceText(formatGuidance(structuralMetadataGuidance));
+            return;
+        }
+
+        if (selectedFormSection === OTHER_DATA_TYPES_FORM_SECTION) {
+            const otherDataTypesGuidance = schemaFields.find(
+                field => field.location === "Other.data.types"
+            )?.guidance;
+            setGuidanceText(formatGuidance(otherDataTypesGuidance));
+            return;
+        }
+
         if (selectedFormSection === "Associated Project Grants") {
             setGuidanceText(
                 formatGuidance(getAssociatedProjectGrantsGuidance(schemaFields))
@@ -900,6 +925,39 @@ const CreateDatasetForm = ({
 
     const isStructuralMetadataSection =
         selectedFormSection === STRUCTURAL_METADATA_FORM_SECTION;
+
+    const isOtherDataTypesSection =
+        selectedFormSection === OTHER_DATA_TYPES_FORM_SECTION;
+
+    const structuralMetadataSection = useMemo(
+        () =>
+            schemaFields.find(
+                field => field.location === STRUCTURAL_METADATA_FORM_SECTION
+            ),
+        [schemaFields]
+    );
+
+    const otherDataTypesSection = useMemo(
+        () =>
+            schemaFields.find(field => field.location === "Other.data.types"),
+        [schemaFields]
+    );
+
+    const structuralMetadataUploadSection = useMemo(
+        () =>
+            schemaFields.find(
+                field => field.location === "structuralMetadata.upload"
+            ),
+        [schemaFields]
+    );
+
+    const structuralMetadataReviewSection = useMemo(
+        () =>
+            schemaFields.find(
+                field => field.location === "structuralMetadata.review"
+            ),
+        [schemaFields]
+    );
 
     const isDatasetFiltersSection =
         selectedFormSection === DATASET_FILTERS_FORM_SECTION;
@@ -1136,14 +1194,36 @@ const CreateDatasetForm = ({
                                                     }
                                                 />
                                             ) : (
-                                                <Typography variant="h2">
-                                                    {capitalise(
-                                                        splitCamelcase(
-                                                            selectedFormSection
-                                                        )
-                                                    )}
+                                                <Typography
+                                                    variant="h2"
+                                                    sx={
+                                                        isStructuralMetadataSection ||
+                                                        isOtherDataTypesSection
+                                                            ? { mb: 2 }
+                                                            : undefined
+                                                    }>
+                                                    {isStructuralMetadataSection &&
+                                                    structuralMetadataSection?.title
+                                                        ? structuralMetadataSection.title
+                                                        : isOtherDataTypesSection &&
+                                                            otherDataTypesSection?.title
+                                                          ? otherDataTypesSection.title
+                                                          : capitalise(
+                                                                splitCamelcase(
+                                                                    selectedFormSection
+                                                                )
+                                                            )}
                                                 </Typography>
                                             ))}
+
+                                        {isOtherDataTypesSection && (
+                                            <Divider
+                                                sx={{
+                                                    mb: 2,
+                                                    borderColor: colors.grey300,
+                                                }}
+                                            />
+                                        )}
 
                                         {isDatasetFiltersSection && (
                                             <DatasetFiltersSection
@@ -1161,6 +1241,24 @@ const CreateDatasetForm = ({
                                                 structuralMetadata={
                                                     structuralMetadata
                                                 }
+                                                uploadTitle={
+                                                    structuralMetadataUploadSection?.title
+                                                }
+                                                uploadIntro={
+                                                    structuralMetadataUploadSection?.description?.replaceAll(
+                                                        "\\n",
+                                                        "\n"
+                                                    ) ?? undefined
+                                                }
+                                                reviewTitle={
+                                                    structuralMetadataReviewSection?.title
+                                                }
+                                                reviewIntro={
+                                                    structuralMetadataReviewSection?.description?.replaceAll(
+                                                        "\\n",
+                                                        "\n"
+                                                    ) ?? undefined
+                                                }
                                                 fileProcessedAction={(
                                                     metadata: StructuralMetadata[]
                                                 ) => {
@@ -1171,6 +1269,9 @@ const CreateDatasetForm = ({
                                                         metadata
                                                     );
                                                 }}
+                                                onMetadataChange={
+                                                    setStructuralMetadata
+                                                }
                                                 handleToggleUploading={
                                                     setIsSaving
                                                 }
@@ -1395,6 +1496,99 @@ const CreateDatasetForm = ({
                                                             )
                                                         )}
                                                     </>
+                                                ) : isOtherDataTypesSection ? (
+                                                    schemaFields
+                                                        .filter(
+                                                            schemaField =>
+                                                                !schemaField
+                                                                    .field
+                                                                    ?.hidden
+                                                        )
+                                                        .filter(
+                                                            ({ location }) =>
+                                                                location?.startsWith(
+                                                                    selectedFormSection
+                                                                )
+                                                        )
+                                                        .map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) =>
+                                                                fieldParent.is_array_form ? (
+                                                                    <Paper
+                                                                        key={`${fieldParent.location}-${index}`}
+                                                                        sx={{
+                                                                            p: 2,
+                                                                            mb: 0,
+                                                                            border: `1px solid ${colors.grey300}`,
+                                                                            borderRadius: 1,
+                                                                            boxShadow:
+                                                                                "none",
+                                                                            backgroundColor:
+                                                                                "#F0F2F5",
+                                                                        }}>
+                                                                        <FormHydrationAccordionSection
+                                                                            title={fieldParent.title.replace(
+                                                                                " Array",
+                                                                                ""
+                                                                            )}
+                                                                            sx={{ mb: 0 }}>
+                                                                            <FormHydrationFieldItem
+                                                                                fieldParent={
+                                                                                    fieldParent
+                                                                                }
+                                                                                selectedFormSection={
+                                                                                    selectedFormSection
+                                                                                }
+                                                                                index={
+                                                                                    index
+                                                                                }
+                                                                                control={
+                                                                                    control
+                                                                                }
+                                                                                schemadefs={
+                                                                                    schemadefs
+                                                                                }
+                                                                                getValues={
+                                                                                    getValues
+                                                                                }
+                                                                                updateGuidanceText={
+                                                                                    updateGuidanceText
+                                                                                }
+                                                                                hideGroupTitle
+                                                                                hideArrayMutators
+                                                                                useFieldPanels
+                                                                            />
+                                                                        </FormHydrationAccordionSection>
+                                                                    </Paper>
+                                                                ) : (
+                                                                    <FormHydrationFieldItem
+                                                                        key={`${fieldParent.location}-${index}`}
+                                                                        fieldParent={
+                                                                            fieldParent
+                                                                        }
+                                                                        selectedFormSection={
+                                                                            selectedFormSection
+                                                                        }
+                                                                        index={
+                                                                            index
+                                                                        }
+                                                                        control={
+                                                                            control
+                                                                        }
+                                                                        schemadefs={
+                                                                            schemadefs
+                                                                        }
+                                                                        getValues={
+                                                                            getValues
+                                                                        }
+                                                                        updateGuidanceText={
+                                                                            updateGuidanceText
+                                                                        }
+                                                                    />
+                                                                )
+                                                        )
                                                 ) : (
                                                     selectedFormSection &&
                                                     schemaFields
@@ -1465,9 +1659,31 @@ const CreateDatasetForm = ({
                                     />
                                 ) : (
                                     <>
-                                        <Typography variant="h2">
-                                            {t("guidance")}
+                                        <Typography
+                                            variant="h2"
+                                            sx={
+                                                isOtherDataTypesSection
+                                                    ? {
+                                                          color: "primary.main",
+                                                          fontWeight: 700,
+                                                          mb: 1.5,
+                                                      }
+                                                    : undefined
+                                            }>
+                                            {isOtherDataTypesSection &&
+                                            otherDataTypesSection?.title
+                                                ? otherDataTypesSection.title
+                                                : t("guidance")}
                                         </Typography>
+
+                                        {isOtherDataTypesSection && (
+                                            <Divider
+                                                sx={{
+                                                    mb: 2,
+                                                    borderColor: colors.grey300,
+                                                }}
+                                            />
+                                        )}
 
                                         {guidanceText && (
                                             <MarkDownSanitizedWithHtml
@@ -1583,13 +1799,15 @@ const CreateDataset = ({
         );
     }
 
-    if (!formJSON) {
+    const resolvedFormJSON = formJSONProp ?? formJSON;
+
+    if (!resolvedFormJSON) {
         return <Loading />;
     }
 
     return (
         <CreateDatasetForm
-            formJSON={formJSON}
+            formJSON={resolvedFormJSON}
             teamId={teamId}
             user={user}
             defaultTeamId={defaultTeamId}

@@ -23,6 +23,9 @@ interface FormHydrationFieldItemProps {
     schemadefs: Defs;
     getValues: (name?: string) => unknown;
     updateGuidanceText: (fieldName: string, fieldArrayName?: string) => void;
+    hideGroupTitle?: boolean;
+    hideArrayMutators?: boolean;
+    useFieldPanels?: boolean;
 }
 
 const FormHydrationFieldItem = ({
@@ -33,6 +36,9 @@ const FormHydrationFieldItem = ({
     schemadefs,
     getValues,
     updateGuidanceText,
+    hideGroupTitle = false,
+    hideArrayMutators = false,
+    useFieldPanels = false,
 }: FormHydrationFieldItemProps) => {
     const { field, fields } = fieldParent;
     const listKey = `${selectedFormSection}-${fieldParent.location ?? ""}-${fieldParent.title ?? field?.name ?? ""}-${index}`;
@@ -58,6 +64,9 @@ const FormHydrationFieldItem = ({
                     }
                     fieldParent={fieldParent}
                     setSelectedField={updateGuidanceText}
+                    hideGroupTitle={hideGroupTitle}
+                    hideArrayMutators={hideArrayMutators}
+                    useFieldPanels={useFieldPanels}
                 />
             ) : (
                 field &&

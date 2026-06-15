@@ -2,10 +2,11 @@ import BoxContainer from "@/components/BoxContainer";
 import ProtectedAccountRoute from "@/components/ProtectedAccountRoute";
 import { Defs } from "@/interfaces/V4Schema";
 import { getSchemaFromTraser, getTeam, getUser } from "@/utils/api";
+import { getLocalFormHydration } from "@/utils/localFormHydration";
 import metaData, { noFollowRobots } from "@/utils/metadata";
 import { getPermissions } from "@/utils/permissions";
 import { getTeamUser } from "@/utils/user";
-import CreateDatasetPageClient from "../components/CreateDataset/CreateDatasetPageClient";
+import CreateDataset from "../components/CreateDataset";
 
 export const metadata = metaData(
     {
@@ -39,15 +40,18 @@ export default async function CreateDatasetPage({
         // Schema service may be unavailable or return an error (e.g. unknown name/version)
     }
 
+    const formJSON = getLocalFormHydration(teamId);
+
     return (
         <ProtectedAccountRoute
             permissions={permissions}
             pagePermissions={["datasets.create"]}>
             <BoxContainer sx={{ mt: "14px" }}>
-                <CreateDatasetPageClient
+                <CreateDataset
+                    formJSON={formJSON}
                     teamId={Number(teamId)}
                     user={user}
-                    defaultTeamId={teamId}
+                    defaultTeamId={Number(teamId)}
                     schemadefs={schemadefs}
                 />
             </BoxContainer>

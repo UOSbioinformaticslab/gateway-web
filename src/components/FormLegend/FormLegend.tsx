@@ -124,7 +124,9 @@ const FormLegend = ({
                                                 ? 600
                                                 : "normal",
                                     }}>
-                                    {capitalise(splitCamelcase(item.name))}
+                                    {capitalise(
+                                        splitCamelcase(item.label ?? item.name)
+                                    )}
                                 </Typography>
 
                                 {item.count !== undefined && (
