@@ -7,6 +7,7 @@ import FormError from "@/components/FormError";
 import FormInfoLabel from "@/components/FormInfoLabel";
 import Typography from "@/components/Typography";
 import { colors } from "@/config/theme";
+import { formatFieldErrors } from "@/utils/formatFieldErrorMessage";
 
 interface FormInputWrapperProps {
     horizontalForm?: boolean;
@@ -45,6 +46,11 @@ const FormInputWrapper = ({
         return value.length;
     }, [value]);
 
+    const formattedError = useMemo(
+        () => formatFieldErrors(error, label),
+        [error, label]
+    );
+
     return (
         <Box
             sx={{
@@ -81,7 +87,7 @@ const FormInputWrapper = ({
                     </Typography>
                 )}
                 {children}
-                {error && <FormError error={error} />}
+                {formattedError && <FormError error={formattedError} />}
             </Box>
         </Box>
     );

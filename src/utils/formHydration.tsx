@@ -251,6 +251,12 @@ const formGenerateLegendItems = async (
 
             return {
                 name: section,
+                label:
+                    section === "Other"
+                        ? schemaFields.find(
+                              field => field.location === "Other.data.types"
+                          )?.title
+                        : undefined,
                 status: getSectionStatus,
             };
         })
