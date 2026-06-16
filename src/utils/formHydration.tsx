@@ -256,7 +256,42 @@ const formGenerateLegendItems = async (
                         ? schemaFields.find(
                               field => field.location === "Other.data.types"
                           )?.title
-                        : undefined,
+                        : section === ENTITY_RELATIONSHIP_DIAGRAM_SECTION
+                          ? schemaFields.find(
+                                field =>
+                                    field.location ===
+                                    ENTITY_RELATIONSHIP_DIAGRAM_SECTION
+                            )?.title
+                          : section === COVERAGE_SECTION
+                            ? schemaFields.find(
+                                  field => field.location === COVERAGE_SECTION
+                              )?.title
+                            : section === PROVENANCE_SECTION
+                              ? schemaFields.find(
+                                    field =>
+                                        field.location === PROVENANCE_SECTION
+                                )?.title
+                              : section === ACCESSIBILITY_SECTION
+                                ? schemaFields.find(
+                                      field =>
+                                          field.location ===
+                                          ACCESSIBILITY_SECTION
+                                  )?.title
+                                : section === TOOLS_AND_PUBLICATIONS_SECTION
+                                  ? schemaFields.find(
+                                        field =>
+                                            field.location ===
+                                            TOOLS_AND_PUBLICATIONS_SECTION
+                                    )?.title
+                                  : section === OBSERVATIONS_SECTION
+                                    ? schemaFields
+                                          .find(
+                                              field =>
+                                                  field.location ===
+                                                  OBSERVATIONS_SECTION
+                                          )
+                                          ?.title?.replace(" Array", "")
+                                    : undefined,
                 status: getSectionStatus,
             };
         })
@@ -310,6 +345,12 @@ const getFormHydrationFieldHeaderProps = ({
 };
 
 const ASSOCIATED_PROJECT_GRANTS_SECTION = "Associated Project Grants";
+const ENTITY_RELATIONSHIP_DIAGRAM_SECTION = "Entity Relationship Diagram";
+const COVERAGE_SECTION = "coverage";
+const PROVENANCE_SECTION = "provenance";
+const ACCESSIBILITY_SECTION = "accessibility";
+const TOOLS_AND_PUBLICATIONS_SECTION = "enrichmentAndLinkage";
+const OBSERVATIONS_SECTION = "observations";
 
 const SUMMARY_SECTION = "summary";
 const DOCUMENTATION_SECTION = "documentation";
@@ -323,6 +364,13 @@ const SUMMARY_DATA_CUSTODIAN_ACCORDION_LOCATIONS = new Set([
 
 const isPanelOnlyFormField = (location?: string) =>
     location?.startsWith(`${ASSOCIATED_PROJECT_GRANTS_SECTION}.`) ||
+    location?.startsWith(`${ENTITY_RELATIONSHIP_DIAGRAM_SECTION}.`) ||
+    location?.startsWith(`${COVERAGE_SECTION}.`) ||
+    location?.startsWith(`${PROVENANCE_SECTION}.`) ||
+    location?.startsWith(`${ACCESSIBILITY_SECTION}.`) ||
+    location?.startsWith(`${TOOLS_AND_PUBLICATIONS_SECTION}.`) ||
+    location === OBSERVATIONS_SECTION ||
+    location?.startsWith(`${OBSERVATIONS_SECTION}.`) ||
     location?.startsWith(`${SUMMARY_SECTION}.`) ||
     location?.startsWith(`${DOCUMENTATION_SECTION}.`);
 
@@ -381,6 +429,92 @@ const getDocumentationSectionHeaderProps = (schemaFields: FormHydration[]) => {
 
 const getDocumentationSectionGuidance = (schemaFields: FormHydration[]) =>
     schemaFields.find(({ location }) => location === DOCUMENTATION_SECTION)
+        ?.guidance;
+
+const getEntityRelationshipDiagramSectionHeaderProps = (
+    schemaFields: FormHydration[]
+) => {
+    const entityRelationshipDiagramSection = schemaFields.find(
+        ({ location }) => location === ENTITY_RELATIONSHIP_DIAGRAM_SECTION
+    );
+
+    if (!entityRelationshipDiagramSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(entityRelationshipDiagramSection);
+};
+
+const getCoverageSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const coverageSection = schemaFields.find(
+        ({ location }) => location === COVERAGE_SECTION
+    );
+
+    if (!coverageSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(coverageSection);
+};
+
+const getCoverageSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === COVERAGE_SECTION)?.guidance;
+
+const getDatasetTimelinesSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === PROVENANCE_SECTION)?.guidance;
+
+const getAccessibilitySectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const accessibilitySection = schemaFields.find(
+        ({ location }) => location === ACCESSIBILITY_SECTION
+    );
+
+    if (!accessibilitySection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(accessibilitySection);
+};
+
+const getAccessibilitySectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === ACCESSIBILITY_SECTION)
+        ?.guidance;
+
+const getToolsAndPublicationsSectionHeaderProps = (
+    schemaFields: FormHydration[]
+) => {
+    const toolsAndPublicationsSection = schemaFields.find(
+        ({ location }) => location === TOOLS_AND_PUBLICATIONS_SECTION
+    );
+
+    if (!toolsAndPublicationsSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(toolsAndPublicationsSection);
+};
+
+const getToolsAndPublicationsSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(
+        ({ location }) => location === TOOLS_AND_PUBLICATIONS_SECTION
+    )?.guidance;
+
+const getObservationsSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const observationsSection = schemaFields.find(
+        ({ location }) => location === OBSERVATIONS_SECTION
+    );
+
+    if (!observationsSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps({
+        ...observationsSection,
+        title: observationsSection.title.replace(" Array", ""),
+    });
+};
+
+const getObservationsSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === OBSERVATIONS_SECTION)
         ?.guidance;
 
 const getWelcomeSectionGuidance = (schemaFields: FormHydration[]) =>
@@ -759,6 +893,16 @@ export {
     getSummarySectionGuidance,
     getDocumentationSectionHeaderProps,
     getDocumentationSectionGuidance,
+    getEntityRelationshipDiagramSectionHeaderProps,
+    getCoverageSectionHeaderProps,
+    getCoverageSectionGuidance,
+    getDatasetTimelinesSectionGuidance,
+    getAccessibilitySectionHeaderProps,
+    getAccessibilitySectionGuidance,
+    getToolsAndPublicationsSectionHeaderProps,
+    getToolsAndPublicationsSectionGuidance,
+    getObservationsSectionHeaderProps,
+    getObservationsSectionGuidance,
     getWelcomeSectionGuidance,
     withFormHydrationFieldPanelContent,
     withFormHydrationPanelOnlyFieldContent,

@@ -6,6 +6,7 @@ import { sessionHeader, sessionPrefix } from "@/config/session";
 import { getUserFromToken } from "@/utils/cookies";
 import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 export async function GET() {
     const session = await getSessionCookie();
@@ -19,7 +20,7 @@ export async function GET() {
 
         const authUser = getUserFromToken(jwtToken || "");
 
-        if (!authUser) {
+        if (!authUser?.id) {
             return NextResponse.json(
                 { data: { isLoggedIn: false } },
                 { status: 200 }
@@ -28,14 +29,36 @@ export async function GET() {
 
         try {
             const response = await fetch(
-                `${apis.usersV1UrlIP}/${authUser?.id}`,
+                `${apis.usersV1UrlIP}/${authUser.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
                         [sessionHeader]: sessionPrefix + session,
+                        ...getPartnerHeaders(),
                     },
                 }
             );
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 404) {
+                    return NextResponse.json(
+                        { data: { isLoggedIn: false } },
+                        { status: 200 }
+                    );
+                }
+
+                let errorMessage: string;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = JSON.stringify(errorData, null, 2);
+                } catch {
+                    errorMessage = await response.text();
+                }
+
+                throw new Error(
+                    `Failed to fetch user profile (${response.status}): ${errorMessage}`
+                );
+            }
 
             const json = await response.json();
 
@@ -46,6 +69,10 @@ export async function GET() {
                 { status: 200 }
             );
         } catch (error) {
+            if (error instanceof Error) {
+                throw error;
+            }
+
             throw new Error("We have been unable to log you in");
         }
     } catch (error) {
