@@ -287,15 +287,19 @@ async function getFilters(): Promise<Filter[]> {
     );
 }
 
-async function getCancerTypeFilters(): Promise<{ key: string; doc_count?: number }[]> {
+async function getCancerTypeFilters(): Promise<
+    { key: string; doc_count?: number }[] | undefined
+> {
     const cache: Cache = {
         tags: ["cancer_type_filters"],
     };
-    // The get function already unwraps json.data, so response should be an array
-    return get<{ key: string; doc_count?: number }[]>(
+
+    const response = await get<{ key: string; doc_count?: number }[] | undefined>(
         apis.cancerTypeFiltersV1UrlIP,
-        { cache, suppressError: false }
+        { cache, suppressError: true }
     );
+
+    return Array.isArray(response) ? response : undefined;
 }
 
 async function getKeywords(): Promise<Keyword[]> {
