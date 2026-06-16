@@ -13,7 +13,8 @@ const apiV2IPUrl =
 const apis = {
     apiV1Url,
     apiV1IPUrl,
-    enabledFeatures: `${apiV1IPUrl}/feature-flags/enabled`,
+    enabledFeatureFlags: `${apiV1IPUrl}/feature-flags/enabled`,
+    enabledFeatures: `${apiV1IPUrl}/features`,
     logoutInternalUrl: "/api/logout",
     signInInternalUrl: "/api/signIn",
     authInternalUrl: "/api/auth",
@@ -67,6 +68,8 @@ const apis = {
     teamsSearchV1Url: `${apiV1Url}/teams/search`,
     wordPressApiUrl: `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}`,
     searchV1Url: `${apiV1Url}/search`,
+    searchV1UrlIP: `${apiV1IPUrl}/search`,
+    searchInternalUrl: "/api/search",
     saveSearchesV1Url: `${apiV1Url}/saved_searches`,
     collectionsV2Url: `${apiV2Url}/collections`,
     collectionsV2UrlIP: `${apiV2IPUrl}/collections`,

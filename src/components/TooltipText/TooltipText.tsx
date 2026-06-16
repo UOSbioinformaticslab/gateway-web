@@ -32,6 +32,7 @@ const TooltipText = ({
 }: TooltipTextProps) => {
     return (
         <Typography
+            component="span"
             data-testid="tooltipText"
             sx={{
                 fontSize: size,

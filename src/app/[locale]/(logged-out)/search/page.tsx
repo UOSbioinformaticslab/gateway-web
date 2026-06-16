@@ -16,14 +16,7 @@ export const metadata = metaData(
 const SearchPage = async () => {
     const filters: Filter[] = await getFilters();
     const cohortDiscovery = await getCohortDiscovery();
-    let cancerTypeFilters: { key: string; doc_count?: number }[] | undefined;
-    try {
-        cancerTypeFilters = await getCancerTypeFilters();
-    } catch (error) {
-        // If cancer type filters API fails, continue without it
-        console.warn("Failed to fetch cancer type filters:", error);
-        cancerTypeFilters = undefined;
-    }
+    const cancerTypeFilters = await getCancerTypeFilters();
 
     const adjustedFilters = filters.map(filter => {
         if (filter.keys === FILTER_DATA_SUBTYPE) {
