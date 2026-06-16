@@ -55,10 +55,15 @@ import {
     DATA_CUSTODIAN_NAME,
     DATASET_TYPE,
     INITIAL_FORM_SECTION,
-    PATIENT_PATHWAY_DESCRIPTION,
     STRUCTURAL_METADATA_FORM_SECTION,
     DATASET_FILTERS_FORM_SECTION,
     OTHER_DATA_TYPES_FORM_SECTION,
+    ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION,
+    COVERAGE_FORM_SECTION,
+    DATASET_TIMELINES_FORM_SECTION,
+    ACCESSIBILITY_FORM_SECTION,
+    TOOLS_AND_PUBLICATIONS_FORM_SECTION,
+    OBSERVATIONS_FORM_SECTION,
     SUBMISSON_FORM_SECTION,
 } from "@/consts/createDataset";
 import { ArrowBackIosNewIcon, ArrowForwardIosIcon } from "@/consts/icons";
@@ -86,6 +91,16 @@ import {
     getSummarySectionGuidance,
     getDocumentationSectionHeaderProps,
     getDocumentationSectionGuidance,
+    getEntityRelationshipDiagramSectionHeaderProps,
+    getCoverageSectionHeaderProps,
+    getCoverageSectionGuidance,
+    getDatasetTimelinesSectionGuidance,
+    getAccessibilitySectionHeaderProps,
+    getAccessibilitySectionGuidance,
+    getToolsAndPublicationsSectionHeaderProps,
+    getToolsAndPublicationsSectionGuidance,
+    getObservationsSectionHeaderProps,
+    getObservationsSectionGuidance,
     getWelcomeSectionGuidance,
     isSummaryDataCustodianAccordionField,
     isSummaryStandaloneAccordionField,
@@ -274,7 +289,6 @@ const CreateDatasetForm = ({
         "Last Modified Datetime": today,
         "Name of Data Custodian": "",
         "Dataset population size": "",
-        "Follow-up": null,
         "contact point": "",
         "Contact point": "",
         "Dataset & BioSample alias": "",
@@ -443,13 +457,6 @@ const CreateDatasetForm = ({
             }
         });
     }, [watchType, watchDataTypeArray]);
-
-    const patientPathway = watch(PATIENT_PATHWAY_DESCRIPTION);
-    useEffect(() => {
-        if (patientPathway === "") {
-            setValue(PATIENT_PATHWAY_DESCRIPTION, undefined);
-        }
-    }, [patientPathway, setValue]);
 
     // This is a bit of a hack
     // - the data_custodian_id is coming back as a persistent ID due to a confusing in naming/bug
@@ -823,6 +830,17 @@ const CreateDatasetForm = ({
                 return;
             }
 
+            if (fieldArrayName === "Observations Array") {
+                const sectionGuidance = formatGuidance(
+                    getObservationsSectionGuidance(schemaFields)
+                );
+                const fieldGuidance = formatGuidance(fieldSchema?.guidance);
+                setGuidanceText(
+                    fieldGuidance?.trim() ? fieldGuidance : sectionGuidance
+                );
+                return;
+            }
+
             setGuidanceText(formatGuidance(fieldSchema?.guidance));
             return;
         }
@@ -855,6 +873,66 @@ const CreateDatasetForm = ({
             const fieldGuidance = formatGuidance(fieldSchema.guidance);
             setGuidanceText(
                 fieldGuidance?.trim() ? fieldGuidance : documentationGuidance
+            );
+            return;
+        }
+
+        if (
+            fieldSchema?.location?.startsWith(
+                `${ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION}.`
+            )
+        ) {
+            const sectionGuidance = formatGuidance(
+                schemaFields.find(
+                    field =>
+                        field.location ===
+                        ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION
+                )?.guidance
+            );
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
+            setGuidanceText(
+                fieldGuidance?.trim() ? fieldGuidance : sectionGuidance
+            );
+            return;
+        }
+
+        if (fieldSchema?.location?.startsWith(`${COVERAGE_FORM_SECTION}.`)) {
+            const sectionGuidance = formatGuidance(
+                getCoverageSectionGuidance(schemaFields)
+            );
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
+            setGuidanceText(
+                fieldGuidance?.trim() ? fieldGuidance : sectionGuidance
+            );
+            return;
+        }
+
+        if (
+            fieldSchema?.location?.startsWith(
+                `${DATASET_TIMELINES_FORM_SECTION}.`
+            )
+        ) {
+            const sectionGuidance = formatGuidance(
+                getDatasetTimelinesSectionGuidance(schemaFields)
+            );
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
+            setGuidanceText(
+                fieldGuidance?.trim() ? fieldGuidance : sectionGuidance
+            );
+            return;
+        }
+
+        if (
+            fieldSchema?.location?.startsWith(
+                `${ACCESSIBILITY_FORM_SECTION}.`
+            )
+        ) {
+            const sectionGuidance = formatGuidance(
+                getAccessibilitySectionGuidance(schemaFields)
+            );
+            const fieldGuidance = formatGuidance(fieldSchema.guidance);
+            setGuidanceText(
+                fieldGuidance?.trim() ? fieldGuidance : sectionGuidance
             );
             return;
         }
@@ -902,6 +980,51 @@ const CreateDatasetForm = ({
             return;
         }
 
+        if (selectedFormSection === ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION) {
+            const entityRelationshipDiagramGuidance = schemaFields.find(
+                field => field.location === ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION
+            )?.guidance;
+            setGuidanceText(formatGuidance(entityRelationshipDiagramGuidance));
+            return;
+        }
+
+        if (selectedFormSection === COVERAGE_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(getCoverageSectionGuidance(schemaFields))
+            );
+            return;
+        }
+
+        if (selectedFormSection === DATASET_TIMELINES_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(getDatasetTimelinesSectionGuidance(schemaFields))
+            );
+            return;
+        }
+
+        if (selectedFormSection === ACCESSIBILITY_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(getAccessibilitySectionGuidance(schemaFields))
+            );
+            return;
+        }
+
+        if (selectedFormSection === TOOLS_AND_PUBLICATIONS_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(
+                    getToolsAndPublicationsSectionGuidance(schemaFields)
+                )
+            );
+            return;
+        }
+
+        if (selectedFormSection === OBSERVATIONS_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(getObservationsSectionGuidance(schemaFields))
+            );
+            return;
+        }
+
         if (selectedFormSection === "Associated Project Grants") {
             setGuidanceText(
                 formatGuidance(getAssociatedProjectGrantsGuidance(schemaFields))
@@ -929,6 +1052,12 @@ const CreateDatasetForm = ({
     const isOtherDataTypesSection =
         selectedFormSection === OTHER_DATA_TYPES_FORM_SECTION;
 
+    const isToolsAndPublicationsSection =
+        selectedFormSection === TOOLS_AND_PUBLICATIONS_FORM_SECTION;
+
+    const isObservationsSection =
+        selectedFormSection === OBSERVATIONS_FORM_SECTION;
+
     const structuralMetadataSection = useMemo(
         () =>
             schemaFields.find(
@@ -940,6 +1069,14 @@ const CreateDatasetForm = ({
     const otherDataTypesSection = useMemo(
         () =>
             schemaFields.find(field => field.location === "Other.data.types"),
+        [schemaFields]
+    );
+
+    const datasetTimelinesSection = useMemo(
+        () =>
+            schemaFields.find(
+                field => field.location === DATASET_TIMELINES_FORM_SECTION
+            ),
         [schemaFields]
     );
 
@@ -971,6 +1108,59 @@ const CreateDatasetForm = ({
         () => getDocumentationSectionHeaderProps(schemaFields),
         [schemaFields]
     );
+
+    const entityRelationshipDiagramSectionHeader = useMemo(
+        () => getEntityRelationshipDiagramSectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const coverageSectionHeader = useMemo(
+        () => getCoverageSectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const accessibilitySectionHeader = useMemo(
+        () => getAccessibilitySectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const toolsAndPublicationsSectionHeader = useMemo(
+        () => getToolsAndPublicationsSectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const observationsSectionHeader = useMemo(
+        () => getObservationsSectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const visibleAccessibilitySectionFields = useMemo(() => {
+        if (selectedFormSection !== ACCESSIBILITY_FORM_SECTION) {
+            return null;
+        }
+
+        const visible = schemaFields.filter(
+            schemaField =>
+                !schemaField.field?.hidden &&
+                schemaField.location?.startsWith(
+                    `${ACCESSIBILITY_FORM_SECTION}.`
+                )
+        );
+
+        return {
+            usage: visible.filter(field =>
+                field.location?.startsWith("accessibility.usage.")
+            ),
+            access: visible.filter(field =>
+                field.location?.startsWith("accessibility.access.")
+            ),
+            formatAndStandards: visible.filter(field =>
+                field.location?.startsWith(
+                    "accessibility.formatAndStandards."
+                )
+            ),
+        };
+    }, [schemaFields, selectedFormSection]);
 
     const visibleSummarySectionFields = useMemo(() => {
         if (selectedFormSection !== "summary") {
@@ -1193,6 +1383,61 @@ const CreateDatasetForm = ({
                                                         documentationSectionHeader.description
                                                     }
                                                 />
+                                            ) : entityRelationshipDiagramSectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        entityRelationshipDiagramSectionHeader.title
+                                                    }
+                                                    description={
+                                                        entityRelationshipDiagramSectionHeader.description
+                                                    }
+                                                />
+                                            ) : coverageSectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  COVERAGE_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        coverageSectionHeader.title
+                                                    }
+                                                    description={
+                                                        coverageSectionHeader.description
+                                                    }
+                                                />
+                                            ) : accessibilitySectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  ACCESSIBILITY_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        accessibilitySectionHeader.title
+                                                    }
+                                                    description={
+                                                        accessibilitySectionHeader.description
+                                                    }
+                                                />
+                                            ) : toolsAndPublicationsSectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  TOOLS_AND_PUBLICATIONS_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        toolsAndPublicationsSectionHeader.title
+                                                    }
+                                                    description={
+                                                        toolsAndPublicationsSectionHeader.description
+                                                    }
+                                                />
+                                            ) : observationsSectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  OBSERVATIONS_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        observationsSectionHeader.title
+                                                    }
+                                                    description={
+                                                        observationsSectionHeader.description
+                                                    }
+                                                />
                                             ) : (
                                                 <Typography
                                                     variant="h2"
@@ -1208,7 +1453,11 @@ const CreateDatasetForm = ({
                                                         : isOtherDataTypesSection &&
                                                             otherDataTypesSection?.title
                                                           ? otherDataTypesSection.title
-                                                          : capitalise(
+                                                          : selectedFormSection ===
+                                                              DATASET_TIMELINES_FORM_SECTION &&
+                                                              datasetTimelinesSection?.title
+                                                            ? datasetTimelinesSection.title
+                                                            : capitalise(
                                                                 splitCamelcase(
                                                                     selectedFormSection
                                                                 )
@@ -1496,6 +1745,158 @@ const CreateDatasetForm = ({
                                                             )
                                                         )}
                                                     </>
+                                                ) : isToolsAndPublicationsSection ? (
+                                                    schemaFields
+                                                        .filter(
+                                                            schemaField =>
+                                                                !schemaField
+                                                                    .field
+                                                                    ?.hidden
+                                                        )
+                                                        .filter(
+                                                            ({ location }) =>
+                                                                location?.startsWith(
+                                                                    selectedFormSection
+                                                                )
+                                                        )
+                                                        .map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => (
+                                                                <Paper
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    sx={{
+                                                                        p: 2,
+                                                                        mb: 2,
+                                                                        border: `1px solid ${colors.grey300}`,
+                                                                        borderRadius: 1,
+                                                                        boxShadow:
+                                                                            "none",
+                                                                        backgroundColor:
+                                                                            "#F0F2F5",
+                                                                    }}>
+                                                                    <FormHydrationAccordionSection
+                                                                        title={
+                                                                            fieldParent.is_array_form
+                                                                                ? fieldParent.title.replace(
+                                                                                      " Array",
+                                                                                      ""
+                                                                                  )
+                                                                                : fieldParent.title
+                                                                        }
+                                                                        description={
+                                                                            fieldParent.description
+                                                                        }
+                                                                        sx={{
+                                                                            mb: 0,
+                                                                        }}>
+                                                                        <FormHydrationFieldItem
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={
+                                                                                index
+                                                                            }
+                                                                            control={
+                                                                                control
+                                                                            }
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                            hideGroupTitle
+                                                                            hideArrayMutators={
+                                                                                fieldParent.is_array_form
+                                                                            }
+                                                                            useFieldPanels={
+                                                                                fieldParent.is_array_form
+                                                                            }
+                                                                        />
+                                                                    </FormHydrationAccordionSection>
+                                                                </Paper>
+                                                            )
+                                                        )
+                                                ) : isObservationsSection ? (
+                                                    schemaFields
+                                                        .filter(
+                                                            schemaField =>
+                                                                !schemaField
+                                                                    .field
+                                                                    ?.hidden
+                                                        )
+                                                        .filter(
+                                                            ({ location }) =>
+                                                                location?.startsWith(
+                                                                    selectedFormSection
+                                                                )
+                                                        )
+                                                        .map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => (
+                                                                <Paper
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    sx={{
+                                                                        p: 2,
+                                                                        mb: 2,
+                                                                        border: `1px solid ${colors.grey300}`,
+                                                                        borderRadius: 1,
+                                                                        boxShadow:
+                                                                            "none",
+                                                                        backgroundColor:
+                                                                            "#F0F2F5",
+                                                                    }}>
+                                                                    <FormHydrationAccordionSection
+                                                                        title={fieldParent.title.replace(
+                                                                            " Array",
+                                                                            ""
+                                                                        )}
+                                                                        description={
+                                                                            fieldParent.description
+                                                                        }
+                                                                        sx={{
+                                                                            mb: 0,
+                                                                        }}>
+                                                                        <FormHydrationFieldItem
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={
+                                                                                index
+                                                                            }
+                                                                            control={
+                                                                                control
+                                                                            }
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                            hideGroupTitle
+                                                                            hideArrayMutators
+                                                                            useFieldPanels
+                                                                        />
+                                                                    </FormHydrationAccordionSection>
+                                                                </Paper>
+                                                            )
+                                                        )
                                                 ) : isOtherDataTypesSection ? (
                                                     schemaFields
                                                         .filter(
@@ -1589,6 +1990,121 @@ const CreateDatasetForm = ({
                                                                     />
                                                                 )
                                                         )
+                                                ) : visibleAccessibilitySectionFields ? (
+                                                    <>
+                                                        {visibleAccessibilitySectionFields
+                                                            .usage.length > 0 && (
+                                                            <FormHydrationAccordionSection title="Usage">
+                                                                {visibleAccessibilitySectionFields.usage.map(
+                                                                    (
+                                                                        fieldParent,
+                                                                        index
+                                                                    ) => (
+                                                                        <FormHydrationFieldItem
+                                                                            key={`${fieldParent.location}-${index}`}
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={
+                                                                                index
+                                                                            }
+                                                                            control={
+                                                                                control
+                                                                            }
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                            useFieldPanels
+                                                                        />
+                                                                    )
+                                                                )}
+                                                            </FormHydrationAccordionSection>
+                                                        )}
+                                                        {visibleAccessibilitySectionFields
+                                                            .access.length > 0 && (
+                                                            <FormHydrationAccordionSection title="Access">
+                                                                {visibleAccessibilitySectionFields.access.map(
+                                                                    (
+                                                                        fieldParent,
+                                                                        index
+                                                                    ) => (
+                                                                        <FormHydrationFieldItem
+                                                                            key={`${fieldParent.location}-${index}`}
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={
+                                                                                index
+                                                                            }
+                                                                            control={
+                                                                                control
+                                                                            }
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                            useFieldPanels
+                                                                        />
+                                                                    )
+                                                                )}
+                                                            </FormHydrationAccordionSection>
+                                                        )}
+                                                        {visibleAccessibilitySectionFields
+                                                            .formatAndStandards
+                                                            .length > 0 && (
+                                                            <FormHydrationAccordionSection title="Format and Standards">
+                                                                {visibleAccessibilitySectionFields.formatAndStandards.map(
+                                                                    (
+                                                                        fieldParent,
+                                                                        index
+                                                                    ) => (
+                                                                        <FormHydrationFieldItem
+                                                                            key={`${fieldParent.location}-${index}`}
+                                                                            fieldParent={
+                                                                                fieldParent
+                                                                            }
+                                                                            selectedFormSection={
+                                                                                selectedFormSection
+                                                                            }
+                                                                            index={
+                                                                                index
+                                                                            }
+                                                                            control={
+                                                                                control
+                                                                            }
+                                                                            schemadefs={
+                                                                                schemadefs
+                                                                            }
+                                                                            getValues={
+                                                                                getValues
+                                                                            }
+                                                                            updateGuidanceText={
+                                                                                updateGuidanceText
+                                                                            }
+                                                                            useFieldPanels
+                                                                        />
+                                                                    )
+                                                                )}
+                                                            </FormHydrationAccordionSection>
+                                                        )}
+                                                    </>
                                                 ) : (
                                                     selectedFormSection &&
                                                     schemaFields

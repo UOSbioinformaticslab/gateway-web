@@ -11,7 +11,6 @@ import Box from "@/components/Box";
 import Button from "@/components/Button";
 import Typography from "@/components/Typography";
 import theme, { colors } from "@/config/theme";
-import { INITIAL_FORM_SECTION } from "@/consts/createDataset";
 import { AddIcon } from "@/consts/icons";
 import {
     ACCOUNT,
@@ -111,13 +110,13 @@ const FormFieldArray = ({
 
     return (
         <div key={`${fieldParent.title}_fieldarray`}>
-            {!hideGroupTitle && groupHeader.show && (
+            {!hideGroupTitle && !isDatasetType && groupHeader.show && (
                 <FormHydrationFieldHeader
                     title={groupHeader.title}
                     description={groupHeader.description}
                 />
             )}
-            {!hideGroupTitle && !groupHeader.show && (
+            {!hideGroupTitle && !isDatasetType && !groupHeader.show && (
                 <Typography sx={{ mb: 1 }}>
                     {fieldParent.title.replace(" Array", "")}
                     {fieldParent.required && (
@@ -130,11 +129,6 @@ const FormFieldArray = ({
                 </Typography>
             )}
 
-            {isDatasetType && (
-                <Typography sx={{ mb: 1 }}>
-                    Please select dataset types on {INITIAL_FORM_SECTION}
-                </Typography>
-            )}
             {errors?.[fieldParent.title]?.message && (
                 <Typography sx={{ color: colors.red700 }}>
                     {errors[fieldParent.title].message as string}

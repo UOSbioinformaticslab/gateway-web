@@ -6,8 +6,28 @@ import { SxProps } from "@mui/material/styles";
 import { generateHTML, JSONContent } from "@tiptap/react";
 import DOMPurify from "isomorphic-dompurify";
 import Markdown from "markdown-to-jsx";
+import Box from "@/components/Box";
+import { colors } from "@/config/theme";
 import { convertNumericalCharaterEntities } from "@/utils/string";
 import { EXTENSIONS } from "../Wysiwyg/consts";
+
+const MarkdownImage = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <Box
+        component="img"
+        {...props}
+        sx={{
+            maxWidth: "100%",
+            width: "100%",
+            height: "auto",
+            display: "block",
+            border: `1px solid ${colors.grey300}`,
+            borderRadius: 1,
+            mb: 2,
+            mt: 1,
+            boxSizing: "border-box",
+        }}
+    />
+);
 
 export interface MarkdownWithHtmlProps {
     content: string;
@@ -62,6 +82,10 @@ export const MarkDownSanitizedWithHtml = ({
                 component: CustomLink,
             },
         }),
+        img: {
+            component: MarkdownImage,
+            forceBlock: true,
+        },
         p: {
             component: Typography,
             props: { sx: { mb: 2 } },

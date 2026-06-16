@@ -732,19 +732,49 @@ const formHydrationResponse = {
               }
             ]
           },
+          {
+            "title": "Entity Relationship Diagram",
+            "is_array_form": false,
+            "description": "Visual representation of data table relationships.",
+            "location": "Entity Relationship Diagram",
+            "guidance": "**Url**\\n\\nNo specific guidance provided.\\n\\n**Visual Schema Linkage**\\n\\n![Entity relationship diagram](https://crukdatahublandingpage-production.up.railway.app/assets/erd.png)",
+            "field": {
+              "component": "TextField",
+              "name": "Entity Relationship Diagram",
+              "placeholder": "",
+              "label": "Entity Relationship Diagram",
+              "required": false,
+              "hidden": true
+            }
+          },
+          {
+            "title": "Url",
+            "is_array_form": false,
+            "description": null,
+            "location": "Entity Relationship Diagram.url",
+            "guidance": "**Url**\\n\\nNo specific guidance provided.\\n\\n**Visual Schema Linkage**\\n\\n![Entity relationship diagram](https://crukdatahublandingpage-production.up.railway.app/assets/erd.png)",
+            "field": {
+              "component": "TextField",
+              "name": "Url",
+              "placeholder": "Enter value...",
+              "label": "Url",
+              "required": false,
+              "hidden": false
+            }
+          },
         {
-          "title": "Geographic coverage",
+          "title": "Coverage",
           "is_array_form": false,
-          "description": "The geographical area covered by the dataset. It is recommended that links are to entries in one of the recommended standards:\\n- For locations in the UK: [ONS standards](https://geoportal.statistics.gov.uk/datasets/208d9884575647c29f0dd5a1184e711a/about)\\n- For locations in other countries: [ISO 3166-1 & ISO 3166-2](https://github.com/HDRUK/reference-codes)",
-          "location": "coverage.spatial",
-          "guidance": "- The geographical area covered by the dataset.\\n- Please provide a valid location.\\n- For locations in the UK, this location should conform to [ONS standards](https://geoportal.statistics.gov.uk/datasets/208d9884575647c29f0dd5a1184e711a/about).\\n- For locations in other countries we use [ISO 3166-1 & ISO 3166-2](https://github.com/HDRUK/reference-codes).",
+          "description": null,
+          "location": "coverage",
+          "guidance": "Include the minimum and maximum age of participants, as well as a URL where a researcher can learn more about the completeness of the dataset.",
           "field": {
             "component": "TextField",
-            "name": "Geographic coverage",
-            "placeholder": "United Kingdom",
-            "label": "The geographical area covered by the dataset. It is recommended that links are to entries in one of the recommended standards:\\n- For locations in the UK: [ONS standards](https://geoportal.statistics.gov.uk/datasets/208d9884575647c29f0dd5a1184e711a/about)\\n- For locations in other countries: [ISO 3166-1 & ISO 3166-2](https://github.com/HDRUK/reference-codes)",
-            "required": true,
-            "hidden": false
+            "name": "Coverage",
+            "placeholder": "",
+            "label": "Coverage",
+            "required": false,
+            "hidden": true
           }
         },
         {
@@ -795,181 +825,18 @@ const formHydrationResponse = {
           }
         },
         {
-          "title": "Biological sample availability",
+          "title": "Dataset Timelines",
           "is_array_form": false,
-          "description": "The type of biospecimen saved from a biological entity.",
-          "location": "coverage.materialType",
-          "guidance": "Indicate the specimen type, can be several values from the list below:\\n- Availability of physical samples associated with the dataset.\\n- If samples are available, please indicate the types of samples that are available.\\n- More than one type may be provided.\\n- If samples are not yet available, please provide **“Availability to be confirmed”**.\\n- If samples are not available, then please provide **“Not available”**.\\n- **Not available**: Samples associated with the dataset are not available.\\n- **Bone marrow**: Bone marrow samples associated with the data are available.\\n- **Cancer cell lines**: Cancer cell line samples associated with the data are available.\\n- **CDNA/MRNA**: CDNA/MRNA samples associated with the data are available.\\n- **Core biopsy**: Core biopsy samples associated with the data are available.\\n- **DNA**: DNA samples associated with the data are available.\\n- **Entire body organ**: Entire body organ associated with the data are available.\\n- **Faeces**: Faeces samples associated with the data are available.\\n- **Immortalized cell lines**: Immortalized cell line samples associated with the data are available.\\n- **Isolated pathogen**: Isolated pathogen associated with the data are available.\\n- **MicroRNA**: MicroRNA samples associated with the data are available.\\n- **Peripheral blood cells**: Peripheral blood cell samples associated with the data are available.\\n- **Plasma**: Plasma samples associated with the data are available.\\n- **PM Tissue**: PM Tissue samples associated with the data are available.\\n- **Primary cells**: Primary cell samples associated with the data are available.\\n- **RNA**: RNA samples associated with the data are available.\\n- **Saliva**: Saliva samples associated with the data are available.\\n- **Serum**: Serum samples associated with the data are available.\\n- **Swabs**: Swab samples associated with the data are available.\\n- **Tissue**: Tissue samples associated with the data are available.\\n- **Urine**: Urine samples associated with the data are available.\\n- **Whole blood**: Whole blood samples associated with the data are available.\\n- **Availability to be confirmed**: Availability of samples is currently being confirmed.\\n- **Other**: Other types of sample available.",
+          "description": "Optional information setting out how often the information is updated and the time period covered.",
+          "location": "provenance",
+          "guidance": "Optional information setting out how often the information is updated and the time period covered.",
           "field": {
-            "component": "Autocomplete",
-            "options": [
-              {
-                "label": "None/not available",
-                "value": "None/not available"
-              },
-              {
-                "label": "Bone marrow",
-                "value": "Bone marrow"
-              },
-              {
-                "label": "Cancer cell lines",
-                "value": "Cancer cell lines"
-              },
-              {
-                "label": "CDNA/MRNA",
-                "value": "CDNA/MRNA"
-              },
-              {
-                "label": "Core biopsy",
-                "value": "Core biopsy"
-              },
-              {
-                "label": "DNA",
-                "value": "DNA"
-              },
-              {
-                "label": "Entire body organ",
-                "value": "Entire body organ"
-              },
-              {
-                "label": "Faeces",
-                "value": "Faeces"
-              },
-              {
-                "label": "Immortalized cell lines",
-                "value": "Immortalized cell lines"
-              },
-              {
-                "label": "Isolated pathogen",
-                "value": "Isolated pathogen"
-              },
-              {
-                "label": "MicroRNA",
-                "value": "MicroRNA"
-              },
-              {
-                "label": "Peripheral blood cells",
-                "value": "Peripheral blood cells"
-              },
-              {
-                "label": "Plasma",
-                "value": "Plasma"
-              },
-              {
-                "label": "PM Tissue",
-                "value": "PM Tissue"
-              },
-              {
-                "label": "Primary cells",
-                "value": "Primary cells"
-              },
-              {
-                "label": "RNA",
-                "value": "RNA"
-              },
-              {
-                "label": "Saliva",
-                "value": "Saliva"
-              },
-              {
-                "label": "Serum",
-                "value": "Serum"
-              },
-              {
-                "label": "Swabs",
-                "value": "Swabs"
-              },
-              {
-                "label": "Tissue",
-                "value": "Tissue"
-              },
-              {
-                "label": "Urine",
-                "value": "Urine"
-              },
-              {
-                "label": "Whole blood",
-                "value": "Whole blood"
-              },
-              {
-                "label": "Availability to be confirmed",
-                "value": "Availability to be confirmed"
-              },
-              {
-                "label": "Other",
-                "value": "Other"
-              }
-            ],
-            "name": "Biological sample availability",
-            "label": "The type of biospecimen saved from a biological entity.",
-            "placeholder": null,
+            "component": "TextField",
+            "name": "Dataset Timelines",
+            "placeholder": "",
+            "label": "Dataset Timelines",
             "required": false,
-            "hidden": false,
-            "freeSolo": false
-          }
-        },
-        {
-          "title": "Follow-up",
-          "is_array_form": false,
-          "description": "If known, what is the typical time span that a patient appears in the dataset (follow up period). In a prospective cohort study, after baseline information is collected, participants are followed “longitudinally” i.e. new information is collected about them for a period of time afterward. This is known as the “follow up period”. What is the typical time span of follow up, e.g. 1 year, 5 years? If there are multiple cohorts in the dataset with varying follow up periods, please provide the longest follow up period.",
-          "location": "coverage.followUp",
-          "guidance": "If known, please indicate the typical time span that a patient appears in the dataset (follow up period).\\n-**0 - 6 MONTHS**: Data typically available for a patient over a 0-6 month period.\\n-**6 - 12 MONTHS**: Data typically available for a patient over a 6-12 month period.\\n-**1 - 10 YEARS**: Data typically available for a patient over a 1-10 year period.\\n-**\u003E 10 YEARS**: Data typically available for a patient for over a 10 year period.\\n-**CONTINUOUS**: Data for patients is being regularly added to and updated.\\n-**UNKNOWN**: Timespan is Unknown.\\n-**OTHER**: Data available for a patient over another time period.",
-          "field": {
-            "component": "Select",
-            "options": [
-              {
-                "label": "0 - 6 Months",
-                "value": "0 - 6 Months"
-              },
-              {
-                "label": "6 - 12 Months",
-                "value": "6 - 12 Months"
-              },
-              {
-                "label": "1 - 10 Years",
-                "value": "1 - 10 Years"
-              },
-              {
-                "label": "\u003E 10 Years",
-                "value": "\u003E 10 Years"
-              },
-              {
-                "label": "Unknown",
-                "value": "Unknown"
-              },
-              {
-                "label": "Continuous",
-                "value": "Continuous"
-              },
-              {
-                "label": "Other",
-                "value": "Other"
-              },
-              {
-                "label": null,
-                "value": null
-              }
-            ],
-            "name": "Follow-up",
-            "label": "If known, what is the typical time span that a patient appears in the dataset (follow up period). In a prospective cohort study, after baseline information is collected, participants are followed “longitudinally” i.e. new information is collected about them for a period of time afterward. This is known as the “follow up period”. What is the typical time span of follow up, e.g. 1 year, 5 years? If there are multiple cohorts in the dataset with varying follow up periods, please provide the longest follow up period.",
-            "required": false,
-            "hidden": false
-          }
-        },
-        {
-          "title": "Patient pathway description",
-          "is_array_form": false,
-          "description": "Please indicate if the dataset is representative of the patient pathway and any limitations the dataset may have with respect to pathway coverage. This could include if the dataset is from a single speciality or area, a single tier of care, linked across two tiers (e.g. primary and secondary care), or an integrated care record covering the whole patient pathway.",
-          "location": "coverage.pathway",
-          "guidance": "- Please indicate if the dataset is representative of the patient pathway and any limitations the dataset may have with respect to pathway coverage.\\n- This could include if the dataset is from a single speciality or area, a single tier of care, linked across two tiers (e.g. primary and secondary care), or an integrated care record covering the whole patient pathway.",
-          "field": {
-            "component": "TextArea",
-            "name": "Patient pathway description",
-            "placeholder": null,
-            "label": "Please indicate if the dataset is representative of the patient pathway and any limitations the dataset may have with respect to pathway coverage. This could include if the dataset is from a single speciality or area, a single tier of care, linked across two tiers (e.g. primary and secondary care), or an integrated care record covering the whole patient pathway.",
-            "limit": 10000,
-            "required": false,
-            "hidden": false
+            "hidden": true
           }
         },
         {
@@ -1014,7 +881,7 @@ const formHydrationResponse = {
             "label": "Please indicate the source of the data extraction.",
             "placeholder": null,
             "required": false,
-            "hidden": false,
+            "hidden": true,
             "freeSolo": false
           }
         },
@@ -1132,7 +999,7 @@ const formHydrationResponse = {
             "label": "Please indicate the setting(s) where data was collected. Multiple settings may be provided.",
             "placeholder": null,
             "required": false,
-            "hidden": false,
+            "hidden": true,
             "freeSolo": false
           }
         },
@@ -1161,18 +1028,37 @@ const formHydrationResponse = {
             "name": "Image contrast",
             "label": "Indicate whether usage of imaging contrast is captured within the dataset.",
             "required": false,
-            "hidden": false
+            "hidden": true
+          }
+        },
+        {
+          "title": "Temporal Coverage",
+          "is_array_form": false,
+          "description": null,
+          "location": "provenance.temporal",
+          "guidance": "",
+          "field": {
+            "component": "TextField",
+            "name": "Temporal Coverage",
+            "placeholder": "",
+            "label": "Temporal Coverage",
+            "required": false,
+            "hidden": true
           }
         },
         {
           "title": "Publishing frequency",
           "is_array_form": false,
-          "description": "Please indicate the frequency of distribution release. If a dataset is distributed regularly please choose a distribution release periodicity from the constrained list and indicate the next release date. When the release date becomes historical, a new release date will be calculated based on the publishing periodicity. If a dataset has been published and will remain static please indicate that it is static and indicated when it was released. If a dataset is released on an irregular basis or “on-demand” please indicate that it is Irregular and leave release date as null. If a dataset can be published in real-time or near-real-time please indicate that it is continuous and leave release date as null. Notes: see https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/",
+          "description": "Frequency of distribution release",
           "location": "provenance.temporal.publishingFrequency",
-          "guidance": "Please indicate the frequency of publishing.\\n- If a dataset is published regularly please choose a publishing periodicity from the constrained list and indicate the next release date.\\n- When the release date becomes historical, a new release date will be calculated based on the publishing periodicity.\\n- If a dataset has been published and will remain static please indicate that it is static and indicate when it was released.\\n- If a dataset is released on an irregular basis or “on-demand” please indicate that it is Irregular and leave release date as null.\\n- If a dataset can be published in real-time or near-real-time please indicate that it is continuous and leave release date as null.\\n- Notes: see https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/.\\n\\n  Options:\\n- **Static**: Dataset published once.\\n- **Irregular**: Dataset published at uneven intervals.\\n- **Continuous**: Dataset published without interruption.\\n- **Biennial**: Dataset published every two years.\\n- **Annual**: Dataset published occurs once a year.\\n- **Biannual**: Dataset published twice a year.\\n- **Quarterly**: Dataset published every three months.\\n- **Bimonthly**: Dataset published every two months.\\n- **Monthly**: Dataset published once a month.\\n- **Biweekly**: Dataset published every two weeks.\\n- **Weekly**: Dataset published once a week.\\n- **Twice weekly**: Dataset published twice a week.\\n- **Daily**: Dataset published once a day.\\n- **Other**: Dataset published using other interval.",
+          "guidance": "**Publishing frequency**\\n\\nPlease indicate the frequency of publishing.\\n- If a dataset is published regularly please choose a publishing periodicity from the constrained list and indicate the next release date.\\n- When the release date becomes historical, a new release date will be calculated based on the publishing periodicity.\\n- If a dataset has been published and will remain static please indicate that it is static and indicate when it was released.\\n- If a dataset is released on an irregular basis or “on-demand” please indicate that it is Irregular and leave release date as null.\\n- If a dataset can be published in real-time or near-real-time please indicate that it is continuous and leave release date as null.\\n- Notes: see https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/.\\n\\n**Options:**\\n- **Static**: Dataset published once.\\n- **Irregular**: Dataset published at uneven intervals.\\n- **Continuous**: Dataset published without interruption.\\n- **Biennial**: Dataset published every two years.\\n- **Annual**: Dataset published occurs once a year.\\n- **Biannual**: Dataset published twice a year.\\n- **Quarterly**: Dataset published every three months.\\n- **Bimonthly**: Dataset published every two months.\\n- **Monthly**: Dataset published once a month.\\n- **Biweekly**: Dataset published every two weeks.\\n- **Weekly**: Dataset published once a week.\\n- **Twice weekly**: Dataset published twice a week.\\n- **Daily**: Dataset published once a day.\\n- **Other**: Dataset published using other interval.",
           "field": {
             "component": "Select",
             "options": [
+              {
+                "label": "-- Select --",
+                "value": ""
+              },
               {
                 "label": "Static",
                 "value": "Static"
@@ -1228,14 +1114,10 @@ const formHydrationResponse = {
               {
                 "label": "Other",
                 "value": "Other"
-              },
-              {
-                "label": null,
-                "value": null
               }
             ],
             "name": "Publishing frequency",
-            "label": "Please indicate the frequency of distribution release. If a dataset is distributed regularly please choose a distribution release periodicity from the constrained list and indicate the next release date. When the release date becomes historical, a new release date will be calculated based on the publishing periodicity. If a dataset has been published and will remain static please indicate that it is static and indicated when it was released. If a dataset is released on an irregular basis or “on-demand” please indicate that it is Irregular and leave release date as null. If a dataset can be published in real-time or near-real-time please indicate that it is continuous and leave release date as null. Notes: see https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/",
+            "label": "Publishing frequency",
             "required": true,
             "hidden": false
           }
@@ -1243,9 +1125,9 @@ const formHydrationResponse = {
         {
           "title": "Distribution release date",
           "is_array_form": false,
-          "description": "Date of the latest release of the dataset. If this is a regular release i.e. quarterly, or this is a static dataset please complete this alongside Periodicity. If this is Irregular or Continuously released please leave this blank. Notes: Periodicity and release date will be used to determine when the next release is expected. E.g. if the release date is documented as 01/01/2020 and it is now 20/04/2020 and there is a quarterly release schedule, the latest release will be calculated as 01/04/2020.",
+          "description": "Latest release date",
           "location": "provenance.temporal.distributionReleaseDate",
-          "guidance": "- Please indicate the frequency the dataset is published.\\n- If a dataset is published regularly please choose a publishing periodicity from the constrained list and indicate the next release date.\\n- When the release date becomes historical, a new release date will be calculated based on the publishing periodicity.\\n- If a dataset has been published and will remain static please indicate that it is static and indicate when it was released.\\n- If a dataset is released on an irregular basis or “on-demand” please indicate that it is Irregular and leave release date as null.\\n- If a dataset can be published in real-time or near-real-time please indicate that it is continuous and leave release date as null.\\n- Notes: see [https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/](https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/)",
+          "guidance": "**Distribution release date**\\n\\nDate of the latest release of the dataset. If this is a regular release i.e. quarterly, or this is a static dataset please complete this alongside Periodicity. If this is Irregular or Continuously released please leave this blank.\\n\\nPeriodicity and release date will be used to determine when the next release is expected. E.g. if the release date is documented as 01/01/2020 and it is now 20/04/2020 and there is a quarterly release schedule, the latest release will be calculated as 01/04/2020.",
           "field": {
             "component": "DatePicker",
             "name": "Distribution release date",
@@ -1259,7 +1141,7 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "The start of the time period that the dataset provides coverage for. If there are multiple cohorts in the dataset with varying start dates, please provide the earliest date and use the description or the media attribute to provide more information.",
           "location": "provenance.temporal.startDate",
-          "guidance": "- The start of the time period that the dataset provides coverage for.\\n- If there are multiple cohorts in the dataset with varying start dates, please provide the earliest date and use the description or the media attribute to provide more information.",
+          "guidance": "**Start date**\\n\\n- The start of the time period that the dataset provides coverage for.\\n- If there are multiple cohorts in the dataset with varying start dates, please provide the earliest date and use the description or the media attribute to provide more information.",
           "field": {
             "component": "DatePicker",
             "name": "Start date",
@@ -1273,7 +1155,7 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "The end of the time period that the dataset provides coverage for. If the dataset is “Continuous” and has no known end date, please state continuous. If there are multiple cohorts in the dataset with varying end dates, please provide the latest date and use the description or the media attribute to provide more information.",
           "location": "provenance.temporal.endDate",
-          "guidance": "- The end of the time period that the dataset provides coverage for.\\n- If the dataset is **“Continuous”** and has no known end date, **please leave blank**.\\n- If there are **multiple cohorts** in the dataset with varying end dates, please provide the **latest date**.",
+          "guidance": "**End date**\\n\\n- The end of the time period that the dataset provides coverage for.\\n- If the dataset is **“Continuous”** and has no known end date, **please leave blank**.\\n- If there are **multiple cohorts** in the dataset with varying end dates, please provide the **latest date**.",
           "field": {
             "component": "DatePicker",
             "name": "End date",
@@ -1285,12 +1167,16 @@ const formHydrationResponse = {
         {
           "title": "Time lag",
           "is_array_form": false,
-          "description": "Please indicate the typical time-lag between an event and the data for that event appearing in the dataset.",
+          "description": "Typical time-lag between events and data appearing in the dataset.",
           "location": "provenance.temporal.timeLag",
-          "guidance": "Please indicate the typical time-lag between an event and the data for that event appearing in the dataset.\\n- **Less than 1 week**: Typical time lag of less than a week.\\n- **1-2 weeks**: Typical time-lag of one to two weeks.\\n- **2-4 weeks**: Typical time-lag of two to four weeks.\\n- **1-2 months**: Typical time-lag of one to two months.\\n- **2-6 months**: Typical time-lag of two to six months.\\n- **6 months plus**: Typical time-lag of more than six months.\\n- **Variable**: Variable time-lag.\\n- **Not applicable**: Not Applicable i.e. static dataset.\\n- **Other**: Other time-lag.",
+          "guidance": "**Time lag**\\n\\nPlease indicate the typical time-lag between an event and the data for that event appearing in the dataset.\\n\\n**Options:**\\n- **Less than 1 week**: Typical time lag of less than a week.\\n- **1-2 weeks**: Typical time-lag of one to two weeks.\\n- **2-4 weeks**: Typical time-lag of two to four weeks.\\n- **1-2 months**: Typical time-lag of one to two months.\\n- **2-6 months**: Typical time-lag of two to six months.\\n- **More than 6 months**: Typical time-lag of more than six months.\\n- **Variable**: Variable time-lag.\\n- **Not applicable**: Not Applicable i.e. static dataset.\\n- **Other**: Other time-lag.",
           "field": {
             "component": "Select",
             "options": [
+              {
+                "label": "-- Select --",
+                "value": ""
+              },
               {
                 "label": "Less than 1 week",
                 "value": "Less than 1 week"
@@ -1329,9 +1215,54 @@ const formHydrationResponse = {
               }
             ],
             "name": "Time lag",
-            "label": "Please indicate the typical time-lag between an event and the data for that event appearing in the dataset.",
+            "label": "Time lag",
             "required": true,
             "hidden": false
+          }
+        },
+        {
+          "title": "Accessibility",
+          "is_array_form": false,
+          "description": "Upload information on how researchers can gain access to the data and access restrictions.",
+          "location": "accessibility",
+          "guidance": "Upload information on how researchers can gain access to the data and access restrictions.",
+          "field": {
+            "component": "TextField",
+            "name": "Accessibility",
+            "placeholder": "",
+            "label": "Accessibility",
+            "required": false,
+            "hidden": true
+          }
+        },
+        {
+          "title": "Usage",
+          "is_array_form": false,
+          "description": null,
+          "location": "accessibility.usage",
+          "guidance": "",
+          "field": {
+            "component": "TextField",
+            "name": "Usage",
+            "placeholder": "",
+            "label": "Usage",
+            "required": false,
+            "hidden": true
+          }
+        },
+        {
+          "title": "Access",
+          "is_array_form": false,
+          "description": null,
+          "location": "accessibility.access",
+          "guidance": "",
+          "field": {
+            "component": "TextField",
+            "name": "Access",
+            "placeholder": "",
+            "label": "Access",
+            "required": false,
+            "hidden": true
           }
         },
         {
@@ -1339,7 +1270,7 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Please provide an indication of consent permissions for datasets and/or materials, and relates to the purposes for which datasets and/or material might be removed, stored or used. NOTE: we have extended the Data Use Ontology to include a value for NO LINKAGE.",
           "location": "accessibility.usage.dataUseLimitation",
-          "guidance": "Please provide an indication of consent permissions for datasets and/or materials, and relates to the purposes for which datasets and/or material might be removed, stored or used.\\n- **General research use**: This data use limitation indicates that use is allowed for general research use for any research purpose.\\n- **Genetic studies only**: This data use limitation indicates that use is limited to genetic studies only (i.e., no phenotype-only research).\\n- **No general methods research**: This data use limitation indicates that use includes methods development research(e.g., development of software or algorithms) only within the bounds of other use limitations.\\n- **No restriction**: This data use limitation indicates there is no restriction on use.\\n- **Research-specific restrictions**: This data use limitation indicates that use is limited to studies of a certain research type.\\n- **Research use only**: This data use limitation indicates that use is limited to research purposes (e.g., does not include its use in clinical care).\\n- **No linkage**: This data use limitation indicates there is a restriction on linking to any other datasets",
+          "guidance": "**Data use limitation**\\n\\nPlease provide an indication of consent permissions for datasets and/or materials, and relates to the purposes for which datasets and/or material might be removed, stored or used.\\n- **General research use**: This data use limitation indicates that use is allowed for general research use for any research purpose.\\n- **Genetic studies only**: This data use limitation indicates that use is limited to genetic studies only (i.e., no phenotype-only research).\\n- **No general methods research**: This data use limitation indicates that use includes methods development research(e.g., development of software or algorithms) only within the bounds of other use limitations.\\n- **No restriction**: This data use limitation indicates there is no restriction on use.\\n- **Research-specific restrictions**: This data use limitation indicates that use is limited to studies of a certain research type.\\n- **Research use only**: This data use limitation indicates that use is limited to research purposes (e.g., does not include its use in clinical care).\\n- **No linkage**: This data use limitation indicates there is a restriction on linking to any other datasets",
           "field": {
             "component": "Autocomplete",
             "options": [
@@ -1397,8 +1328,8 @@ const formHydrationResponse = {
               }
             ],
             "name": "Data use limitation",
-            "label": "Please provide an indication of consent permissions for datasets and/or materials, and relates to the purposes for which datasets and/or material might be removed, stored or used. NOTE: we have extended the Data Use Ontology to include a value for NO LINKAGE.",
-            "placeholder": null,
+            "label": "Data use limitation",
+            "placeholder": "Enter value...",
             "required": false,
             "hidden": false,
             "freeSolo": false
@@ -1407,9 +1338,9 @@ const formHydrationResponse = {
         {
           "title": "Data use requirements",
           "is_array_form": false,
-          "description": "Please indicate fit here are any additional conditions set for use if any, multiple requirements may be provided. Please ensure that these restrictions are documented in access rights information.",
+          "description": "Please indicate if there are any additional conditions set for use if any, multiple requirements may be provided. Please ensure that these restrictions are documented in access rights information.",
           "location": "accessibility.usage.dataUseRequirements",
-          "guidance": "- Please indicate if there are any additional conditions set for use if any, multiple requirements may be provided.\\n- Please ensure that these restrictions are documented in access rights information.\\n- **Collaboration required**: This requirement indicates that the requestor must either agree to join a research consortium or collaborate with the primary study investigator(s).\\n- **Ethics approval required**: This requirement indicates that the requestor must provide documentation of local institutional review board (IRB)/ ethics review board (ERB) approval.\\n- **Geographical restrictions**: This requirement indicates that use is limited to within a specific geographic region.\\n- **Institution-specific restrictions**: This requirement indicates that use is limited to use within an approved institution.\\n- **Not for profit use**: This requirement indicates that use of the data is limited to not-for-profit organizations and not-for-profit use, non-commercial use.\\n- **Project-specific restrictions**: This requirement indicates that use is limited to use within an approved project.\\n- **Publication moratorium**: This requirement indicates that requestor agrees not to publish results of studies until a specific date.\\n- **Publication required**: This requirement indicates that requestor agrees to make results of studies using the data available to the larger scientific community.\\n- **Return to database or resource**: This requirement indicates that the requestor must return derived/enriched data to the database/resource.\\n- **Time limit on use**: This requirement indicates that use is approved for a specific number of months.\\n- **User-specific restriction**: This requirement indicates that use is limited to use by approved users.",
+          "guidance": "**Data use requirements**\\n\\n- Please indicate if there are any additional conditions set for use if any, multiple requirements may be provided.\\n- Please ensure that these restrictions are documented in access rights information.\\n- **Collaboration required**: This requirement indicates that the requestor must either agree to join a research consortium or collaborate with the primary study investigator(s).\\n- **Ethics approval required**: This requirement indicates that the requestor must provide documentation of local institutional review board (IRB)/ ethics review board (ERB) approval.\\n- **Geographical restrictions**: This requirement indicates that use is limited to within a specific geographic region.\\n- **Institution-specific restrictions**: This requirement indicates that use is limited to use within an approved institution.\\n- **Not for profit use**: This requirement indicates that use of the data is limited to not-for-profit organizations and not-for-profit use, non-commercial use.\\n- **Project-specific restrictions**: This requirement indicates that use is limited to use within an approved project.\\n- **Publication moratorium**: This requirement indicates that requestor agrees not to publish results of studies until a specific date.\\n- **Publication required**: This requirement indicates that requestor agrees to make results of studies using the data available to the larger scientific community.\\n- **Return to database or resource**: This requirement indicates that the requestor must return derived/enriched data to the database/resource.\\n- **Time limit on use**: This requirement indicates that use is approved for a specific number of months.\\n- **User-specific restriction**: This requirement indicates that use is limited to use by approved users.",
           "field": {
             "component": "Autocomplete",
             "options": [
@@ -1463,8 +1394,8 @@ const formHydrationResponse = {
               }
             ],
             "name": "Data use requirements",
-            "label": "Please indicate fit here are any additional conditions set for use if any, multiple requirements may be provided. Please ensure that these restrictions are documented in access rights information.",
-            "placeholder": null,
+            "label": "Data use requirements",
+            "placeholder": "Enter value...",
             "required": false,
             "hidden": false,
             "freeSolo": false
@@ -1473,14 +1404,14 @@ const formHydrationResponse = {
         {
           "title": "Citation requirements",
           "is_array_form": false,
-          "description": "Please provide the text that you would like included as part of any citation that credits this dataset. This is typically just the name of the publisher.   No employee details should be provided.",
+          "description": "Please provide the text that you would like included as part of any citation that credits this dataset. This is typically just the name of the publisher. No employee details should be provided.",
           "location": "accessibility.usage.resourceCreator",
-          "guidance": "- Please provide the text that you would like included as part of any citation that credits this dataset.\\n- This is typically just the name of the publisher. No employee details should be provided.\\n- To add multiple entries, please click on **'+' symbol** to enter each separate website.\\n- **Example**: National Services Scotland",
+          "guidance": "**Citation requirements**\\n\\n- Please provide the text that you would like included as part of any citation that credits this dataset.\\n- This is typically just the name of the publisher. No employee details should be provided.\\n- To add multiple entries, please click on **'+' symbol** to enter each separate website.\\n- **Example**: National Services Scotland",
           "field": {
             "component": "TextArea",
             "name": "Citation requirements",
             "placeholder": "National Services Scotland",
-            "label": "Please provide the text that you would like included as part of any citation that credits this dataset. This is typically just the name of the publisher.   No employee details should be provided.",
+            "label": "Citation requirements",
             "limit": 1000,
             "required": false,
             "hidden": false
@@ -1491,12 +1422,12 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Please provide details for the data access rights.",
           "location": "accessibility.access.accessRights",
-          "guidance": "- The URL of a webpage where the data access request process and/or guidance is provided. If there is more than one access process i.e. industry vs academic please provide both separated by a comma.\\n- If such a resource or the underlying process doesn’t exist, please provide “In Progress”, until both the process and the documentation are ready.",
+          "guidance": "**Access rights**\\n\\n- The URL of a webpage where the data access request process and/or guidance is provided. If there is more than one access process i.e. industry vs academic please provide both separated by a comma.\\n- If such a resource or the underlying process doesn’t exist, please provide “In Progress”, until both the process and the documentation are ready.",
           "field": {
             "component": "TextArea",
             "name": "Access rights",
             "placeholder": "In Progress",
-            "label": "Please provide details for the data access rights.",
+            "label": "Access rights",
             "limit": 50000,
             "required": true,
             "hidden": false
@@ -1507,10 +1438,14 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "The method a Researcher will use to access the dataset, if approved.",
           "location": "accessibility.access.accessServiceCategory",
-          "guidance": "Select the category which best matches how a Researcher will access the dataset, if approved for access. If the access method changes based on the data required for the project (e.g. the dataset can be shared via secure email if the extract is fully anonymised, but must be accessed via a TRE/SDE if the extract is only pseudonymised) then select 'varies based on project'.",
+          "guidance": "**Access method category**\\n\\nSelect the category which best matches how a Researcher will access the dataset, if approved for access. If the access method changes based on the data required for the project (e.g. the dataset can be shared via secure email if the extract is fully anonymised, but must be accessed via a TRE/SDE if the extract is only pseudonymised) then select 'varies based on project'.",
           "field": {
             "component": "Select",
             "options": [
+              {
+                "label": "-- Select --",
+                "value": ""
+              },
               {
                 "label": "TRE/SDE",
                 "value": "TRE/SDE"
@@ -1529,7 +1464,7 @@ const formHydrationResponse = {
               }
             ],
             "name": "Access method category",
-            "label": "The method a Researcher will use to access the dataset, if approved.",
+            "label": "Access method category",
             "required": false,
             "hidden": false
           }
@@ -1539,12 +1474,12 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Please provide a brief description of the data access services that are available including: environment that is currently available to researchers; additional consultancy and services; any indication of costs associated. If no environment is currently available, please indicate the current plans and timelines when and how data will be made available to researchers Note: This value will be used as default access environment for all datasets submitted by the organisation. However, there will be the opportunity to overwrite this value for each dataset.",
           "location": "accessibility.access.accessService",
-          "guidance": "Please provide a brief description of the data access services that are available including:\\n- environment that is currently available to researchers\\n- additional consultancy and services\\n- any indication of costs associated\\n\\n  If no environment is currently available, please indicate the current plans and timelines when and how data will be made available to researchers.\\n  **Note**: This value will be used as default access environment for all datasets submitted by the organisation. However, there will be the opportunity to overwrite this value for each dataset.",
+          "guidance": "**Access service description**\\n\\nPlease provide a brief description of the data access services that are available including:\\n- environment that is currently available to researchers\\n- additional consultancy and services\\n- any indication of costs associated\\n\\n  If no environment is currently available, please indicate the current plans and timelines when and how data will be made available to researchers.\\n  **Note**: This value will be used as default access environment for all datasets submitted by the organisation. However, there will be the opportunity to overwrite this value for each dataset.",
           "field": {
             "component": "TextArea",
             "name": "Access service description",
             "placeholder": "https://re-docs.genomicsengland.co.uk/tutorials/",
-            "label": "Please provide a brief description of the data access services that are available including: environment that is currently available to researchers; additional consultancy and services; any indication of costs associated. If no environment is currently available, please indicate the current plans and timelines when and how data will be made available to researchers Note: This value will be used as default access environment for all datasets submitted by the organisation. However, there will be the opportunity to overwrite this value for each dataset.",
+            "label": "Access service description",
             "limit": 50000,
             "required": false,
             "hidden": false
@@ -1555,12 +1490,12 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Please provide link(s) to a webpage or description detailing the service or cost model for processing data access requests.",
           "location": "accessibility.access.accessRequestCost",
-          "guidance": "This information should cover the costs and/or services available to different audiences (i.e. academic, commercial, non-UK, etc.). This can be in the form of text or a URL.",
+          "guidance": "**Access request cost**\\n\\nThis information should cover the costs and/or services available to different audiences (i.e. academic, commercial, non-UK, etc.). This can be in the form of text or a URL.",
           "field": {
             "component": "TextArea",
             "name": "Access request cost",
-            "placeholder": null,
-            "label": "Please provide link(s) to a webpage or description detailing the service or cost model for processing data access requests.",
+            "placeholder": "Enter value...",
+            "label": "Access request cost",
             "limit": 50000,
             "required": false,
             "hidden": false
@@ -1571,10 +1506,14 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Please provide an indication of the typical processing times based on the types of requests typically received.",
           "location": "accessibility.access.deliveryLeadTime",
-          "guidance": "- **Less than 1 week**: Access request process typically processed in less than a week.\\n- **1-2 weeks**: Access request process typically processed in one to two weeks.\\n- **2-4 weeks**: Access request process typically processed in two to four weeks.\\n- **1-2 months**: Access request process typically processed in one to two months.\\n- **2-6 months**: Access request process typically processed in two to six months.\\n- **More than 6 months**: Access request process typically processed in more than six months.\\n- **Variable**: Access request lead time is variable.\\n- **Not applicable**: Access request process duration is not applicable.\\n- **Other**: If the typical timeframe does not fit into the broad ranges i.e. lightweight application vs linked data application, please choose “Other” and indicate the typical timeframe within the description for the dataset.",
+          "guidance": "**Time to dataset access**\\n\\n- **Less than 1 week**: Access request process typically processed in less than a week.\\n- **1-2 weeks**: Access request process typically processed in one to two weeks.\\n- **2-4 weeks**: Access request process typically processed in two to four weeks.\\n- **1-2 months**: Access request process typically processed in one to two months.\\n- **2-6 months**: Access request process typically processed in two to six months.\\n- **More than 6 months**: Access request process typically processed in more than six months.\\n- **Variable**: Access request lead time is variable.\\n- **Not applicable**: Access request process duration is not applicable.\\n- **Other**: If the typical timeframe does not fit into the broad ranges i.e. lightweight application vs linked data application, please choose “Other” and indicate the typical timeframe within the description for the dataset.",
           "field": {
             "component": "Select",
             "options": [
+              {
+                "label": "-- Select --",
+                "value": ""
+              },
               {
                 "label": "Less than 1 week",
                 "value": "Less than 1 week"
@@ -1613,7 +1552,7 @@ const formHydrationResponse = {
               }
             ],
             "name": "Time to dataset access",
-            "label": "Please provide an indication of the typical processing times based on the types of requests typically received.",
+            "label": "Time to dataset access",
             "required": false,
             "hidden": false
           }
@@ -1623,12 +1562,12 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Please use country code from ISO 3166-1 country codes and the associated ISO 3166-2 for regions, cities, states etc. for the country/state under whose laws the data subjects' data is collected, processed and stored.",
           "location": "accessibility.access.jurisdiction",
-          "guidance": "A full list of country codes can be found here (alpha-2 column): https://www.iso.org/obp/ui/#search/code/",
+          "guidance": "**Jurisdiction**\\n\\nA full list of country codes can be found here (alpha-2 column): https://www.iso.org/obp/ui/#search/code/",
           "field": {
             "component": "Autocomplete",
             "name": "Jurisdiction",
-            "label": "Please use country code from ISO 3166-1 country codes and the associated ISO 3166-2 for regions, cities, states etc. for the country/state under whose laws the data subjects' data is collected, processed and stored.",
-            "placeholder": null,
+            "label": "Jurisdiction",
+            "placeholder": "Enter value...",
             "required": false,
             "hidden": false,
             "freeSolo": true
@@ -1639,12 +1578,12 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "Data Controller means a person/entity who (either alone or jointly or in common with other persons/entities) determines the purposes for which and the way any Data Subject data, specifically personal data or are to be processed.",
           "location": "accessibility.access.dataController",
-          "guidance": "- Data Controller means a person/entity who (either alone or jointly or in common with other persons/entities) determines the purposes for which and the way any Data Subject data, specifically personal data or are to be processed.\\n- Notes: For most organisations this will be the same as the Data Custodian of the dataset. If this is not the case, please indicate that there is a different controller.\\n- If there is a different controller please complete the Data Processor attribute to indicate if the Data Custodian is a Processor rather than the Data Controller.\\n- In some cases, there may be multiple Data Controllers i.e. GP data. If this is the case, please indicate the fact in a free-text field and describe the data sharing arrangement or a link to it, so that this can be understood by research users.\\n- Example: NHS England",
+          "guidance": "**Data Controller**\\n\\n- Data Controller means a person/entity who (either alone or jointly or in common with other persons/entities) determines the purposes for which and the way any Data Subject data, specifically personal data or are to be processed.\\n- Notes: For most organisations this will be the same as the Data Custodian of the dataset. If this is not the case, please indicate that there is a different controller.\\n- If there is a different controller please complete the Data Processor attribute to indicate if the Data Custodian is a Processor rather than the Data Controller.\\n- In some cases, there may be multiple Data Controllers i.e. GP data. If this is the case, please indicate the fact in a free-text field and describe the data sharing arrangement or a link to it, so that this can be understood by research users.\\n- Example: NHS England",
           "field": {
             "component": "TextArea",
             "name": "Data Controller",
             "placeholder": "NHS England",
-            "label": "Data Controller means a person/entity who (either alone or jointly or in common with other persons/entities) determines the purposes for which and the way any Data Subject data, specifically personal data or are to be processed.",
+            "label": "Data Controller",
             "limit": 50000,
             "required": false,
             "hidden": false
@@ -1655,15 +1594,30 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "A Data Processor, in relation to any Data Subject data, specifically personal data, means any person/entity (other than an employee of the data controller) who processes the data on behalf of the data controller.",
           "location": "accessibility.access.dataProcessor",
-          "guidance": "A Data Processor, in relation to any Data Subject data, specifically personal data, means any person/entity (other than an employee of the data controller) who processes the data on behalf of the data controller.\\n- Notes: Required to complete if the Data Custodian is the Data Processor rather than the Data Controller.\\n- If the Publisher is also the Data Controller please provide “Not Applicable”.\\n- Examples: Not Applicable, SAIL",
+          "guidance": "**Data Processor**\\n\\nA Data Processor, in relation to any Data Subject data, specifically personal data, means any person/entity (other than an employee of the data controller) who processes the data on behalf of the data controller.\\n- Notes: Required to complete if the Data Custodian is the Data Processor rather than the Data Controller.\\n- If the Publisher is also the Data Controller please provide “Not Applicable”.\\n- Examples: Not Applicable, SAIL",
           "field": {
             "component": "TextArea",
             "name": "Data Processor",
-            "placeholder": "Not Applicable",
-            "label": "A Data Processor, in relation to any Data Subject data, specifically personal data, means any person/entity (other than an employee of the data controller) who processes the data on behalf of the data controller.",
+            "placeholder": "Not Applicable, SAIL",
+            "label": "Data Processor",
             "limit": 50000,
             "required": false,
             "hidden": false
+          }
+        },
+        {
+          "title": "Format and Standards",
+          "is_array_form": false,
+          "description": null,
+          "location": "accessibility.formatAndStandards",
+          "guidance": "",
+          "field": {
+            "component": "TextField",
+            "name": "Format and Standards",
+            "placeholder": "",
+            "label": "Format and Standards",
+            "required": false,
+            "hidden": true
           }
         },
         {
@@ -1671,7 +1625,7 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "List any relevant terminologies / ontologies / controlled vocabularies, such as ICD 10 Codes, NHS Data Dictionary National Codes or SNOMED CT International, that are being used by the dataset. If the controlled vocabularies are local standards, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition. Notes: More than one vocabulary may be provided.",
           "location": "accessibility.formatAndStandards.vocabularyEncodingScheme",
-          "guidance": "- List any relevant terminologies / ontologies / controlled vocabularies, such as ICD 10 Codes, NHS Data Dictionary National Codes or SNOMED CT International, that are being used by the dataset.\\n- If the controlled vocabularies are local standards, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition.\\n- Notes: More than one vocabulary may be provided.\\n- **Local**: Local Coding Standard.\\n- [**OPCS4**](https://digital.nhs.uk/data-and-information/information-standards/governance/latest-activity/standards-and-collections/dapb0084-opcs-classification-of-interventions-and-procedures/)\\n- [**READ**](https://digital.nhs.uk/services/terminology-and-classifications/read-codes)\\n- [**SNOMED CT**](http://www.snomed.org/)\\n- [**SNOMED RT**](https://confluence.ihtsdotools.org/display/DOCGLOSS/SNOMED+RT)\\n- [**DM+D**](https://digital.nhs.uk/data-and-information/information-standards/information-standards-and-data-collections-including-extractions/publications-and-notifications/standards-and-collections/scci0052-dictionary-of-medicines-and-devices-dm-d)\\n- [**NHS National Codes**](https://www.datadictionary.nhs.uk/)\\n- [**ODS**](https://digital.nhs.uk/services/organisation-data-service)\\n- [**LOINC**](https://loinc.org/)\\n- [**ICD10**](https://www.who.int/classifications/icd/icdonlineversions/en/)\\n- [**ICD10CM**](https://www.cdc.gov/nchs/icd/icd10cm.htm)\\n- [**ICD10PCS**](https://ec.europa.eu/eip/ageing/standards/healthcare/e-health/icd-10-pcs_en)\\n- [**ICD9CM**](https://www.cdc.gov/nchs/icd/icd9cm.htm)\\n- [**ICD9**](https://www.cdc.gov/nchs/icd/icd9.htm)\\n- [**ICDO3**](https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology)\\n- [**AMT**](https://www.digitalhealth.gov.au/healthcare-providers/product-releases)\\n- [**APC**](https://www.acep.org/administration/reimbursement/reimbursement-faqs/apc-ambulatory-payment-classifications-faq/)\\n- [**ATC**](https://www.whocc.no/atc_ddd_index/)\\n- [**CIEL**](https://github.com/OpenConceptLab/ocl_web/wiki/CIEL)\\n- [**HPO**](https://hpo.jax.org/app/)\\n- [**CPT4**](https://www.ama-assn.org/practice-management/cpt)\\n- [**DPD**](https://health-products.canada.ca/dpd-bdpp/index-eng.jsp)\\n- [**DRG**](https://www.who.int/publications/i/item/WHO-UHC-HGF-Guidance-20.10)\\n- [**HEMONC**](https://hemonc.org/wiki/Main_Page)\\n- [**JMDC**](https://www.jmdc.co.jp/en/)\\n- [**KCD7**](https://forums.ohdsi.org/t/adding-kcd7-code-korean-icd-10-to-the-omop-vocabulary/7576)\\n- [**MULTUM**](https://www.cerner.com/solutions/drug-database)\\n- [**NAACCR**](https://www.naaccr.org/)\\n- [**NDC**](https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory)\\n- [**NDFRT**](https://bioportal.bioontology.org/ontologies/NDFRT)\\n- [**OXMIS**](https://oxrisk.com/oxmis/)\\n- [**RXNORM**](https://www.nlm.nih.gov/research/umls/rxnorm/index.html)\\n- [**RXNORM EXTENSION**](https://www.nlm.nih.gov/research/umls/rxnorm/index.html)\\n- [**SPL**](https://www.fda.gov/industry/fda-resources-data-standards/structured-product-labeling-resources)\\n- **Other**: Please indicate if there is another standard that you are using. This will trigger a support ticket where you can request the addition of the terminology to the HOP.\\n- [**NHS Scotland National Codes**](https://www.ndc.scot.nhs.uk/Data-Dictionary/)\\n- [**NHS Wales National Codes**](http://www.datadictionary.wales.nhs.uk/)",
+          "guidance": "**Controlled vocabulary**\\n\\n- List any relevant terminologies / ontologies / controlled vocabularies, such as ICD 10 Codes, NHS Data Dictionary National Codes or SNOMED CT International, that are being used by the dataset.\\n- If the controlled vocabularies are local standards, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition.\\n- Notes: More than one vocabulary may be provided.\\n- **Local**: Local Coding Standard.\\n- [**OPCS4**](https://digital.nhs.uk/data-and-information/information-standards/governance/latest-activity/standards-and-collections/dapb0084-opcs-classification-of-interventions-and-procedures/)\\n- [**READ**](https://digital.nhs.uk/services/terminology-and-classifications/read-codes)\\n- [**SNOMED CT**](http://www.snomed.org/)\\n- [**SNOMED RT**](https://confluence.ihtsdotools.org/display/DOCGLOSS/SNOMED+RT)\\n- [**DM+D**](https://digital.nhs.uk/data-and-information/information-standards/information-standards-and-data-collections-including-extractions/publications-and-notifications/standards-and-collections/scci0052-dictionary-of-medicines-and-devices-dm-d)\\n- [**NHS National Codes**](https://www.datadictionary.nhs.uk/)\\n- [**ODS**](https://digital.nhs.uk/services/organisation-data-service)\\n- [**LOINC**](https://loinc.org/)\\n- [**ICD10**](https://www.who.int/classifications/icd/icdonlineversions/en/)\\n- [**ICD10CM**](https://www.cdc.gov/nchs/icd/icd10cm.htm)\\n- [**ICD10PCS**](https://ec.europa.eu/eip/ageing/standards/healthcare/e-health/icd-10-pcs_en)\\n- [**ICD9CM**](https://www.cdc.gov/nchs/icd/icd9cm.htm)\\n- [**ICD9**](https://www.cdc.gov/nchs/icd/icd9.htm)\\n- [**ICDO3**](https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology)\\n- [**AMT**](https://www.digitalhealth.gov.au/healthcare-providers/product-releases)\\n- [**APC**](https://www.acep.org/administration/reimbursement/reimbursement-faqs/apc-ambulatory-payment-classifications-faq/)\\n- [**ATC**](https://www.whocc.no/atc_ddd_index/)\\n- [**CIEL**](https://github.com/OpenConceptLab/ocl_web/wiki/CIEL)\\n- [**HPO**](https://hpo.jax.org/app/)\\n- [**CPT4**](https://www.ama-assn.org/practice-management/cpt)\\n- [**DPD**](https://health-products.canada.ca/dpd-bdpp/index-eng.jsp)\\n- [**DRG**](https://www.who.int/publications/i/item/WHO-UHC-HGF-Guidance-20.10)\\n- [**HEMONC**](https://hemonc.org/wiki/Main_Page)\\n- [**JMDC**](https://www.jmdc.co.jp/en/)\\n- [**KCD7**](https://forums.ohdsi.org/t/adding-kcd7-code-korean-icd-10-to-the-omop-vocabulary/7576)\\n- [**MULTUM**](https://www.cerner.com/solutions/drug-database)\\n- [**NAACCR**](https://www.naaccr.org/)\\n- [**NDC**](https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory)\\n- [**NDFRT**](https://bioportal.bioontology.org/ontologies/NDFRT)\\n- [**OXMIS**](https://oxrisk.com/oxmis/)\\n- [**RXNORM**](https://www.nlm.nih.gov/research/umls/rxnorm/index.html)\\n- [**RXNORM EXTENSION**](https://www.nlm.nih.gov/research/umls/rxnorm/index.html)\\n- [**SPL**](https://www.fda.gov/industry/fda-resources-data-standards/structured-product-labeling-resources)\\n- **Other**: Please indicate if there is another standard that you are using. This will trigger a support ticket where you can request the addition of the terminology to the HOP.\\n- [**NHS Scotland National Codes**](https://www.ndc.scot.nhs.uk/Data-Dictionary/)\\n- [**NHS Wales National Codes**](http://www.datadictionary.wales.nhs.uk/)",
           "field": {
             "component": "Autocomplete",
             "options": [
@@ -1829,8 +1783,8 @@ const formHydrationResponse = {
               }
             ],
             "name": "Controlled vocabulary",
-            "label": "List any relevant terminologies / ontologies / controlled vocabularies, such as ICD 10 Codes, NHS Data Dictionary National Codes or SNOMED CT International, that are being used by the dataset. If the controlled vocabularies are local standards, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition. Notes: More than one vocabulary may be provided.",
-            "placeholder": "LOCAL",
+            "label": "Controlled vocabulary",
+            "placeholder": "Enter value...",
             "required": true,
             "hidden": false,
             "freeSolo": false
@@ -1841,7 +1795,7 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "List standardised data models that the dataset has been stored in or transformed to, such as OMOP or FHIR. If the data is only available in a local format, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition.",
           "location": "accessibility.formatAndStandards.conformsTo",
-          "guidance": "- List standardised data models that the dataset has been stored in or transformed to, such as OMOP or FHIR.\\n- If the data is only available in a local format, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition.\\n- [**HL7 FHIR**](https://www.hl7.org/fhir/)\\n- [**HL7 V2**](https://www.hl7.org/implement/standards/product_section.cfm?section=13)\\n- [**HL7 CDA**](https://www.hl7.org/implement/standards/product_section.cfm?section=10)\\n- [**HL7 CCOW**](https://www.hl7.org/implement/standards/product_section.cfm?section=16)\\n- [**DICOM**](https://www.dicomstandard.org/)\\n- [**I2B2**](https://www.i2b2.org/)\\n- [**IHE**](https://www.ihe.net/resources/profiles/)\\n- [**OMOP**](https://www.ohdsi.org/data-standardization/the-common-data-model/)\\n- [**openEHR**](https://www.openehr.org/)\\n- [**Sentinel**](https://www.sentinelinitiative.org/sentinel/data/distributed-database-common-data-model)\\n- [**PCORnet**](https://pcornet.org/data-driven-common-model/)\\n- [**CDISC**](https://www.cdisc.org/standards/data-exchange/odm)\\n- **Local**: In-house developed data model.\\n- **Other**: Other standardised data model.\\n- [**NHS Data Dictionary**](https://www.datadictionary.nhs.uk/)\\n- [**NHS Scotland Data Dictionary**](https://www.ndc.scot.nhs.uk/Data-Dictionary/)\\n- [**NHS Wales Data Dictionary**](https://www.datadictionary.wales.nhs.uk/)",
+          "guidance": "**Alignment with standardised data models**\\n\\n- List standardised data models that the dataset has been stored in or transformed to, such as OMOP or FHIR.\\n- If the data is only available in a local format, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition.\\n- [**HL7 FHIR**](https://www.hl7.org/fhir/)\\n- [**HL7 V2**](https://www.hl7.org/implement/standards/product_section.cfm?section=13)\\n- [**HL7 CDA**](https://www.hl7.org/implement/standards/product_section.cfm?section=10)\\n- [**HL7 CCOW**](https://www.hl7.org/implement/standards/product_section.cfm?section=16)\\n- [**DICOM**](https://www.dicomstandard.org/)\\n- [**I2B2**](https://www.i2b2.org/)\\n- [**IHE**](https://www.ihe.net/resources/profiles/)\\n- [**OMOP**](https://www.ohdsi.org/data-standardization/the-common-data-model/)\\n- [**openEHR**](https://www.openehr.org/)\\n- [**Sentinel**](https://www.sentinelinitiative.org/sentinel/data/distributed-database-common-data-model)\\n- [**PCORnet**](https://pcornet.org/data-driven-common-model/)\\n- [**CDISC**](https://www.cdisc.org/standards/data-exchange/odm)\\n- **Local**: In-house developed data model.\\n- **Other**: Other standardised data model.\\n- [**NHS Data Dictionary**](https://www.datadictionary.nhs.uk/)\\n- [**NHS Scotland Data Dictionary**](https://www.ndc.scot.nhs.uk/Data-Dictionary/)\\n- [**NHS Wales Data Dictionary**](https://www.datadictionary.wales.nhs.uk/)",
           "field": {
             "component": "Autocomplete",
             "options": [
@@ -1919,8 +1873,8 @@ const formHydrationResponse = {
               }
             ],
             "name": "Alignment with standardised data models",
-            "label": "List standardised data models that the dataset has been stored in or transformed to, such as OMOP or FHIR. If the data is only available in a local format, please make that explicit. If you are using a standard that has not been included in the list, please use “other” and contact support desk to ask for an addition.",
-            "placeholder": "LOCAL",
+            "label": "Alignment with standardised data models",
+            "placeholder": "Enter value...",
             "required": true,
             "hidden": false,
             "freeSolo": false
@@ -1931,7 +1885,7 @@ const formHydrationResponse = {
           "is_array_form": false,
           "description": "This should list all the languages in which the dataset metadata and underlying data is made available complaint with ISO 639.",
           "location": "accessibility.formatAndStandards.language",
-          "guidance": "https://www.iso.org/iso-639-language-code\\n- **aa**: Afar\\n- **ab**: Abkhazian\\n- **af**: Afrikaans\\n- **ak**: Akan\\n- **sq**: Albanian\\n- **am**: Amharic\\n- **ar**: Arabic\\n- **an**: Aragonese\\n- **hy**: Armenian\\n- **as**: Assamese\\n- **av**: Avaric\\n- **ae**: Avestan\\n- **ay**: Aymara\\n- **az**: Azerbaijani\\n- **ba**: Bashkir\\n- **bm**: Bambara\\n- **eu**: Basque\\n- **be**: Belarusian\\n- **bn**: Bengali\\n- **bh**: Bihari languages\\n- **bi**: Bislama\\n- **bo**: Tibetan\\n- **bs**: Bosnian\\n- **br**: Breton\\n- **bg**: Bulgarian\\n- **my**: Burmese\\n- **ca**: Catalan; Valencian\\n- **cs**: Czech\\n- **ch**: Chamorro\\n- **ce**: Chechen\\n- **zh**: Chinese\\n- **cu**: Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic\\n- **cv**: Chuvash\\n- **kw**: Cornish\\n- **co**: Corsican\\n- **cr**: Cree\\n- **cy**: Welsh\\n- **cs**: Czech\\n- **da**: Danish\\n- **de**: German\\n- **dv**: Divehi; Dhivehi; Maldivian\\n- **nl**: Dutch; Flemish\\n- **dz**: Dzongkha\\n- **el**: Greek, Modern (1453-)\\n- **en**: English\\n- **eo**: Esperanto\\n- **et**: Estonian\\n- **eu**: Basque\\n- **ee**: Ewe\\n- **fo**: Faroese\\n- **fa**: Persian\\n- **fj**: Fijian\\n- **fi**: Finnish\\n- **fr**: French\\n- **fy**: Western Frisian\\n- **ff**: Fulah\\n- **ka**: Georgian\\n- **de**: German\\n- **gd**: Gaelic; Scottish Gaelic\\n- **ga**: Irish\\n- **gl**: Galician\\n- **gv**: Manx\\n- **el**: Greek, Modern (1453-)\\n- **gn**: Guarani\\n- **gu**: Gujarati\\n- **ht**: Haitian; Haitian Creole\\n- **ha**: Hausa\\n- **ho**: Hiri Motu\\n- **hr**: Croatian\\n- **hu**: Hungarian\\n- **hy**: Armenian\\n- **ig**: Igbo\\n- **is**: Icelandic\\n- **io**: Ido\\n- **ii**: Sichuan Yi; Nuosu\\n- **iu**: Inuktitut\\n- **ie**: Interlingue; Occidental\\n- **ia**: Interlingua (International Auxiliary Language Association)\\n- **id**: Indonesian\\n- **ik**: Inupiaq\\n- **is**: Icelandic\\n- **it**: Italian\\n- **jv**: Javanese\\n- **ja**: Japanese\\n- **kl**: Kalaallisut; Greenlandic\\n- **kn**: Kannada\\n- **ks**: Kashmiri\\n- **ka**: Georgian\\n- **kr**: Kanuri\\n- **kk**: Kazakh\\n- **km**: Central Khmer\\n- **ki**: Kikuyu; Gikuyu\\n- **rw**: Kinyarwanda\\n- **ky**: Kirghiz; Kyrgyz\\n- **kv**: Komi\\n- **kg**: Kongo\\n- **ko**: Korean\\n- **kj**: Kuanyama; Kwanyama\\n- **ku**: Kurdish\\n- **lo**: Lao\\n- **la**: Latin\\n- **lv**: Latvian\\n- **li**: Limburgan; Limburger; limburgish\\n- **ln**: Lingala\\n- **lt**: Lithuanian\\n- **lb**: Luxembourgish; Letzeburgesch\\n- **lu**: Luba-Katanga\\n- **lg**: Ganda\\n- **mk**: Macedonian\\n- **mh**: Marshallese\\n- **ml**: Malayalam\\n- **mi**: Maori\\n- **mr**: Marathi\\n- **ms**: Malay\\n- **mk**: Macedonian\\n- **mg**: Malagasy\\n- **mt**: Maltese\\n- **mn**: Mongolian\\n- **mi**: Maori\\n- **ms**: Malay\\n- **my**: Burmese\\n- **na**: Nauru\\n- **nv**: Navajo; Navaho\\n- **nr**: Ndebele, South; South Ndebele\\n- **nd**: Ndebele, North; North Ndebele\\n- **ng**: Ndonga\\n- **ne**: Nepali\\n- **nl**: Dutch; Flemish\\n- **nn**: Norwegian Nynorsk; Nynorsk, Norwegian\\n- **nb**: Bokmål, Norwegian; Norwegian Bokmål\\n- **no**: Norwegian\\n- **ny**: Chichewa; Chewa; Nyanja\\n- **oc**: Occitan (post 1500)\\n- **oj**: Ojibwa\\n- **or**: Oriya\\n- **om**: Oromo\\n- **os**: Ossetian; Ossetic\\n- **pa**: Panjabi; Punjabi\\n- **fa**: Persian\\n- **pi**: Pali\\n- **pl**: Polish\\n- **pt**: Portuguese\\n- **ps**: Pushto; Pashto\\n- **qu**: Quechua\\n- **rm**: Romansh\\n- **ro**: Romanian; Moldavian; Moldovan\\n- **rn**: Rundi\\n- **ru**: Russian\\n- **sg**: Sango\\n- **sa**: Sanskrit\\n- **si**: Sinhala; Sinhalese\\n- **sk**: Slovak\\n- **sl**: Slovenian\\n- **se**: Northern Sami\\n- **sm**: Samoan\\n- **sn**: Shona\\n- **sd**: Sindhi\\n- **so**: Somali\\n- **st**: Sotho, Southern\\n- **es**: Spanish; Castilian\\n- **sq**: Albanian\\n- **sc**: Sardinian\\n- **sr**: Serbian\\n- **ss**: Swati\\n- **su**: Sundanese\\n- **sw**: Swahili\\n- **sv**: Swedish\\n- **ty**: Tahitian\\n- **ta**: Tamil\\n- **tt**: Tatar\\n- **te**: Telugu\\n- **tg**: Tajik\\n- **tl**: Tagalog\\n- **th**: Thai\\n- **bo**: Tibetan\\n- **ti**: Tigrinya\\n- **to**: Tonga (Tonga Islands)\\n- **tn**: Tswana\\n- **ts**: Tsonga\\n- **tk**: Turkmen\\n- **tr**: Turkish\\n- **tw**: Twi\\n- **ug**: Uighur; Uyghur\\n- **uk**: Ukrainian\\n- **ur**: Urdu\\n- **uz**: Uzbek\\n- **ve**: Venda\\n- **vi**: Vietnamese\\n- **vo**: Volapük\\n- **cy**: Welsh\\n- **wa**: Walloon\\n- **wo**: Wolof\\n- **xh**: Xhosa\\n- **yi**: Yiddish\\n- **yo**: Yoruba\\n- **za**: Zhuang; Chuang\\n- **zh**: Chinese\\n- **zu**: Zulu",
+          "guidance": "**Language**\\n\\nhttps://www.iso.org/iso-639-language-code\\n- **aa**: Afar\\n- **ab**: Abkhazian\\n- **af**: Afrikaans\\n- **ak**: Akan\\n- **sq**: Albanian\\n- **am**: Amharic\\n- **ar**: Arabic\\n- **an**: Aragonese\\n- **hy**: Armenian\\n- **as**: Assamese\\n- **av**: Avaric\\n- **ae**: Avestan\\n- **ay**: Aymara\\n- **az**: Azerbaijani\\n- **ba**: Bashkir\\n- **bm**: Bambara\\n- **eu**: Basque\\n- **be**: Belarusian\\n- **bn**: Bengali\\n- **bh**: Bihari languages\\n- **bi**: Bislama\\n- **bo**: Tibetan\\n- **bs**: Bosnian\\n- **br**: Breton\\n- **bg**: Bulgarian\\n- **my**: Burmese\\n- **ca**: Catalan; Valencian\\n- **cs**: Czech\\n- **ch**: Chamorro\\n- **ce**: Chechen\\n- **zh**: Chinese\\n- **cu**: Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic\\n- **cv**: Chuvash\\n- **kw**: Cornish\\n- **co**: Corsican\\n- **cr**: Cree\\n- **cy**: Welsh\\n- **cs**: Czech\\n- **da**: Danish\\n- **de**: German\\n- **dv**: Divehi; Dhivehi; Maldivian\\n- **nl**: Dutch; Flemish\\n- **dz**: Dzongkha\\n- **el**: Greek, Modern (1453-)\\n- **en**: English\\n- **eo**: Esperanto\\n- **et**: Estonian\\n- **eu**: Basque\\n- **ee**: Ewe\\n- **fo**: Faroese\\n- **fa**: Persian\\n- **fj**: Fijian\\n- **fi**: Finnish\\n- **fr**: French\\n- **fy**: Western Frisian\\n- **ff**: Fulah\\n- **ka**: Georgian\\n- **de**: German\\n- **gd**: Gaelic; Scottish Gaelic\\n- **ga**: Irish\\n- **gl**: Galician\\n- **gv**: Manx\\n- **el**: Greek, Modern (1453-)\\n- **gn**: Guarani\\n- **gu**: Gujarati\\n- **ht**: Haitian; Haitian Creole\\n- **ha**: Hausa\\n- **ho**: Hiri Motu\\n- **hr**: Croatian\\n- **hu**: Hungarian\\n- **hy**: Armenian\\n- **ig**: Igbo\\n- **is**: Icelandic\\n- **io**: Ido\\n- **ii**: Sichuan Yi; Nuosu\\n- **iu**: Inuktitut\\n- **ie**: Interlingue; Occidental\\n- **ia**: Interlingua (International Auxiliary Language Association)\\n- **id**: Indonesian\\n- **ik**: Inupiaq\\n- **is**: Icelandic\\n- **it**: Italian\\n- **jv**: Javanese\\n- **ja**: Japanese\\n- **kl**: Kalaallisut; Greenlandic\\n- **kn**: Kannada\\n- **ks**: Kashmiri\\n- **ka**: Georgian\\n- **kr**: Kanuri\\n- **kk**: Kazakh\\n- **km**: Central Khmer\\n- **ki**: Kikuyu; Gikuyu\\n- **rw**: Kinyarwanda\\n- **ky**: Kirghiz; Kyrgyz\\n- **kv**: Komi\\n- **kg**: Kongo\\n- **ko**: Korean\\n- **kj**: Kuanyama; Kwanyama\\n- **ku**: Kurdish\\n- **lo**: Lao\\n- **la**: Latin\\n- **lv**: Latvian\\n- **li**: Limburgan; Limburger; limburgish\\n- **ln**: Lingala\\n- **lt**: Lithuanian\\n- **lb**: Luxembourgish; Letzeburgesch\\n- **lu**: Luba-Katanga\\n- **lg**: Ganda\\n- **mk**: Macedonian\\n- **mh**: Marshallese\\n- **ml**: Malayalam\\n- **mi**: Maori\\n- **mr**: Marathi\\n- **ms**: Malay\\n- **mk**: Macedonian\\n- **mg**: Malagasy\\n- **mt**: Maltese\\n- **mn**: Mongolian\\n- **mi**: Maori\\n- **ms**: Malay\\n- **my**: Burmese\\n- **na**: Nauru\\n- **nv**: Navajo; Navaho\\n- **nr**: Ndebele, South; South Ndebele\\n- **nd**: Ndebele, North; North Ndebele\\n- **ng**: Ndonga\\n- **ne**: Nepali\\n- **nl**: Dutch; Flemish\\n- **nn**: Norwegian Nynorsk; Nynorsk, Norwegian\\n- **nb**: Bokmål, Norwegian; Norwegian Bokmål\\n- **no**: Norwegian\\n- **ny**: Chichewa; Chewa; Nyanja\\n- **oc**: Occitan (post 1500)\\n- **oj**: Ojibwa\\n- **or**: Oriya\\n- **om**: Oromo\\n- **os**: Ossetian; Ossetic\\n- **pa**: Panjabi; Punjabi\\n- **fa**: Persian\\n- **pi**: Pali\\n- **pl**: Polish\\n- **pt**: Portuguese\\n- **ps**: Pushto; Pashto\\n- **qu**: Quechua\\n- **rm**: Romansh\\n- **ro**: Romanian; Moldavian; Moldovan\\n- **rn**: Rundi\\n- **ru**: Russian\\n- **sg**: Sango\\n- **sa**: Sanskrit\\n- **si**: Sinhala; Sinhalese\\n- **sk**: Slovak\\n- **sl**: Slovenian\\n- **se**: Northern Sami\\n- **sm**: Samoan\\n- **sn**: Shona\\n- **sd**: Sindhi\\n- **so**: Somali\\n- **st**: Sotho, Southern\\n- **es**: Spanish; Castilian\\n- **sq**: Albanian\\n- **sc**: Sardinian\\n- **sr**: Serbian\\n- **ss**: Swati\\n- **su**: Sundanese\\n- **sw**: Swahili\\n- **sv**: Swedish\\n- **ty**: Tahitian\\n- **ta**: Tamil\\n- **tt**: Tatar\\n- **te**: Telugu\\n- **tg**: Tajik\\n- **tl**: Tagalog\\n- **th**: Thai\\n- **bo**: Tibetan\\n- **ti**: Tigrinya\\n- **to**: Tonga (Tonga Islands)\\n- **tn**: Tswana\\n- **ts**: Tsonga\\n- **tk**: Turkmen\\n- **tr**: Turkish\\n- **tw**: Twi\\n- **ug**: Uighur; Uyghur\\n- **uk**: Ukrainian\\n- **ur**: Urdu\\n- **uz**: Uzbek\\n- **ve**: Venda\\n- **vi**: Vietnamese\\n- **vo**: Volapük\\n- **cy**: Welsh\\n- **wa**: Walloon\\n- **wo**: Wolof\\n- **xh**: Xhosa\\n- **yi**: Yiddish\\n- **yo**: Yoruba\\n- **za**: Zhuang; Chuang\\n- **zh**: Chinese\\n- **zu**: Zulu",
           "field": {
             "component": "Autocomplete",
             "options": [
@@ -2673,7 +2627,7 @@ const formHydrationResponse = {
               }
             ],
             "name": "Language",
-            "label": "This should list all the languages in which the dataset metadata and underlying data is made available complaint with ISO 639.",
+            "label": "Language",
             "placeholder": "en",
             "required": true,
             "hidden": false,
@@ -2683,18 +2637,257 @@ const formHydrationResponse = {
         {
           "title": "Format",
           "is_array_form": false,
-          "description": "If multiple formats are available please specify. See application, audio, image, message, model, multipart, text, video, https://www.iana.org/assignments/media-types/media-types.xhtml Note: If your file format is not included in the current list of formats, please indicate other. If you are using the HOP you will be directed to a service desk page where you can request your additional format. If not please go to: https://metadata.atlassian.net/servicedesk/customer/portal/4 to request your format.",
+          "description": "List the types of data available",
           "location": "accessibility.formatAndStandards.format",
-          "guidance": "- If multiple formats are available, please specify. See application, audio, image, message, model, multipart, text, video, \u003Chttps://www.iana.org/assignments/media-types/media-types.xhtml\u003E.\\n- Please **enter one format type at a time** and click **Add New Field** to add further keywords.\\n- Note: If your file format is not included in the current list of formats, please indicate other.\\n- **Example**: text/tab-separated-values, application/sql, text/csv, image/diacom-rle",
+          "guidance": "**Format**\\n\\n- If multiple formats are available, please specify. See application, audio, image, message, model, multipart, text, video, \u003Chttps://www.iana.org/assignments/media-types/media-types.xhtml\u003E.\\n- Please **enter one format type at a time** and click **Add New Field** to add further keywords.\\n- Note: If your file format is not included in the current list of formats, please indicate other.\\n- **Example**: text/tab-separated-values, application/sql, text/csv, image/diacom-rle",
           "field": {
             "component": "Autocomplete",
             "name": "Format",
-            "label": "If multiple formats are available please specify. See application, audio, image, message, model, multipart, text, video, https://www.iana.org/assignments/media-types/media-types.xhtml Note: If your file format is not included in the current list of formats, please indicate other. If you are using the HOP you will be directed to a service desk page where you can request your additional format. If not please go to: https://metadata.atlassian.net/servicedesk/customer/portal/4 to request your format.",
+            "label": "Format",
             "placeholder": "text/tab-separated-values",
             "required": true,
             "hidden": false,
             "freeSolo": true
           }
+        },
+        {
+          "title": "Tools and Publications",
+          "is_array_form": false,
+          "description": "This section includes information about related datasets that may have previously been linked, as well as indicating if there is the opportunity to link to other datasets in the future. If a dataset has been enriched and/or derivations, scores and existing tools are available this section allows providers to indicate this to researchers.",
+          "location": "enrichmentAndLinkage",
+          "guidance": "Upload information on other projects, tools, publications and other datasets that are linked to this one.",
+          "field": {
+            "component": "TextField",
+            "name": "Tools and Publications",
+            "placeholder": "",
+            "label": "Tools and Publications",
+            "required": false,
+            "hidden": true
+          }
+        },
+        {
+          "title": "Derived from Array",
+          "description": "If applicable, please provide DOIs or links to datasets from which data in this dataset has been derived or calculated from.",
+          "location": "enrichmentAndLinkage.derivedFrom",
+          "is_array_form": true,
+          "required": false,
+          "fields": [
+            {
+              "title": "Persistent identifier of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.derivedFrom.pid",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Persistent identifier of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Persistent identifier of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Title of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.derivedFrom.title",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Title of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Title of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Url of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.derivedFrom.url",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Url of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Url of a dataset",
+                "required": false,
+                "hidden": false
+              }
+            }
+          ]
+        },
+        {
+          "title": "Is part of Array",
+          "description": "This relationship indicates that the dataset is a component or subset of a broader collection of related datasets. For example, clinical trial data for a specific drug may be part of a larger database of pharmaceutical research data. Complete only if the dataset is part of a group or family of datasets i.e. Hospital Episode Statistics has several constituents. If your dataset is not part of a group, please enter 'NOT APPLICABLE' **Example**: Hospital Episodes Statistics datasets (A&E, APC, OP, AC MSDS).",
+          "location": "enrichmentAndLinkage.isPartOf",
+          "is_array_form": true,
+          "required": false,
+          "fields": [
+            {
+              "title": "Persistent identifier of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.isPartOf.pid",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Persistent identifier of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Persistent identifier of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Title of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.isPartOf.title",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Title of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Title of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Url of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.isPartOf.url",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Url of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Url of a dataset",
+                "required": false,
+                "hidden": false
+              }
+            }
+          ]
+        },
+        {
+          "title": "Linked datasets Array",
+          "description": "If applicable, please provide the DOI of other datasets that have previously been linked to this dataset and their availability. If no DOI is available, please provide the title of the datasets that can be linked.",
+          "location": "enrichmentAndLinkage.linkableDatasets",
+          "is_array_form": true,
+          "required": false,
+          "fields": [
+            {
+              "title": "Persistent identifier of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.linkableDatasets.pid",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Persistent identifier of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Persistent identifier of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Title of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.linkableDatasets.title",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Title of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Title of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Url of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.linkableDatasets.url",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Url of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Url of a dataset",
+                "required": false,
+                "hidden": false
+              }
+            }
+          ]
+        },
+        {
+          "title": "Similar to datasets Array",
+          "description": "Datasets that are similar to each other in some way, collect similar patients, regional equivalent etc.",
+          "location": "enrichmentAndLinkage.similarToDatasets",
+          "is_array_form": true,
+          "required": false,
+          "fields": [
+            {
+              "title": "Persistent identifier of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.similarToDatasets.pid",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Persistent identifier of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Persistent identifier of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Title of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.similarToDatasets.title",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Title of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Title of a dataset",
+                "limit": 150,
+                "required": false,
+                "hidden": false
+              }
+            },
+            {
+              "title": "Url of a dataset",
+              "is_array_form": false,
+              "description": null,
+              "location": "enrichmentAndLinkage.similarToDatasets.url",
+              "guidance": "",
+              "field": {
+                "component": "TextField",
+                "name": "Url of a dataset",
+                "placeholder": "Enter value...",
+                "label": "Url of a dataset",
+                "required": false,
+                "hidden": false
+              }
+            }
+          ]
         },
         {
           "title": "Investigations",
@@ -2706,7 +2899,7 @@ const formHydrationResponse = {
             "component": "Autocomplete",
             "name": "Investigations",
             "label": "Please provide link to any active projects that are using the dataset.",
-            "placeholder": null,
+            "placeholder": "Enter value...",
             "required": false,
             "hidden": false,
             "freeSolo": true
@@ -2722,7 +2915,7 @@ const formHydrationResponse = {
             "component": "Autocomplete",
             "name": "Tools",
             "label": "Please provide the URL of any analysis tools or models that have been created for this dataset and are available for further use. Multiple tools may be provided. Note: We encourage users to adopt a model along the lines of https://www.ga4gh.org/news/tool-registry-service-api-enabling-an-interoperable-library-of-genomics-analysis-tools/",
-            "placeholder": null,
+            "placeholder": "Enter value...",
             "required": false,
             "hidden": false,
             "freeSolo": true
@@ -2762,366 +2955,12 @@ const formHydrationResponse = {
         },
        
         {
-          "title": "Omics assay",
-          "is_array_form": false,
-          "description": "The specific 'omics assay that generated the dataset.",
-          "location": "omics.assay",
-          "guidance": "The specific 'omics assay that generated the dataset. If the assay used to generate your dataset is not listed, please contract the gateway team by submitting an enquiry.",
-          "field": {
-            "component": "Select",
-            "options": [
-              {
-                "label": "NMR spectroscopy",
-                "value": "NMR spectroscopy"
-              },
-              {
-                "label": "Mass-spectrometry",
-                "value": "Mass-spectrometry"
-              },
-              {
-                "label": "Whole genome sequencing",
-                "value": "Whole genome sequencing"
-              },
-              {
-                "label": "Exome sequencing",
-                "value": "Exome sequencing"
-              },
-              {
-                "label": "Genotyping by array",
-                "value": "Genotyping by array"
-              },
-              {
-                "label": "Transcriptome profiling by high-throughput sequencing",
-                "value": "Transcriptome profiling by high-throughput sequencing"
-              },
-              {
-                "label": "Transcriptome profiling by array",
-                "value": "Transcriptome profiling by array"
-              },
-              {
-                "label": "Amplicon sequencing",
-                "value": "Amplicon sequencing"
-              },
-              {
-                "label": "Methylation binding domain sequencing",
-                "value": "Methylation binding domain sequencing"
-              },
-              {
-                "label": "Methylation profiling by high-throughput sequencing",
-                "value": "Methylation profiling by high-throughput sequencing"
-              },
-              {
-                "label": "Genomic variant calling",
-                "value": "Genomic variant calling"
-              },
-              {
-                "label": "Chromatin accessibility profiling by high-throughput sequencing",
-                "value": "Chromatin accessibility profiling by high-throughput sequencing"
-              },
-              {
-                "label": "Histone modification profiling by high-throughput sequencing",
-                "value": "Histone modification profiling by high-throughput sequencing"
-              },
-              {
-                "label": "Chromatin immunoprecipitation sequencing",
-                "value": "Chromatin immunoprecipitation sequencing"
-              },
-              {
-                "label": "Whole genome shotgun sequencing",
-                "value": "Whole genome shotgun sequencing"
-              },
-              {
-                "label": "Whole transcriptome sequencing",
-                "value": "Whole transcriptome sequencing"
-              },
-              {
-                "label": "Targeted mutation analysis",
-                "value": "Targeted mutation analysis"
-              }
-            ],
-            "name": "Omics assay",
-            "label": "The specific 'omics assay that generated the dataset.",
-            "required": false,
-            "hidden": false
-          }
-        },
-        {
-          "title": "Omics Platform",
-          "is_array_form": false,
-          "description": "The specific technology or infrastructure used to perform the assay. If the omics platform used to create your dataset is not listed, please select other, a member of the gateway team will contact you to add an appropriate term(s) both to your record and to the metadata schema on your behalf.",
-          "location": "omics.platform",
-          "guidance": "The specific technology or infrastructure used to perform the assay. If the omics platform used to create your dataset is not listed, please select other, a member of the gateway team will contact you to add an appropriate term(s) both to your record and to the metadata schema on your behalf.",
-          "field": {
-            "component": "Select",
-            "options": [
-              {
-                "label": "Other",
-                "value": "Other"
-              },
-              {
-                "label": "NMR Nightingale",
-                "value": "NMR Nightingale"
-              },
-              {
-                "label": "Metabolon",
-                "value": "Metabolon"
-              },
-              {
-                "label": "Biocrates",
-                "value": "Biocrates"
-              },
-              {
-                "label": "Illumina",
-                "value": "Illumina"
-              },
-              {
-                "label": "Oxford Nanopore",
-                "value": "Oxford Nanopore"
-              },
-              {
-                "label": "454",
-                "value": "454"
-              },
-              {
-                "label": "Hi-C",
-                "value": "Hi-C"
-              },
-              {
-                "label": "HiFi",
-                "value": "HiFi"
-              }
-            ],
-            "name": "Omics Platform",
-            "label": "The specific technology or infrastructure used to perform the assay. If the omics platform used to create your dataset is not listed, please select other, a member of the gateway team will contact you to add an appropriate term(s) both to your record and to the metadata schema on your behalf.",
-            "required": false,
-            "hidden": false
-          }
-        },
-        {
-          "title": "Derived From Array",
-          "location": "enrichmentAndLinkage.derivedFrom",
-          "is_array_form": true,
-          "required": false,
-          "fields": [
-            {
-              "title": "Persistent identifier of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.derivedFrom.pid",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Persistent identifier of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Title of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.derivedFrom.title",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Title of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Url of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.derivedFrom.url",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Url of a dataset",
-                "placeholder": null,
-                "label": null,
-                "required": false,
-                "hidden": false
-              }
-            }
-          ]
-        },
-        {
-          "title": "Is Part Of Array",
-          "location": "enrichmentAndLinkage.isPartOf",
-          "is_array_form": true,
-          "required": false,
-          "fields": [
-            {
-              "title": "Persistent identifier of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.isPartOf.pid",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Persistent identifier of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Title of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.isPartOf.title",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Title of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Url of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.isPartOf.url",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Url of a dataset",
-                "placeholder": null,
-                "label": null,
-                "required": false,
-                "hidden": false
-              }
-            }
-          ]
-        },
-        {
-          "title": "Linkable Datasets Array",
-          "location": "enrichmentAndLinkage.linkableDatasets",
-          "is_array_form": true,
-          "required": false,
-          "fields": [
-            {
-              "title": "Persistent identifier of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.linkableDatasets.pid",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Persistent identifier of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Title of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.linkableDatasets.title",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Title of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Url of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.linkableDatasets.url",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Url of a dataset",
-                "placeholder": null,
-                "label": null,
-                "required": false,
-                "hidden": false
-              }
-            }
-          ]
-        },
-        {
-          "title": "Similar To Datasets Array",
-          "location": "enrichmentAndLinkage.similarToDatasets",
-          "is_array_form": true,
-          "required": false,
-          "fields": [
-            {
-              "title": "Persistent identifier of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.similarToDatasets.pid",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Persistent identifier of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Title of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.similarToDatasets.title",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Title of a dataset",
-                "placeholder": null,
-                "label": null,
-                "limit": 150,
-                "required": false,
-                "hidden": false
-              }
-            },
-            {
-              "title": "Url of a dataset",
-              "is_array_form": false,
-              "description": null,
-              "location": "enrichmentAndLinkage.similarToDatasets.url",
-              "guidance": "",
-              "field": {
-                "component": "TextField",
-                "name": "Url of a dataset",
-                "placeholder": null,
-                "label": null,
-                "required": false,
-                "hidden": false
-              }
-            }
-          ]
-        },
-        {
           "title": "Observations Array",
+          "description": "This section provides an overview of observations of your dataset linked to specific points in time. Multiple observations about the dataset are encouraged to be provided, including multiple observations of the same property at different timepoints. At least one observation is required.",
           "location": "observations",
           "is_array_form": true,
           "required": false,
+          "guidance": "Please provide interesting observations about your dataset. These might for example include the number of datapoints in a particular table of note.",
           "fields": [
             {
               "title": "Dataset volume measure",
@@ -3532,6 +3371,142 @@ const formHydrationResponse = {
               }
             }
           ]
+        },
+        {
+          "title": "Omics assay",
+          "is_array_form": false,
+          "description": "The specific 'omics assay that generated the dataset.",
+          "location": "omics.assay",
+          "guidance": "The specific 'omics assay that generated the dataset. If the assay used to generate your dataset is not listed, please contract the gateway team by submitting an enquiry.",
+          "field": {
+            "component": "Select",
+            "options": [
+              {
+                "label": "NMR spectroscopy",
+                "value": "NMR spectroscopy"
+              },
+              {
+                "label": "Mass-spectrometry",
+                "value": "Mass-spectrometry"
+              },
+              {
+                "label": "Whole genome sequencing",
+                "value": "Whole genome sequencing"
+              },
+              {
+                "label": "Exome sequencing",
+                "value": "Exome sequencing"
+              },
+              {
+                "label": "Genotyping by array",
+                "value": "Genotyping by array"
+              },
+              {
+                "label": "Transcriptome profiling by high-throughput sequencing",
+                "value": "Transcriptome profiling by high-throughput sequencing"
+              },
+              {
+                "label": "Transcriptome profiling by array",
+                "value": "Transcriptome profiling by array"
+              },
+              {
+                "label": "Amplicon sequencing",
+                "value": "Amplicon sequencing"
+              },
+              {
+                "label": "Methylation binding domain sequencing",
+                "value": "Methylation binding domain sequencing"
+              },
+              {
+                "label": "Methylation profiling by high-throughput sequencing",
+                "value": "Methylation profiling by high-throughput sequencing"
+              },
+              {
+                "label": "Genomic variant calling",
+                "value": "Genomic variant calling"
+              },
+              {
+                "label": "Chromatin accessibility profiling by high-throughput sequencing",
+                "value": "Chromatin accessibility profiling by high-throughput sequencing"
+              },
+              {
+                "label": "Histone modification profiling by high-throughput sequencing",
+                "value": "Histone modification profiling by high-throughput sequencing"
+              },
+              {
+                "label": "Chromatin immunoprecipitation sequencing",
+                "value": "Chromatin immunoprecipitation sequencing"
+              },
+              {
+                "label": "Whole genome shotgun sequencing",
+                "value": "Whole genome shotgun sequencing"
+              },
+              {
+                "label": "Whole transcriptome sequencing",
+                "value": "Whole transcriptome sequencing"
+              },
+              {
+                "label": "Targeted mutation analysis",
+                "value": "Targeted mutation analysis"
+              }
+            ],
+            "name": "Omics assay",
+            "label": "The specific 'omics assay that generated the dataset.",
+            "required": false,
+            "hidden": false
+          }
+        },
+        {
+          "title": "Omics Platform",
+          "is_array_form": false,
+          "description": "The specific technology or infrastructure used to perform the assay. If the omics platform used to create your dataset is not listed, please select other, a member of the gateway team will contact you to add an appropriate term(s) both to your record and to the metadata schema on your behalf.",
+          "location": "omics.platform",
+          "guidance": "The specific technology or infrastructure used to perform the assay. If the omics platform used to create your dataset is not listed, please select other, a member of the gateway team will contact you to add an appropriate term(s) both to your record and to the metadata schema on your behalf.",
+          "field": {
+            "component": "Select",
+            "options": [
+              {
+                "label": "Other",
+                "value": "Other"
+              },
+              {
+                "label": "NMR Nightingale",
+                "value": "NMR Nightingale"
+              },
+              {
+                "label": "Metabolon",
+                "value": "Metabolon"
+              },
+              {
+                "label": "Biocrates",
+                "value": "Biocrates"
+              },
+              {
+                "label": "Illumina",
+                "value": "Illumina"
+              },
+              {
+                "label": "Oxford Nanopore",
+                "value": "Oxford Nanopore"
+              },
+              {
+                "label": "454",
+                "value": "454"
+              },
+              {
+                "label": "Hi-C",
+                "value": "Hi-C"
+              },
+              {
+                "label": "HiFi",
+                "value": "HiFi"
+              }
+            ],
+            "name": "Omics Platform",
+            "label": "The specific technology or infrastructure used to perform the assay. If the omics platform used to create your dataset is not listed, please select other, a member of the gateway team will contact you to add an appropriate term(s) both to your record and to the metadata schema on your behalf.",
+            "required": false,
+            "hidden": false
+          }
         },
         {
           "title": "Dataset Type Array",
@@ -4082,10 +4057,10 @@ const formHydrationResponse = {
           ]
         },
         {
-          "title": "Geographic coverage",
-          "required": true,
+          "title": "Url",
+          "required": false,
           "type": "string",
-          "pattern": "([^,]+)"
+          "format": "url"
         },
         {
           "title": "Minimum age range",
@@ -4104,96 +4079,6 @@ const formHydrationResponse = {
           "required": false,
           "type": "string",
           "format": "url"
-        },
-        {
-          "title": "Biological sample availability",
-          "required": false,
-          "type": "array",
-          "of": {
-            "type": "string",
-            "enum": [
-              "None/not available",
-              "Bone marrow",
-              "Cancer cell lines",
-              "CDNA/MRNA",
-              "Core biopsy",
-              "DNA",
-              "Entire body organ",
-              "Faeces",
-              "Immortalized cell lines",
-              "Isolated pathogen",
-              "MicroRNA",
-              "Peripheral blood cells",
-              "Plasma",
-              "PM Tissue",
-              "Primary cells",
-              "RNA",
-              "Saliva",
-              "Serum",
-              "Swabs",
-              "Tissue",
-              "Urine",
-              "Whole blood",
-              "Availability to be confirmed",
-              "Other"
-            ],
-            "enum_titles": [
-              "None/not available",
-              "Bone marrow",
-              "Cancer cell lines",
-              "CDNA/MRNA",
-              "Core biopsy",
-              "DNA",
-              "Entire body organ",
-              "Faeces",
-              "Immortalized cell lines",
-              "Isolated pathogen",
-              "MicroRNA",
-              "Peripheral blood cells",
-              "Plasma",
-              "PM Tissue",
-              "Primary cells",
-              "RNA",
-              "Saliva",
-              "Serum",
-              "Swabs",
-              "Tissue",
-              "Urine",
-              "Whole blood",
-              "Availability to be confirmed",
-              "Other"
-            ]
-          }
-        },
-        {
-          "title": "Follow-up",
-          "required": false,
-          "type": "string",
-          "enum": [
-            "0 - 6 Months",
-            "6 - 12 Months",
-            "1 - 10 Years",
-            "\u003E 10 Years",
-            "Unknown",
-            "Continuous",
-            "Other",
-            null],
-          "enum_titles": [
-            "0 - 6 Months",
-            "6 - 12 Months",
-            "1 - 10 Years",
-            "\u003E 10 Years",
-            "Unknown",
-            "Continuous",
-            "Other",
-            null]
-        },
-        {
-          "title": "Patient pathway description",
-          "required": false,
-          "type": "string",
-          "min": 2,
-          "max": 10000
         },
         {
           "title": "Purpose of dataset collection",
@@ -4385,6 +4270,7 @@ const formHydrationResponse = {
           "required": true,
           "type": "string",
           "enum": [
+            "",
             "Less than 1 week",
             "1-2 weeks",
             "2-4 weeks",
@@ -4396,6 +4282,7 @@ const formHydrationResponse = {
             "Other"
           ],
           "enum_titles": [
+            "-- Select --",
             "Less than 1 week",
             "1-2 weeks",
             "2-4 weeks",
@@ -5217,7 +5104,7 @@ const formHydrationResponse = {
           ]
         },
         {
-          "title": "Derived From Array",
+          "title": "Derived from Array",
           "required": false,
           "minItems": 0,
           "type": "array",
@@ -5245,7 +5132,7 @@ const formHydrationResponse = {
           ]
         },
         {
-          "title": "Is Part Of Array",
+          "title": "Is part of Array",
           "required": false,
           "minItems": 0,
           "type": "array",
@@ -5273,7 +5160,7 @@ const formHydrationResponse = {
           ]
         },
         {
-          "title": "Linkable Datasets Array",
+          "title": "Linked datasets Array",
           "required": false,
           "minItems": 0,
           "type": "array",
@@ -5301,7 +5188,7 @@ const formHydrationResponse = {
           ]
         },
         {
-          "title": "Similar To Datasets Array",
+          "title": "Similar to datasets Array",
           "required": false,
           "minItems": 0,
           "type": "array",
@@ -5859,9 +5746,6 @@ const formHydrationResponse = {
         ],
         "Language": [
           "en"
-        ],
-        "Biological sample availability": [
-          "None/not available"
         ]
       }
     }
