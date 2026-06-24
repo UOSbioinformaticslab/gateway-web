@@ -64,6 +64,8 @@ import {
     ACCESSIBILITY_FORM_SECTION,
     TOOLS_AND_PUBLICATIONS_FORM_SECTION,
     OBSERVATIONS_FORM_SECTION,
+    DEMOGRAPHIC_FREQUENCY_FORM_SECTION,
+    OMICS_FORM_SECTION,
     SUBMISSON_FORM_SECTION,
 } from "@/consts/createDataset";
 import { ArrowBackIosNewIcon, ArrowForwardIosIcon } from "@/consts/icons";
@@ -101,6 +103,11 @@ import {
     getToolsAndPublicationsSectionGuidance,
     getObservationsSectionHeaderProps,
     getObservationsSectionGuidance,
+    getDemographicFrequencySectionHeaderProps,
+    getDemographicFrequencySectionGuidance,
+    getOmicsSectionHeaderProps,
+    getOmicsSectionGuidance,
+    isDemographicBreakdownArray,
     getWelcomeSectionGuidance,
     isSummaryDataCustodianAccordionField,
     isSummaryStandaloneAccordionField,
@@ -108,6 +115,7 @@ import {
     formatValidationItems,
 } from "@/utils/formHydration";
 import FormHydrationAccordionSection from "./FormHydrationAccordionSection";
+import FormHydrationStaticSection from "./FormHydrationStaticSection";
 import FormHydrationFieldHeader from "./FormHydrationFieldHeader";
 import FormHydrationFieldItem from "./FormHydrationFieldItem";
 import { capitalise, decodeHtmlEntity, splitCamelcase } from "@/utils/general";
@@ -1025,6 +1033,22 @@ const CreateDatasetForm = ({
             return;
         }
 
+        if (selectedFormSection === DEMOGRAPHIC_FREQUENCY_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(
+                    getDemographicFrequencySectionGuidance(schemaFields)
+                )
+            );
+            return;
+        }
+
+        if (selectedFormSection === OMICS_FORM_SECTION) {
+            setGuidanceText(
+                formatGuidance(getOmicsSectionGuidance(schemaFields))
+            );
+            return;
+        }
+
         if (selectedFormSection === "Associated Project Grants") {
             setGuidanceText(
                 formatGuidance(getAssociatedProjectGrantsGuidance(schemaFields))
@@ -1057,6 +1081,11 @@ const CreateDatasetForm = ({
 
     const isObservationsSection =
         selectedFormSection === OBSERVATIONS_FORM_SECTION;
+
+    const isDemographicFrequencySection =
+        selectedFormSection === DEMOGRAPHIC_FREQUENCY_FORM_SECTION;
+
+    const isOmicsSection = selectedFormSection === OMICS_FORM_SECTION;
 
     const structuralMetadataSection = useMemo(
         () =>
@@ -1131,6 +1160,16 @@ const CreateDatasetForm = ({
 
     const observationsSectionHeader = useMemo(
         () => getObservationsSectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const demographicFrequencySectionHeader = useMemo(
+        () => getDemographicFrequencySectionHeaderProps(schemaFields),
+        [schemaFields]
+    );
+
+    const omicsSectionHeader = useMemo(
+        () => getOmicsSectionHeaderProps(schemaFields),
         [schemaFields]
     );
 
@@ -1436,6 +1475,28 @@ const CreateDatasetForm = ({
                                                     }
                                                     description={
                                                         observationsSectionHeader.description
+                                                    }
+                                                />
+                                            ) : demographicFrequencySectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  DEMOGRAPHIC_FREQUENCY_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        demographicFrequencySectionHeader.title
+                                                    }
+                                                    description={
+                                                        demographicFrequencySectionHeader.description
+                                                    }
+                                                />
+                                            ) : omicsSectionHeader?.show &&
+                                              selectedFormSection ===
+                                                  OMICS_FORM_SECTION ? (
+                                                <FormHydrationFieldHeader
+                                                    title={
+                                                        omicsSectionHeader.title
+                                                    }
+                                                    description={
+                                                        omicsSectionHeader.description
                                                     }
                                                 />
                                             ) : (
@@ -1897,6 +1958,180 @@ const CreateDatasetForm = ({
                                                                 </Paper>
                                                             )
                                                         )
+                                                ) : isDemographicFrequencySection ? (
+                                                    schemaFields
+                                                        .filter(
+                                                            schemaField =>
+                                                                !schemaField
+                                                                    .field
+                                                                    ?.hidden
+                                                        )
+                                                        .filter(
+                                                            ({ location }) =>
+                                                                location?.startsWith(
+                                                                    selectedFormSection
+                                                                ) &&
+                                                                location !==
+                                                                    DEMOGRAPHIC_FREQUENCY_FORM_SECTION &&
+                                                                location !==
+                                                                    "demographicFrequency.age" &&
+                                                                location !==
+                                                                    "demographicFrequency.disease"
+                                                        )
+                                                        .map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => {
+                                                                const isBreakdown =
+                                                                    isDemographicBreakdownArray(
+                                                                        fieldParent.location
+                                                                    );
+
+                                                                return (
+                                                                    <Paper
+                                                                        key={`${fieldParent.location}-${index}`}
+                                                                        sx={{
+                                                                            p: 2,
+                                                                            mb: 2,
+                                                                            border: `1px solid ${colors.grey300}`,
+                                                                            borderRadius: 1,
+                                                                            boxShadow:
+                                                                                "none",
+                                                                            backgroundColor:
+                                                                                isBreakdown
+                                                                                    ? "#F0F2F5"
+                                                                                    : "background.paper",
+                                                                        }}>
+                                                                        {isBreakdown ? (
+                                                                            <FormHydrationStaticSection
+                                                                                title={fieldParent.title.replace(
+                                                                                    " Array",
+                                                                                    ""
+                                                                                )}
+                                                                                sx={{
+                                                                                    mb: 0,
+                                                                                }}>
+                                                                                <FormHydrationFieldItem
+                                                                                    fieldParent={
+                                                                                        fieldParent
+                                                                                    }
+                                                                                    selectedFormSection={
+                                                                                        selectedFormSection
+                                                                                    }
+                                                                                    index={
+                                                                                        index
+                                                                                    }
+                                                                                    control={
+                                                                                        control
+                                                                                    }
+                                                                                    schemadefs={
+                                                                                        schemadefs
+                                                                                    }
+                                                                                    getValues={
+                                                                                        getValues
+                                                                                    }
+                                                                                    updateGuidanceText={
+                                                                                        updateGuidanceText
+                                                                                    }
+                                                                                    hideGroupTitle
+                                                                                    hideArrayMutators
+                                                                                    useBreakdownLayout
+                                                                                    breakdownFootnote={
+                                                                                        fieldParent.location ===
+                                                                                        "demographicFrequency.ethnicity"
+                                                                                            ? "* Leave blank if the count is zero or unknown."
+                                                                                            : undefined
+                                                                                    }
+                                                                                />
+                                                                            </FormHydrationStaticSection>
+                                                                        ) : (
+                                                                            <FormHydrationAccordionSection
+                                                                                title={fieldParent.title.replace(
+                                                                                    " Array",
+                                                                                    ""
+                                                                                )}
+                                                                                sx={{
+                                                                                    mb: 0,
+                                                                                }}>
+                                                                                <FormHydrationFieldItem
+                                                                                    fieldParent={
+                                                                                        fieldParent
+                                                                                    }
+                                                                                    selectedFormSection={
+                                                                                        selectedFormSection
+                                                                                    }
+                                                                                    index={
+                                                                                        index
+                                                                                    }
+                                                                                    control={
+                                                                                        control
+                                                                                    }
+                                                                                    schemadefs={
+                                                                                        schemadefs
+                                                                                    }
+                                                                                    getValues={
+                                                                                        getValues
+                                                                                    }
+                                                                                    updateGuidanceText={
+                                                                                        updateGuidanceText
+                                                                                    }
+                                                                                    hideGroupTitle
+                                                                                    useFieldPanels
+                                                                                />
+                                                                            </FormHydrationAccordionSection>
+                                                                        )}
+                                                                    </Paper>
+                                                                );
+                                                            }
+                                                        )
+                                                ) : isOmicsSection ? (
+                                                    schemaFields
+                                                        .filter(
+                                                            schemaField =>
+                                                                !schemaField
+                                                                    .field
+                                                                    ?.hidden
+                                                        )
+                                                        .filter(
+                                                            ({ location }) =>
+                                                                location?.startsWith(
+                                                                    selectedFormSection
+                                                                ) &&
+                                                                location !==
+                                                                    OMICS_FORM_SECTION
+                                                        )
+                                                        .map(
+                                                            (
+                                                                fieldParent,
+                                                                index
+                                                            ) => (
+                                                                <FormHydrationFieldItem
+                                                                    key={`${fieldParent.location}-${index}`}
+                                                                    fieldParent={
+                                                                        fieldParent
+                                                                    }
+                                                                    selectedFormSection={
+                                                                        selectedFormSection
+                                                                    }
+                                                                    index={
+                                                                        index
+                                                                    }
+                                                                    control={
+                                                                        control
+                                                                    }
+                                                                    schemadefs={
+                                                                        schemadefs
+                                                                    }
+                                                                    getValues={
+                                                                        getValues
+                                                                    }
+                                                                    updateGuidanceText={
+                                                                        updateGuidanceText
+                                                                    }
+                                                                />
+                                                            )
+                                                        )
                                                 ) : isOtherDataTypesSection ? (
                                                     schemaFields
                                                         .filter(
@@ -2178,7 +2413,9 @@ const CreateDatasetForm = ({
                                         <Typography
                                             variant="h2"
                                             sx={
-                                                isOtherDataTypesSection
+                                                isOtherDataTypesSection ||
+                                                isDemographicFrequencySection ||
+                                                isOmicsSection
                                                     ? {
                                                           color: "primary.main",
                                                           fontWeight: 700,
@@ -2189,10 +2426,18 @@ const CreateDatasetForm = ({
                                             {isOtherDataTypesSection &&
                                             otherDataTypesSection?.title
                                                 ? otherDataTypesSection.title
-                                                : t("guidance")}
+                                                : isDemographicFrequencySection &&
+                                                    demographicFrequencySectionHeader?.title
+                                                  ? demographicFrequencySectionHeader.title
+                                                  : isOmicsSection &&
+                                                      omicsSectionHeader?.title
+                                                    ? omicsSectionHeader.title
+                                                    : t("guidance")}
                                         </Typography>
 
-                                        {isOtherDataTypesSection && (
+                                        {(isOtherDataTypesSection ||
+                                            isDemographicFrequencySection ||
+                                            isOmicsSection) && (
                                             <Divider
                                                 sx={{
                                                     mb: 2,

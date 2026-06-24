@@ -1,20 +1,41 @@
-export function getPartnerHeaders(): Record<string, string> {
-    // Partner headers are only sent from the server. Browser requests to the
-    // external API are cross-origin and the gateway API CORS policy does not
-    // allow x-partner-context on preflight from localhost.
-    if (typeof window !== "undefined") {
-        return {};
-    }
-
-    const partner =
+function getPartnerContext(): string {
+    return (
         process.env.NEXT_PUBLIC_PARTNER_CONTEXT ??
         process.env.NEXT_PUBLIC_PARTNER ??
-        "";
+        ""
+    );
+}
+
+export function getPartnerHeaders(): Record<string, string> {
+    const partner = getPartnerContext();
 
     if (!partner) return {};
 
     return {
         "x-partner-context": partner,
     };
+}
+
+/** Auth provider slug sent in login/register body (e.g. CRUK → "cruk"). */
+export function getPartnerAuthProvider(): string | undefined {
+    const partner = getPartnerContext().toLowerCase();
+
+    if (partner === "cruk") {
+        return "cruk";
+    }
+
+    return undefined;
+}
+
+export function withPartnerAuthBody<T extends Record<string, unknown>>(
+    body: T
+): T & { provider?: string } {
+    const provider = getPartnerAuthProvider();
+
+    if (!provider || body.provider) {
+        return body;
+    }
+
+    return { ...body, provider };
 }
 

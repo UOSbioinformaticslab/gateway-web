@@ -4,12 +4,14 @@ import { FormHydration } from "@/interfaces/FormHydration";
 import { Defs } from "@/interfaces/V4Schema";
 import {
     getFormHydrationFieldHeaderProps,
+    isDemographicBreakdownArray,
     isPanelOnlyFormField,
     renderFormHydrationField,
     withFormHydrationFieldPanelContent,
     withFormHydrationPanelOnlyFieldContent,
 } from "@/utils/formHydration";
 import FormFieldArray from "./FormFieldArray";
+import DemographicBreakdownFieldArray from "./DemographicBreakdownFieldArray";
 import FormHydrationFieldHeader from "./FormHydrationFieldHeader";
 import FormHydrationFieldPanel from "./FormHydrationFieldPanel";
 
@@ -26,6 +28,8 @@ interface FormHydrationFieldItemProps {
     hideGroupTitle?: boolean;
     hideArrayMutators?: boolean;
     useFieldPanels?: boolean;
+    useBreakdownLayout?: boolean;
+    breakdownFootnote?: string;
 }
 
 const FormHydrationFieldItem = ({
@@ -39,6 +43,8 @@ const FormHydrationFieldItem = ({
     hideGroupTitle = false,
     hideArrayMutators = false,
     useFieldPanels = false,
+    useBreakdownLayout = false,
+    breakdownFootnote,
 }: FormHydrationFieldItemProps) => {
     const { field, fields } = fieldParent;
     const listKey = `${selectedFormSection}-${fieldParent.location ?? ""}-${fieldParent.title ?? field?.name ?? ""}-${index}`;
@@ -56,7 +62,15 @@ const FormHydrationFieldItem = ({
                 />
             )}
             {fields?.length ? (
-                <FormFieldArray
+                useBreakdownLayout && isDemographicBreakdownArray(fieldParent.location) ? (
+                    <DemographicBreakdownFieldArray
+                        control={control}
+                        fieldParent={fieldParent}
+                        setSelectedField={updateGuidanceText}
+                        footnote={breakdownFootnote}
+                    />
+                ) : (
+                    <FormFieldArray
                     schemadefs={schemadefs}
                     control={control}
                     formArrayValues={
@@ -68,6 +82,7 @@ const FormHydrationFieldItem = ({
                     hideArrayMutators={hideArrayMutators}
                     useFieldPanels={useFieldPanels}
                 />
+                )
             ) : (
                 field &&
                 (showFieldPanel ? (

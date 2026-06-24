@@ -32,13 +32,13 @@ const postFetch = async <T>(
             method: "POST",
             body: !isFormData ? JSON.stringify(data) : data,
             credentials: "include",
-            headers: !isFormData
-                ? {
-                      "Content-Type": "application/json",
-                      [sessionHeader]: sessionPrefix + session,
-                      ...getPartnerHeaders(),
-                  }
-                : {},
+            headers: {
+                ...(!isFormData
+                    ? { "Content-Type": "application/json" }
+                    : {}),
+                [sessionHeader]: sessionPrefix + session,
+                ...getPartnerHeaders(),
+            },
         });
 
         if (response.ok) {

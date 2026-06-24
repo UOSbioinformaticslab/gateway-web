@@ -291,7 +291,19 @@ const formGenerateLegendItems = async (
                                                   OBSERVATIONS_SECTION
                                           )
                                           ?.title?.replace(" Array", "")
-                                    : undefined,
+                                    : section === DEMOGRAPHIC_FREQUENCY_SECTION
+                                      ? schemaFields.find(
+                                            field =>
+                                                field.location ===
+                                                DEMOGRAPHIC_FREQUENCY_SECTION
+                                        )?.title
+                                      : section === OMICS_SECTION
+                                        ? schemaFields.find(
+                                              field =>
+                                                  field.location ===
+                                                  OMICS_SECTION
+                                          )?.title
+                                        : undefined,
                 status: getSectionStatus,
             };
         })
@@ -351,6 +363,8 @@ const PROVENANCE_SECTION = "provenance";
 const ACCESSIBILITY_SECTION = "accessibility";
 const TOOLS_AND_PUBLICATIONS_SECTION = "enrichmentAndLinkage";
 const OBSERVATIONS_SECTION = "observations";
+const DEMOGRAPHIC_FREQUENCY_SECTION = "demographicFrequency";
+const OMICS_SECTION = "omics";
 
 const SUMMARY_SECTION = "summary";
 const DOCUMENTATION_SECTION = "documentation";
@@ -372,7 +386,8 @@ const isPanelOnlyFormField = (location?: string) =>
     location === OBSERVATIONS_SECTION ||
     location?.startsWith(`${OBSERVATIONS_SECTION}.`) ||
     location?.startsWith(`${SUMMARY_SECTION}.`) ||
-    location?.startsWith(`${DOCUMENTATION_SECTION}.`);
+    location?.startsWith(`${DOCUMENTATION_SECTION}.`) ||
+    location?.startsWith(`${OMICS_SECTION}.`);
 
 const isSummaryDataCustodianAccordionField = (location?: string) =>
     !!location && SUMMARY_DATA_CUSTODIAN_ACCORDION_LOCATIONS.has(location);
@@ -516,6 +531,89 @@ const getObservationsSectionHeaderProps = (schemaFields: FormHydration[]) => {
 const getObservationsSectionGuidance = (schemaFields: FormHydration[]) =>
     schemaFields.find(({ location }) => location === OBSERVATIONS_SECTION)
         ?.guidance;
+
+const getDemographicFrequencySectionHeaderProps = (
+    schemaFields: FormHydration[]
+) => {
+    const section = schemaFields.find(
+        ({ location }) => location === DEMOGRAPHIC_FREQUENCY_SECTION
+    );
+
+    if (!section) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(section);
+};
+
+const getDemographicFrequencySectionGuidance = (
+    schemaFields: FormHydration[]
+) =>
+    schemaFields.find(
+        ({ location }) => location === DEMOGRAPHIC_FREQUENCY_SECTION
+    )?.guidance;
+
+const getOmicsSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const section = schemaFields.find(
+        ({ location }) => location === OMICS_SECTION
+    );
+
+    if (!section) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(section);
+};
+
+const getOmicsSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === OMICS_SECTION)?.guidance;
+
+const isDemographicBreakdownArray = (location?: string) =>
+    location === "demographicFrequency.age" ||
+    location === "demographicFrequency.ethnicity";
+
+const getDemographicBreakdownBinOptions = (
+    fieldParent: FormHydration
+): string[] => {
+    const binField = fieldParent.fields?.find(field =>
+        field.location?.endsWith(".bin")
+    );
+
+    return (binField?.field?.options ?? []).map(option => String(option.value));
+};
+
+const getDemographicBreakdownFieldTitles = (fieldParent: FormHydration) => {
+    const binField = fieldParent.fields?.find(field =>
+        field.location?.endsWith(".bin")
+    );
+    const countField = fieldParent.fields?.find(field =>
+        field.location?.endsWith(".count")
+    );
+
+    return {
+        binTitle: binField?.title ?? "",
+        countTitle: countField?.title ?? "",
+        countField: countField?.field,
+    };
+};
+
+const buildDemographicBreakdownRows = (
+    fieldParent: FormHydration,
+    existingRows: Record<string, unknown>[] = []
+) => {
+    const options = getDemographicBreakdownBinOptions(fieldParent);
+    const { binTitle, countTitle } =
+        getDemographicBreakdownFieldTitles(fieldParent);
+
+    return options.map(option => {
+        const match = existingRows.find(row => row[binTitle] === option);
+
+        return {
+            [binTitle]: option,
+            [countTitle]: match?.[countTitle] ?? "",
+        };
+    });
+};
 
 const getWelcomeSectionGuidance = (schemaFields: FormHydration[]) =>
     schemaFields.find(({ location }) => location === INITIAL_FORM_SECTION)
@@ -685,9 +783,29 @@ const mapFormFieldsForSubmission = (
         (acc: { [key: string]: string }, [key, value]) => {
             if (mappedSchemaFields[key]) {
                 if (parentField(key)?.is_array_form) {
-                    value.forEach(
+                    const fieldParent = parentField(key);
+                    const arrayEntries = isDemographicBreakdownArray(
+                        fieldParent?.location
+                    )
+                        ? (value as Record<string, unknown>[]).filter(entry => {
+                              const countTitle = fieldParent?.fields?.find(
+                                  field => field.location?.endsWith(".count")
+                              )?.title;
+                              const count = countTitle
+                                  ? entry[countTitle]
+                                  : undefined;
+
+                              return (
+                                  count !== "" &&
+                                  count !== null &&
+                                  count !== undefined
+                              );
+                          })
+                        : value;
+
+                    arrayEntries.forEach(
                         (entry: { [x: string]: string }, index: number) => {
-                            const arrayLocation = parentField(key)?.location;
+                            const arrayLocation = fieldParent?.location;
 
                             Object.keys(entry).forEach(entryKey => {
                                 acc[
@@ -869,6 +987,23 @@ const mapExistingDatasetToFormFields = (
     // Start traversal from the root of the schema
     traverseSchema(schema);
 
+    schema.forEach(field => {
+        if (!isDemographicBreakdownArray(field.location)) {
+            return;
+        }
+
+        const existingRows = get(values, field.title, []) as Record<
+            string,
+            unknown
+        >[];
+
+        set(
+            values,
+            field.title,
+            buildDemographicBreakdownRows(field, existingRows)
+        );
+    });
+
     return values as Metadata;
 };
 
@@ -903,6 +1038,14 @@ export {
     getToolsAndPublicationsSectionGuidance,
     getObservationsSectionHeaderProps,
     getObservationsSectionGuidance,
+    getDemographicFrequencySectionHeaderProps,
+    getDemographicFrequencySectionGuidance,
+    getOmicsSectionHeaderProps,
+    getOmicsSectionGuidance,
+    isDemographicBreakdownArray,
+    getDemographicBreakdownBinOptions,
+    getDemographicBreakdownFieldTitles,
+    buildDemographicBreakdownRows,
     getWelcomeSectionGuidance,
     withFormHydrationFieldPanelContent,
     withFormHydrationPanelOnlyFieldContent,

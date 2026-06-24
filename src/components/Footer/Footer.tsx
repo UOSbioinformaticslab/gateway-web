@@ -28,7 +28,7 @@ const Footer = () => {
 
     const linksSocial = [
         {
-            href: "https://x.com/HDR_UK",
+            href: "https://x.com/CR_UK",
             label: (
                 <FooterSocial>
                     <Image src={twitterInLogo} alt="Twitter logo" width="17" />
@@ -37,7 +37,7 @@ const Footer = () => {
             ),
         },
         {
-            href: "https://www.linkedin.com/company/hdruk/mycompany/",
+            href: "https://www.linkedin.com/company/cancer-research-uk/",
             label: (
                 <FooterSocial>
                     <Image src={linkedInLogo} alt="LinkedIn logo" width="17" />
@@ -49,16 +49,8 @@ const Footer = () => {
 
     const links1 = [
         {
-            href: "https://www.cancerresearchuk.org/",
-            label: t("visitHDRUKSite"),
-        },
-        {
             href: RouteName.TERMS,
             label: t("termsConditions"),
-        },
-        {
-            href: "/about/privacy-policy",
-            label: t("privacyPolicy"),
         },
     ];
 
@@ -66,14 +58,6 @@ const Footer = () => {
         {
             href: "/about/cookie-notice",
             label: t("cookieNotice"),
-        },
-        {
-            href: `${process.env.NEXT_PUBLIC_API_BASE_URL}/documentation`,
-            label: t("apiDocs"),
-        },
-        {
-            href: "/about/accessibility-statement",
-            label: t("accessibilityStatement"),
         },
     ];
 
