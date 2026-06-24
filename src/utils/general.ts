@@ -33,6 +33,31 @@ function extractSubdomain(url: string) {
     }
 }
 
+/** Cookie domain for JWT — only when the request host shares the API parent domain (e.g. Vercel previews omit domain). */
+function getJwtCookieDomain(
+    hostname: string,
+    apiUrl: string
+): string | undefined {
+    if (process.env.NODE_ENV === "development") {
+        return undefined;
+    }
+
+    const apiDomain = extractSubdomain(apiUrl);
+    if (!apiDomain) {
+        return undefined;
+    }
+
+    const parentDomain = apiDomain.slice(1);
+    if (
+        hostname === parentDomain ||
+        hostname.endsWith(`.${parentDomain}`)
+    ) {
+        return apiDomain;
+    }
+
+    return undefined;
+}
+
 function getStaticAssetUrl(file: string) {
     return `${process.env.NEXT_PUBLIC_MEDIA_STATIC_URL}/${file}`;
 }
@@ -127,6 +152,7 @@ export {
     convertToCamelCase,
     splitCamelcase,
     extractSubdomain,
+    getJwtCookieDomain,
     getTrimmedpathname,
     parseStaticImagePaths,
     getTeamAssetPath,
