@@ -1,4 +1,5 @@
 import { FormHydrationSchema } from "@/interfaces/FormHydration";
+import { getDemographicFrequencyDefaultValues } from "./demographicFrequencyDefaults";
 import { formHydrationData } from "./formData.js";
 
 const encodeOrganisationLogo = (formJSON: FormHydrationSchema): FormHydrationSchema => {
@@ -14,6 +15,7 @@ export const getLocalFormHydration = (
 ): FormHydrationSchema => {
     const defaultValues = {
         ...formHydrationData.defaultValues,
+        ...getDemographicFrequencyDefaultValues(),
         ...(teamId !== undefined ? { team_id: Number(teamId) } : {}),
     };
 

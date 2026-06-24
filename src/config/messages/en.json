@@ -159,8 +159,8 @@
             "readMore": "Read more"
         },
         "dataCustodianSupport": {
-            "title": "Data Custodian Area",
-            "backToSupport": "Back to Data Custodian Area",
+            "title": "Data Custodians",
+            "backToSupport": "Back to Data Custodians",
             "gatewaySchemaTitle": "Gateway Schema",
             "uploadingToolsTitle": "Uploading Analysis Scripts & Software",
             "metadataOnboardingTitle": "Metadata Onboarding and Integrations",
@@ -1653,7 +1653,7 @@
             "noFilters": "No filters available"
         },
         "Footer": {
-            "copyright": "HDR UK {year}. All rights reserved.",
+            "copyright": "University of Sussex {year}. All rights reserved.",
             "visitHDRUKSite": "Visit the HDR UK Site",
             "termsConditions": "Terms and conditions",
             "privacyPolicy": "Privacy policy",

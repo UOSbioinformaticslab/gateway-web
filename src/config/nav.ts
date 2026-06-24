@@ -12,7 +12,7 @@ const navItems = [
         href: "/about/how-we-protect-your-data",
     },
     {
-        label: "Data Custodian Area",
+        label: "Data Custodians",
         href: "/data-custodian/support",
     },
 ];

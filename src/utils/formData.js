@@ -3058,7 +3058,22 @@ const formHydrationResponse = {
           ]
         },
         {
-          "title": "Demographic Frequency Age Array",
+          "title": "Demographic frequency",
+          "is_array_form": false,
+          "description": "The statistical characteristics of a population or group within the dataset.",
+          "location": "demographicFrequency",
+          "guidance": "CRUK is committed to improving the racial diversity of datasets.",
+          "field": {
+            "component": "TextField",
+            "name": "Demographic frequency",
+            "placeholder": "",
+            "label": "Demographic frequency",
+            "required": false,
+            "hidden": true
+          }
+        },
+        {
+          "title": "Age Breakdown Array",
           "location": "demographicFrequency.age",
           "is_array_form": true,
           "required": false,
@@ -3172,7 +3187,7 @@ const formHydrationResponse = {
                 "name": "Age grouping",
                 "label": null,
                 "required": true,
-                "hidden": false
+                "hidden": true
               }
             },
             {
@@ -3185,16 +3200,16 @@ const formHydrationResponse = {
                 "component": "TextField",
                 "name": "Age count",
                 "type": "number",
-                "placeholder": 1000,
+                "placeholder": 0,
                 "label": null,
-                "required": true,
+                "required": false,
                 "hidden": false
               }
             }
           ]
         },
         {
-          "title": "Demographic Frequency Ethnicity Array",
+          "title": "Ethnicity Breakdown Array",
           "location": "demographicFrequency.ethnicity",
           "is_array_form": true,
           "required": false,
@@ -3284,7 +3299,7 @@ const formHydrationResponse = {
                 "name": "Ethnicity grouping",
                 "label": null,
                 "required": true,
-                "hidden": false
+                "hidden": true
               }
             },
             {
@@ -3297,9 +3312,9 @@ const formHydrationResponse = {
                 "component": "TextField",
                 "name": "Ethnicity count",
                 "type": "number",
-                "placeholder": 1000,
+                "placeholder": 0,
                 "label": null,
-                "required": true,
+                "required": false,
                 "hidden": false
               }
             }
@@ -3373,14 +3388,33 @@ const formHydrationResponse = {
           ]
         },
         {
+          "title": "Omics",
+          "is_array_form": false,
+          "description": "Omics",
+          "location": "omics",
+          "guidance": "Select the omics assay and platform used to generate your dataset.",
+          "field": {
+            "component": "TextField",
+            "name": "Omics",
+            "placeholder": "",
+            "label": "",
+            "required": false,
+            "hidden": true
+          }
+        },
+        {
           "title": "Omics assay",
           "is_array_form": false,
-          "description": "The specific 'omics assay that generated the dataset.",
+          "description": "The specific 'omics' assay that generated the dataset.",
           "location": "omics.assay",
-          "guidance": "The specific 'omics assay that generated the dataset. If the assay used to generate your dataset is not listed, please contract the gateway team by submitting an enquiry.",
+          "guidance": "The specific 'omics' assay that generated the dataset. If the assay used to generate your dataset is not listed, please contact the gateway team by submitting an enquiry.",
           "field": {
             "component": "Select",
             "options": [
+              {
+                "label": "-- Select --",
+                "value": ""
+              },
               {
                 "label": "NMR spectroscopy",
                 "value": "NMR spectroscopy"
@@ -3465,6 +3499,10 @@ const formHydrationResponse = {
           "field": {
             "component": "Select",
             "options": [
+              {
+                "label": "-- Select --",
+                "value": ""
+              },
               {
                 "label": "Other",
                 "value": "Other"
@@ -5288,7 +5326,7 @@ const formHydrationResponse = {
             null]
         },
         {
-          "title": "Demographic Frequency Age Array",
+          "title": "Age Breakdown Array",
           "required": false,
           "minItems": 0,
           "type": "array",
@@ -5352,14 +5390,14 @@ const formHydrationResponse = {
             },
             {
               "title": "Age count",
-              "required": true,
+              "required": false,
               "type": "integer",
               "min": -1
             }
           ]
         },
         {
-          "title": "Demographic Frequency Ethnicity Array",
+          "title": "Ethnicity Breakdown Array",
           "required": false,
           "minItems": 0,
           "type": "array",
@@ -5411,7 +5449,7 @@ const formHydrationResponse = {
             },
             {
               "title": "Ethnicity count",
-              "required": true,
+              "required": false,
               "type": "integer",
               "min": -1
             }

@@ -3,7 +3,7 @@
 exports[`Footer should render component 1`] = `
 <div>
   <footer
-    class="mui-style-7ip1ev"
+    class="mui-style-1gtpevs"
   >
     <div
       class="MuiContainer-root MuiContainer-maxWidthDesktop mui-style-1pszioj-MuiContainer-root"
@@ -12,7 +12,7 @@ exports[`Footer should render component 1`] = `
         class="MuiBox-root mui-style-0"
       >
         <img
-          alt="HDRUK logo"
+          alt="CRUK logo"
           data-nimg="1"
           decoding="async"
           height="130"
@@ -27,13 +27,13 @@ exports[`Footer should render component 1`] = `
         >
           <li>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
-              href="https://x.com/HDR_UK"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-19715up-MuiTypography-root-MuiLink-root"
+              href="https://x.com/CR_UK"
               rel="noopener"
               target="_blank"
             >
               <span
-                class="mui-style-uxqwo1"
+                class="mui-style-16348cl"
               >
                 <img
                   alt="Twitter logo"
@@ -54,13 +54,13 @@ exports[`Footer should render component 1`] = `
           </li>
           <li>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
-              href="https://www.linkedin.com/company/hdruk/mycompany/"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-19715up-MuiTypography-root-MuiLink-root"
+              href="https://www.linkedin.com/company/cancer-research-uk/"
               rel="noopener"
               target="_blank"
             >
               <span
-                class="mui-style-uxqwo1"
+                class="mui-style-16348cl"
               >
                 <img
                   alt="LinkedIn logo"
@@ -81,10 +81,10 @@ exports[`Footer should render component 1`] = `
           </li>
         </ul>
         <div
-          class="mui-style-945zl8"
+          class="mui-style-hl2cc3"
         >
           ©
-          HDR UK 2025. All rights reserved.
+          University of Sussex 2026. All rights reserved.
         </div>
       </div>
       <ul
@@ -96,28 +96,10 @@ exports[`Footer should render component 1`] = `
           >
             <li>
               <a
-                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
-                href="https://www.hdruk.ac.uk/"
-                rel="noopener"
-                target="_blank"
-              >
-                Visit the HDR UK Site
-              </a>
-            </li>
-            <li>
-              <a
-                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
+                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-19715up-MuiTypography-root-MuiLink-root"
                 href="/terms-and-conditions"
               >
                 Terms and conditions
-              </a>
-            </li>
-            <li>
-              <a
-                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
-                href="/about/privacy-policy"
-              >
-                Privacy policy
               </a>
             </li>
           </ul>
@@ -128,28 +110,10 @@ exports[`Footer should render component 1`] = `
           >
             <li>
               <a
-                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
+                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-19715up-MuiTypography-root-MuiLink-root"
                 href="/about/cookie-notice"
               >
                 Cookie notice
-              </a>
-            </li>
-            <li>
-              <a
-                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
-                href="http://localhost:8000/api/documentation"
-                rel="noopener"
-                target="_blank"
-              >
-                API docs
-              </a>
-            </li>
-            <li>
-              <a
-                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways mui-style-r8b5xb-MuiTypography-root-MuiLink-root"
-                href="/about/accessibility-statement"
-              >
-                Accessibility Statement
               </a>
             </li>
           </ul>
