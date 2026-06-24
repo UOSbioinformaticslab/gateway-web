@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import apis from "@/config/apis";
 import config from "@/config/config";
 import { sessionHeader, sessionPrefix } from "@/config/session";
-import { extractSubdomain } from "@/utils/general";
+import { getJwtCookieDomain } from "@/utils/general";
 import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
 import { getPartnerHeaders, withPartnerAuthBody } from "@/utils/partnerHeaders";
@@ -130,15 +130,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const cookieDomain = getJwtCookieDomain(
+            request.nextUrl.hostname,
+            apis.apiV1IPUrl as string
+        );
+
         const cookie = serialize(config.JWT_COOKIE, token, {
             maxAge: 60 * 60 * 24 * 30, // 30 days
             path: "/",
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            ...(process.env.NODE_ENV !== "development" && {
-                domain: extractSubdomain(apis.apiV1IPUrl as string) || "",
-            }),
+            ...(cookieDomain && { domain: cookieDomain }),
         });
 
         const nextResponse = NextResponse.json(
