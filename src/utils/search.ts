@@ -1,6 +1,7 @@
 import { get } from "lodash";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { Metadata } from "@/interfaces/Dataset";
+import { SearchResultDataset } from "@/interfaces/Search";
 import { Filter } from "@/interfaces/Filter";
 import {
     SavedSearchFilterWithPivot,
@@ -20,15 +21,50 @@ const getDateRange = (metadata: Metadata) => {
 };
 
 const getPopulationSize = (
-    metadata: Metadata | undefined,
+    source: Metadata | SearchResultDataset | undefined,
     notReportedLabel: string
 ) => {
-    if (!metadata) return notReportedLabel;
+    if (!source) return notReportedLabel;
 
-    const population = get(metadata, "summary.populationSize");
-    return population && typeof population === "number" && population > 0
-        ? (population as number).toLocaleString()
+    const population =
+        get(source, "metadata.summary.populationSize") ??
+        get(source, "metadata.metadata.summary.populationSize") ??
+        get(source, "summary.populationSize");
+
+    const numericPopulation = Number(
+        String(population ?? "").replace(/,/g, "")
+    );
+
+    return Number.isFinite(numericPopulation) && numericPopulation > 0
+        ? numericPopulation.toLocaleString()
         : notReportedLabel;
+};
+
+const getLeadResearcher = (result: SearchResultDataset): string => {
+    const fromSummary = get(result, "metadata.summary.leadResearcher");
+    if (fromSummary) return String(fromSummary);
+
+    const projectGrants = get(result, "metadata.projectGrants");
+    if (Array.isArray(projectGrants) && projectGrants.length > 0) {
+        const fromGrant = get(projectGrants[0], "leadResearcher");
+        if (fromGrant) return String(fromGrant);
+    }
+
+    return "";
+};
+
+const getAccessibility = (result: SearchResultDataset): string => {
+    const datasetFilters = get(result, "metadata.datasetFilters") as
+        | { category?: string; label?: string }[]
+        | undefined;
+    if (!Array.isArray(datasetFilters)) return "";
+
+    const accessibility = datasetFilters.find(
+        filter => filter.category === "accessType"
+    );
+    const label = accessibility?.label?.trim();
+
+    return label || "";
 };
 
 const getAllParams = (searchParams: ReadonlyURLSearchParams | null) => {
@@ -103,9 +139,11 @@ const hasMinimumSearchCharLength = (value: string | null | undefined) => {
 };
 
 export {
+    getAccessibility,
     getAllParams,
     getDateRange,
     getFiltersFromSaveSearch,
+    getLeadResearcher,
     getPopulationSize,
     getSaveSearchFilters,
     getUrlFromSearchParams,

@@ -9,6 +9,29 @@ import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
 import { getPartnerHeaders, withPartnerAuthBody } from "@/utils/partnerHeaders";
 
+function getPartnerContextFromRequest(request: NextRequest): string | undefined {
+    const raw = request.headers.get("x-partner-context")?.trim();
+    return raw ? raw : undefined;
+}
+
+function getPartnerHeadersForRequest(request: NextRequest) {
+    const partner = getPartnerContextFromRequest(request);
+    if (partner) return { "x-partner-context": partner };
+    return getPartnerHeaders();
+}
+
+function withPartnerProviderFromRequest<T extends Record<string, unknown>>(
+    request: NextRequest,
+    body: T
+): T & { provider?: string } {
+    const partner = getPartnerContextFromRequest(request)?.toLowerCase();
+    if (partner === "cruk" && body.provider == null) {
+        return { ...body, provider: "cruk" };
+    }
+
+    return withPartnerAuthBody(body);
+}
+
 export async function POST(request: NextRequest) {
     const session = await getSessionCookie();
     const cookieStore = await cookies();
@@ -39,9 +62,11 @@ export async function POST(request: NextRequest) {
             headers: {
                 "Content-Type": "application/json",
                 [sessionHeader]: sessionPrefix + session,
-                ...getPartnerHeaders(),
+                ...getPartnerHeadersForRequest(request),
             },
-            body: JSON.stringify(withPartnerAuthBody({ email, password })),
+            body: JSON.stringify(
+                withPartnerProviderFromRequest(request, { email, password })
+            ),
         });
 
         if (!response.ok) {
