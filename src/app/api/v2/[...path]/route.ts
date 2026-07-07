@@ -37,6 +37,21 @@ async function proxy(
         );
     }
 
+    if (!apis.apiV2IPUrl) {
+        logger.error(
+            {
+                message: "Missing apiV2IPUrl env config",
+                hint: "Ensure NEXT_PUBLIC_API_V2_URL (and optionally NEXT_PUBLIC_API_V2_IP_URL) are set",
+            },
+            session,
+            "api/v2"
+        );
+        return NextResponse.json(
+            { message: "Server misconfigured: missing API V2 URL" },
+            { status: 500 }
+        );
+    }
+
     try {
         const { path } = await context.params;
         const query = request.nextUrl.search;
@@ -67,12 +82,24 @@ async function proxy(
         });
     } catch (error) {
         logger.error(
-            error instanceof Error ? error.message : String(error),
+            {
+                message: "Failed to proxy v2 request",
+                error: error instanceof Error ? error.message : String(error),
+                path: request.nextUrl.pathname,
+                search: request.nextUrl.search,
+                method: request.method,
+                upstreamBase: apis.apiV2IPUrl,
+            },
             session,
             "api/v2"
         );
         return NextResponse.json(
-            { message: "Failed to proxy v2 request" },
+            {
+                message: "Failed to proxy v2 request",
+                ...(process.env.NODE_ENV === "development"
+                    ? { debug: { upstreamBase: apis.apiV2IPUrl } }
+                    : {}),
+            },
             { status: 500 }
         );
     }
