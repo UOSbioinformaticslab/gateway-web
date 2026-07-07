@@ -112,6 +112,7 @@ import {
     pickOnlyFilters,
 } from "@/utils/filters";
 import { getAllParams, getSaveSearchFilters } from "@/utils/search";
+import { getPartnerContext } from "@/utils/partnerHeaders";
 import useAddLibraryModal from "../../hooks/useAddLibraryModal";
 import DataCustodianNetwork from "../DataCustodianNetwork";
 import FilterChips from "../FilterChips";
@@ -353,7 +354,12 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         isLoading: isSearching,
         mutate,
     } = usePostSwr<SearchPaginationType<SearchResult>>(
-        `${apis.searchV1Url}/${queryParams.type}?view_type=mini&per_page=${
+        `${apis.searchV1Url}/${queryParams.type}?${
+            queryParams.type === SearchCategory.DATASETS &&
+            getPartnerContext().toUpperCase() === "CRUK"
+                ? ""
+                : "view_type=mini&"
+        }per_page=${
             queryParams.per_page
         }&page=${queryParams.page}&sort=${queryParams.sort}${
             queryParams.type === SearchCategory.PUBLICATIONS
@@ -367,6 +373,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         {
             keepPreviousData: true,
             withPagination: true,
+            errorNotificationsOn: false,
             shouldFetch:
                 forceSearch ||
                 queryParams.type !== SearchCategory.PUBLICATIONS ||
@@ -384,6 +391,18 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             filter_list: cleanSearchFilters(queryParams, filtersList),
         });
     }, [queryParams]);
+
+    useEffect(() => {
+        if (isSearching || data?.lastPage == null) {
+            return;
+        }
+
+        const currentPage = parseInt(queryParams.page, 10);
+        if (currentPage > data.lastPage) {
+            setQueryParams(prev => ({ ...prev, page: "1" }));
+            updatePath(PAGE_FIELD, "1");
+        }
+    }, [data?.lastPage, isSearching, queryParams.page, updatePath]);
 
     const saveSearchQuery = usePost<SavedSearchPayload>(
         apis.saveSearchesV1Url,
@@ -930,7 +949,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                             )}
                             {!isSearching &&
                                 !isEuropePmcSearchNoQuery &&
-                                !!data?.list?.length &&
+                                data != null &&
                                 data?.path?.includes(queryParams.type) && (
                                     <Box
                                         sx={{
@@ -1022,7 +1041,13 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                             sx={{
                                                 p: `0 ${theme.spacing(2)}`,
                                             }}>
-                                            {renderResults()}
+                                            {data?.list?.length ? (
+                                                renderResults()
+                                            ) : (
+                                                <Box sx={{ pb: 2 }}>
+                                                    {t("noResults")}
+                                                </Box>
+                                            )}
                                         </Box>
                                     </Box>
                                 )}

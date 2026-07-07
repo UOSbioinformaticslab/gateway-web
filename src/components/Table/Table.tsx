@@ -45,6 +45,8 @@ interface TableProps<T> {
     renderActionCell?: (row: T) => React.ReactNode;
     /** Icons or chips shown inline immediately after the title in the top band (search results). */
     renderTitleBandExtras?: (row: T) => React.ReactNode;
+    /** Optional override for the title band; the title column cell still renders in the data row. */
+    renderTitleBandCell?: (row: T) => React.ReactNode;
 }
 
 /** Top band background (icons + title + actions) per reference layout. */
@@ -150,6 +152,7 @@ function Table<T extends unknown>(props: TableProps<T>) {
         variant = "default",
         renderActionCell,
         renderTitleBandExtras,
+        renderTitleBandCell,
     } = props;
     const isSearchResults = variant === "searchResults";
     const blockDivider = colors.grey300;
@@ -301,10 +304,13 @@ function Table<T extends unknown>(props: TableProps<T>) {
                                                 textDecoration: "underline",
                                             },
                                         }}>
-                                        {flexRender(
-                                            titleCell.column.columnDef.cell,
-                                            titleCell.getContext()
-                                        )}
+                                        {renderTitleBandCell
+                                            ? renderTitleBandCell(row.original)
+                                            : flexRender(
+                                                  titleCell.column.columnDef
+                                                      .cell,
+                                                  titleCell.getContext()
+                                              )}
                                     </Box>
                                     {renderTitleBandExtras ? (
                                         <Box

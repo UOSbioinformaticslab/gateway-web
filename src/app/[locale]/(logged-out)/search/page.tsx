@@ -30,8 +30,8 @@ const SearchPage = async () => {
         return filter;
     });
 
-    const SCHEMA_NAME = "HDRUK";
-    const SCHEMA_VERSION = "4.0.0";
+    const SCHEMA_NAME = "CRUK";
+    const SCHEMA_VERSION = "1.0.0";
 
     const { schema } = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
     return (

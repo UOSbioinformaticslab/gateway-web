@@ -16,7 +16,7 @@ import useGet from "@/hooks/useGet";
 import apis from "@/config/apis";
 import { RouteName } from "@/consts/routeName";
 import ActionDropdown from "../ActionDropdown";
-import { getDateRange, getPopulationSize } from "@/utils/search";
+import { getAccessibility, getDateRange, getLeadResearcher, getPopulationSize } from "@/utils/search";
 import { formatTextDelimiter } from "@/utils/dataset";
 
 const ICON_OPTS = [
@@ -90,8 +90,6 @@ interface ResultTableProps {
     showSynopsis?: boolean;
 }
 const CONFORMS_TO_PATH = "metadata.accessibility.formatAndStandards.conformsTo";
-const PUBLISHER_NAME_PATH = "metadata.summary.publisher.name";
-const PUBLISHERS_ID = "metadata.summary.publisher.gatewayId";
 const ACCESS_SERVICE_PATH =
     "metadata.accessibility.access.accessServiceCategory";
 const columnHelper = createColumnHelper<SearchResultDataset>();
@@ -118,9 +116,7 @@ const getColumns = ({
 
             return (
                 <Link href={linkHref}>
-                    <EllipsisLineLimit
-                        text={get(original, "metadata.summary.title")}
-                    />
+                    <EllipsisLineLimit text={getLeadResearcher(original)} />
                 </Link>
             );
         },
@@ -134,7 +130,7 @@ const getColumns = ({
         cell: ({ row: { original } }) => (
             <div style={{ textAlign: "center" }}>
                 {getPopulationSize(
-                    original?.metadata,
+                    original,
                     translations.populationSizeNotReported
                 )}
             </div>
@@ -153,33 +149,13 @@ const getColumns = ({
     columnHelper.display({
         id: "dataProvider",
         cell: ({ row: { original } }) => {
-            const dataCustodianId = get(original, PUBLISHERS_ID);
-            // if the below is false, its because the api has failed to find the team id based off the original uid for gatewayId
-            const isNumber = !Number.isNaN(Number(dataCustodianId));
-            const linkHref = `/${RouteName.DATA_CUSTODIANS_ITEM}/${dataCustodianId}`;
+            const accessibility = getAccessibility(original);
 
             return (
                 <div style={{ textAlign: "center" }}>
-                    {isNumber && (
-                        <Link
-                            href={linkHref}
-                            onFocus={e => {
-                                e.currentTarget.scrollIntoView({
-                                    behavior: "smooth",
-                                    inline: "center",
-                                    block: "nearest",
-                                });
-                            }}>
-                            <EllipsisLineLimit
-                                text={String(get(original, PUBLISHER_NAME_PATH) ?? "")}
-                            />
-                        </Link>
-                    )}
-                    {!isNumber && (
-                        <EllipsisLineLimit
-                            text={String(get(original, PUBLISHER_NAME_PATH) ?? "")}
-                        />
-                    )}
+                    {accessibility ? (
+                        <EllipsisLineLimit text={accessibility} />
+                    ) : null}
                 </div>
             );
         },
@@ -319,6 +295,16 @@ const ResultTable = ({
                             cohortDiscovery={cohortDiscovery}
                         />
                     )}
+                    renderTitleBandCell={row => {
+                        const linkHref = `/${RouteName.DATASET_ITEM}/${row._id}`;
+                        return (
+                            <Link href={linkHref}>
+                                <EllipsisLineLimit
+                                    text={get(row, "metadata.summary.title")}
+                                />
+                            </Link>
+                        );
+                    }}
                     renderTitleBandExtras={row => (
                         <TitleBandStudyIcons row={row} />
                     )}

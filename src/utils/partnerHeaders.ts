@@ -1,4 +1,4 @@
-function getPartnerContext(): string {
+export function getPartnerContext(): string {
     return (
         process.env.NEXT_PUBLIC_PARTNER_CONTEXT ??
         process.env.NEXT_PUBLIC_PARTNER ??
