@@ -1,10 +1,17 @@
-const apiV1Url = process.env.NEXT_PUBLIC_API_V1_URL;
+// In the browser, route API calls through Next.js so it can attach the httpOnly JWT cookie.
+const apiV1Url =
+    typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_API_V1_URL
+        : "/api/v1";
 const apiV1IPUrl =
     process.env.NODE_ENV === "development"
         ? process.env.NEXT_PUBLIC_API_V1_IP_URL
         : process.env.NEXT_PUBLIC_API_V1_URL;
 
-const apiV2Url = process.env.NEXT_PUBLIC_API_V2_URL;
+const apiV2Url =
+    typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_API_V2_URL
+        : "/api/v2";
 const apiV2IPUrl =
     process.env.NODE_ENV === "development"
         ? process.env.NEXT_PUBLIC_API_V2_IP_URL
