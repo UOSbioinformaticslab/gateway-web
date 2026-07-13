@@ -20,6 +20,8 @@ const apiV2IPUrl =
 const apis = {
     apiV1Url,
     apiV1IPUrl,
+    apiV2Url,
+    apiV2IPUrl,
     enabledFeatureFlags: `${apiV1IPUrl}/feature-flags/enabled`,
     enabledFeatures: `${apiV1IPUrl}/features`,
     logoutInternalUrl: "/api/logout",
