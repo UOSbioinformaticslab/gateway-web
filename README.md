@@ -1,9 +1,9 @@
-[![LICENCE](https://img.shields.io/github/license/HDRUK/gateway-web)](https://github.com/HDRUK/gateway-web/blob/dev/LICENSE)
-[![Support](https://img.shields.io/badge/Supported%20By-HDR%20UK-blue)](https://hdruk.ac.uk)
+[![LICENCE](https://img.shields.io/github/license/UOSbioinformaticslab/gateway-web)](https://github.com/UOSbioinformaticslab/gateway-web/blob/main/LICENSE)
+[![Support](https://img.shields.io/badge/Supported%20By-Cancer%20Research%20UK-2E008B)](https://www.cancerresearchuk.org)
 
-# HDR UK Gateway - Frontend (Next.js)
+# Gateway Web - Frontend (Next.js)
 
-Welcome to the HDR UK Gateway Frontend, a **Next.js** React application that powers the user interface of the **HDR UK Gateway**. This application facilitates seamless interaction with the [Gateway API](https://github.com/HDRUK/gateway-api-2) using:
+Welcome to the Gateway Web frontend, a **Next.js** React application that powers the user interface of the Gateway. Maintained by the **University of Sussex Bioinformatics Lab** and supported by **[Cancer Research UK](https://www.cancerresearchuk.org)**, this application facilitates seamless interaction with the [Gateway API](https://github.com/HDRUK/gateway-api-2) using:
 
 - **[fetch](https://nextjs.org/docs/app/api-reference/functions/fetch)** for efficient server-side communication.
 - **[SWR](https://swr.vercel.app/)** for optimized client-side data fetching and state management.
@@ -27,7 +27,7 @@ Ensure you have the following installed:
 #### 1️⃣ Clone the repository
 Open a terminal and execute:
 ```bash
-git clone https://github.com/HDRUK/gateway-web
+git clone https://github.com/UOSbioinformaticslab/gateway-web
 ```
 
 #### 2️⃣ Navigate to the project directory
@@ -114,9 +114,8 @@ npm test:snapshot
 - [SWR Documentation](https://swr.vercel.app/)
 - [i18next Documentation](https://www.i18next.com/)
 - [Jest Documentation](https://jestjs.io/)
-- [HDR UK Gateway API](https://github.com/HDRUK/gateway-api-2)
+- [Gateway API](https://github.com/HDRUK/gateway-api-2)
 
 ---
 
-For further support, please reach out via [HDR UK](https://healthdatagateway.org/en) or raise a [bug](https://hdruk.atlassian.net/servicedesk/customer/portal/7/group/14/create/34) or even better raise a PR!
-
+This project is maintained by the [University of Sussex Bioinformatics Lab](https://github.com/UOSbioinformaticslab) with support from [Cancer Research UK](https://www.cancerresearchuk.org). To contribute, please [open an issue](https://github.com/UOSbioinformaticslab/gateway-web/issues) or raise a PR!
