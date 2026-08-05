@@ -11,7 +11,7 @@ export default async function AccountProfileLayout({
 }) {
     const user = await getUser();
     const permissions = await getPermissions(user.roles);
-
+    console.log(permissions);
     return (
         <div>
             <TwoColumn

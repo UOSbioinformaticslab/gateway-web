@@ -36,6 +36,7 @@ export enum RouteName {
     LIST = "list",
     PERMISSIONS = "permissions",
     PROFILE = "profile",
+    PROJECT_GRANTS = "project-grants",
     SEARCH = "search",
     SUPPORT = "support",
     TEAM = "team",

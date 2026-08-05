@@ -1,4 +1,4 @@
-const theFilters =
+
 {
     "0_0": {
         "id": "0_0",
@@ -13230,5 +13230,4 @@ const theFilters =
             }
         }
     }
-};
-export const filterData = theFilters;
+}

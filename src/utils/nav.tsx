@@ -102,6 +102,11 @@ const getProfileNav = (permissions: {
             label: "Collections",
             href: `/${RouteName.ACCOUNT}/${RouteName.PROFILE}/${RouteName.COLLECTIONS}`,
         },
+                {
+            icon: <BookmarksOutlinedIcon />,
+            label: "Project Grants",
+            href: `/${RouteName.ACCOUNT}/${RouteName.PROFILE}/${RouteName.PROJECT_GRANTS}`,
+        },
     ];
 };
 
