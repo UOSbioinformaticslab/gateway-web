@@ -1,108 +1,89 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { isMobile } from "react-device-detect";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { Typography } from "@mui/material";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { PageTemplateHome } from "@/interfaces/Cms";
-import { SearchCategory } from "@/interfaces/Search";
+import { Typography } from "@mui/material";
+import Link from "@/components/Link";
 import Box from "@/components/Box";
 import Button from "@/components/Button";
 import Container from "@/components/Container";
-import GradientBoxes from "@/components/GradientBoxes";
-import HTMLContent from "@/components/HTMLContent";
-import LogoSlider from "@/components/LogoSlider";
-import TitleWithBg from "@/components/TitleWithBg";
 import { StaticImages } from "@/config/images";
-import theme, { colors } from "@/config/theme";
-import { ArrowForward } from "@/consts/icons";
+import { colors } from "@/config/theme";
 import { RouteName } from "@/consts/routeName";
-import InfoHoverPanel from "@/app/[locale]/components/InfoHoverPanel";
-import { IFrameWrapper } from "@/styles/IFrameContainer.styles";
-import NewsSection from "../NewsSection";
-import NewsletterSignup from "../NewsletterSignup";
-import { TeamContent, TeamImage, TeamWrapper } from "./Homepage.styles";
+import { PageTemplateHome } from "@/interfaces/Cms";
+import { SearchCategory } from "@/interfaces/Search";
+import Image from "next/image";
+import useAuth from "@/hooks/useAuth";
+import useDialog from "@/hooks/useDialog";
+import ProvidersDialog from "@/modules/ProvidersDialog";
 
-const services = [
+const PANEL_ITEMS: { labelKey: string; href: string; loggedInOnly?: boolean; span2?: boolean }[] = [
     {
-        id: SearchCategory.DATASETS,
-        image: StaticImages.LANDING_PAGE.datasets,
+        labelKey: "finderPanel.browseSearchDatasets",
         href: `/search?type=${SearchCategory.DATASETS}`,
     },
     {
-        id: SearchCategory.DATA_USE,
-        image: StaticImages.LANDING_PAGE.data_uses,
+        labelKey: "finderPanel.browseSearchProjects",
         href: `/search?type=${SearchCategory.DATA_USE}`,
     },
     {
-        id: "feasibility",
-        image: StaticImages.LANDING_PAGE.cohort_discovery,
-        href: "/about/cohort-discovery",
-    },
-    {
-        id: SearchCategory.TOOLS,
-        image: StaticImages.LANDING_PAGE.analysis_scripts_software,
-        href: `/search?type=${SearchCategory.TOOLS}`,
-    },
-    {
-        id: SearchCategory.PUBLICATIONS,
-        image: StaticImages.LANDING_PAGE.publications,
+        labelKey: "finderPanel.browseSearchAssociatedPublications",
         href: `/search?type=${SearchCategory.PUBLICATIONS}`,
     },
     {
-        id: "dataCustodians",
-        image: StaticImages.LANDING_PAGE.data_custodians,
-        href: `/search?type=${SearchCategory.DATA_CUSTODIANS}`,
+        labelKey: "finderPanel.browseSearchAssociatedTools",
+        href: `/search?type=${SearchCategory.TOOLS}`,
     },
-    {
-        id: "dataCustodianNetworks",
-        image: StaticImages.LANDING_PAGE.data_custodian_network,
-        href: `/search?type=${SearchCategory.COLLECTIONS}`,
-    },
-    {
-        id: SearchCategory.COLLECTIONS,
-        image: StaticImages.LANDING_PAGE.collections,
-        href: `/search?type=${SearchCategory.COLLECTIONS}`,
-    },
-    {
-        id: "dar",
-        image: StaticImages.LANDING_PAGE.dar,
-        href: "/account/profile/data-access-requests/applications",
-        loggedIn: true,
-    },
-    // {
-    //     id: "diseaseAtlas",
-    //     image: "/images/homepage/welcome-image.jpg",
-    //     href: "https://www.hdruk.ac.uk/research/research-data-infrastructure/disease-atlas/",
-    // },
 ];
 
-const connectedResources = [
+const RESEARCH_PARTNERS: {
+    name: string;
+    href: string;
+    logoSrc: string;
+    logoWidth: number;
+    logoHeight: number;
+}[] = [
     {
-        id: "courses",
-        image: StaticImages.LANDING_PAGE.courses,
-        href: "https://hdruklearn.org/",
-        externalUrl: true,
+        name: "Cancer Research UK",
+        href: "https://www.cancerresearchuk.org/",
+        logoSrc: "/images/icons/cruk-logo.svg",
+        logoWidth: 200,
+        logoHeight: 46,
     },
     {
-        id: "phenotypes",
-        image: StaticImages.LANDING_PAGE.phenotypes,
-        href: "https://phenotypes.healthdatagateway.org/",
-        externalUrl: true,
+        name: "Cancer Research Horizons",
+        href: "https://www.cancerresearchhorizons.com/",
+        logoSrc: "/images/partners/crh.png",
+        logoWidth: 200,
+        logoHeight: 44,
     },
     {
-        id: "omics",
-        image: StaticImages.LANDING_PAGE.omics_pred,
-        href: "https://www.omicspred.org/",
-        externalUrl: true,
+        name: "University of Sussex",
+        href: "https://bioinformaticslab.sussex.ac.uk/",
+        logoSrc: "/images/partners/sussex.svg",
+        logoWidth: 200,
+        logoHeight: 46,
     },
     {
-        id: "pgs_catalog",
-        image: StaticImages.LANDING_PAGE.pgs_catalog,
-        href: "https://www.pgscatalog.org/",
-        externalUrl: true,
+        name: "University of Oxford",
+        href: "https://www.oncology.ox.ac.uk/",
+        logoSrc: "/images/partners/oxford.svg",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+    {
+        name: "HDR UK",
+        href: "https://healthdatagateway.org/en",
+        logoSrc: "/images/partners/hdruk.svg",
+        logoWidth: 200,
+        logoHeight: 46,
+    },
+    {
+        name: "Biobanking UK",
+        href: "https://www.biobankinguk.org/",
+        logoSrc: "/images/partners/biobank.png",
+        logoWidth: 200,
+        logoHeight: 46,
     },
 ];
 
@@ -110,21 +91,13 @@ interface HomePageProps {
     cmsContent: PageTemplateHome;
 }
 
-const HomePage = ({ cmsContent: { page, posts } }: HomePageProps) => {
+const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
     const t = useTranslations("pages.home");
-    const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+    const { isLoggedIn } = useAuth();
+    const { showDialog } = useDialog();
 
     const {
-        meetTheTeam,
-        homeFields: {
-            affiliateLink,
-            gatewayVideo,
-            gatewayVideoHeader,
-            logos,
-            newsHeader,
-            newsletterSignupHeader,
-            newsletterSignupDescription,
-        },
+        homeFields: { logos },
     } = page.template;
 
     const logosFormatted = useMemo(
@@ -137,246 +110,338 @@ const HomePage = ({ cmsContent: { page, posts } }: HomePageProps) => {
         [logos]
     );
 
-    useEffect(() => {
-        if (isMobile) {
-            setIsTouchDevice(true);
-        }
-    }, []);
-
-    const responsiveServices = isTouchDevice
-        ? services.map(service => ({ ...service, text: t("touchDevice") }))
-        : services;
-
-    const responsiveServicesConnected = isTouchDevice
-        ? connectedResources.map(service => ({
-              ...service,
-              text: t("touchDevice"),
-          }))
-        : connectedResources;
-
-    const items = [
-        {
-            title: t("helpLinks.item1.title"),
-            text: t("helpLinks.item1.text"),
-            href: RouteName.SUPPORT,
-            externalUrl: false,
-        },
-        {
-            title: t("helpLinks.item2.title"),
-            text: t("helpLinks.item2.text"),
-            href: "/community/open-source-development",
-            externalUrl: true,
-        },
-    ];
-
     return (
         <>
+            {/* Hero section */}
             <Box
                 sx={{
-                    background: {
-                        tablet: `linear-gradient(170deg, transparent 60%, ${colors.darkGreen50} calc(60% + 1px))`,
-                        desktop: `linear-gradient(170deg, transparent 72%, ${colors.darkGreen50} calc(72% + 1px))`,
-                    },
-                }}>
-                <Container>
-                    <InfoHoverPanel
-                        items={responsiveServices}
-                        itemsResources={responsiveServicesConnected}
-                        defaultImageSrc={
-                            StaticImages.LANDING_PAGE.welcome_image
-                        }
-                    />
-                </Container>
-            </Box>
-            <Box
-                sx={{
-                    background: colors.darkGreen50,
-                }}>
-                <Container>
-                    <GradientBoxes items={items} maxWidth={420} />
-                </Container>
-            </Box>
-            <Box
-                sx={{
-                    background: "#fff",
-                }}>
-                <Container sx={{ textAlign: "center" }}>
-                    <TitleWithBg
-                        size="md"
-                        variant="h2"
-                        mb={2}
-                        title={gatewayVideoHeader}
-                        bgcolor="transparent"
-                        color="secondary.main"
-                        fontWeight="600"
-                    />
-                </Container>
-            </Box>
-            <Box
-                sx={{
-                    background: `linear-gradient(9deg, ${colors.darkGreen50} 60%, #fff calc(60% + 1px))`,
+                    position: "relative",
+                    minHeight: { mobile: 380, tablet: 420, desktop: 480 },
+                    display: "flex",
+                    alignItems: "center",
+                    backgroundImage: "url(/images/home-scientist.png)",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
                 }}>
                 <Container
                     sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "column",
+                        position: "relative",
+                        zIndex: 1,
+                        py: 4,
                     }}>
                     <Box
                         sx={{
-                            width: "100%",
-                            maxWidth: 950,
+                            maxWidth: 720,
+                            backgroundColor: "rgba(255,255,255,0.93)",
+                            borderRadius: 1,
+                            borderLeft: `5px solid ${colors.pink400}`,
+                            px: { mobile: 3, tablet: 5 },
+                            py: { mobile: 3, tablet: 4 },
+                            boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
                         }}>
-                        <IFrameWrapper>
-                            <HTMLContent
-                                content={gatewayVideo}
-                                sanitize={false}
-                            />
-                        </IFrameWrapper>
+                        <Typography
+                            component="h1"
+                            variant="h2"
+                            sx={{
+                                color: colors.purple500,
+                                fontWeight: 700,
+                                fontSize: { mobile: 24, tablet: 34, desktop: 40 },
+                                lineHeight: 1.05,
+                                mb: 2,
+                            }}>
+                            {t("finderPanel.title")}
+                        </Typography>
+                        <Typography
+                            sx={{
+                                color: colors.purple500,
+                                fontSize: { mobile: 20, tablet: 24 },
+                                lineHeight: 1.35,
+                                maxWidth: 620,
+                            }}>
+                            {t("finderPanel.intro")}
+                        </Typography>
                     </Box>
                 </Container>
             </Box>
+
+            {/* Services panel - gradient background, 9 white cards */}
             <Box
                 sx={{
-                    background: colors.darkGreen50,
-                }}
-                textAlign="center">
+                    background: `linear-gradient(90deg, #f0f7ff 0%, #f0f7ff 40%, ${colors.purple100} 100%)`,
+                    py: { mobile: 4, tablet: 5 },
+                    position: "relative",
+                    overflow: "hidden",
+                }}>
+                <Box
+                    sx={{
+                        position: "absolute",
+                        right: 0,
+                        bottom: 0,
+                        width: "40%",
+                        height: "80%",
+                        background: `linear-gradient(135deg, transparent 30%, ${colors.green50} 70%, rgba(255,255,255,0.3) 100%)`,
+                        pointerEvents: "none",
+                    }}
+                />
+                <Container sx={{ position: "relative", zIndex: 1 }}>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                mobile: "1fr",
+                                tablet: "repeat(2, 1fr)",
+                            },
+                            gap: 2,
+                        }}>
+                        {PANEL_ITEMS.map((item, index) => {
+                            const label = t(item.labelKey);
+                            const isDar = item.loggedInOnly === true;
+                            const needsSignIn = isDar && !isLoggedIn;
+                            const handleClick = (e: React.MouseEvent) => {
+                                if (needsSignIn) {
+                                    e.preventDefault();
+                                    showDialog(ProvidersDialog, {
+                                        isProvidersDialog: true,
+                                    });
+                                }
+                            };
+                            const cardSx = {
+                                bgcolor: "#fff",
+                                color: colors.purple500,
+                                borderRadius: 2,
+                                py: 2,
+                                px: 2,
+                                textAlign: "center" as const,
+                                fontWeight: 700,
+                                fontSize: { mobile: 16, tablet: 18 },
+                                lineHeight: 1.2,
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                                transition: "box-shadow 0.2s",
+                                "&:hover": {
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                },
+                                ...(item.span2 && {
+                                    gridColumn: { tablet: "span 2" },
+                                }),
+                            };
+                            return (
+                                <Link
+                                    key={index}
+                                    href={needsSignIn ? "#" : item.href}
+                                    onClick={handleClick}
+                                    sx={{
+                                        textDecoration: "none",
+                                        display: "block",
+                                        ...cardSx,
+                                    }}>
+                                    {label}
+                                </Link>
+                            );
+                        })}
+                    </Box>
+                </Container>
+            </Box>
+
+            {/* Feature research panel */}
+            <Box sx={{ bgcolor: "#fff", py: { mobile: 3, tablet: 4 } }}>
                 <Container>
-                    <Box sx={{ position: "relative", mb: 2 }}>
-                        <TitleWithBg
-                            size="md"
-                            variant="h2"
-                            title={newsHeader}
-                            bgcolor="transparent"
-                            color="secondary.main"
-                            fontWeight="600"
-                        />
+                    <Link
+                        href={`/search?type=${SearchCategory.DATASETS}`}
+                        sx={{
+                            textDecoration: "none",
+                            display: "block",
+                            color: "inherit",
+                        }}>
                         <Box
                             sx={{
-                                position: "absolute",
-                                right: 0,
-                                top: "50%",
-                                transform: "translateY(-50%)",
-                                [theme.breakpoints.down("tablet")]: {
-                                    position: "static",
-                                    transform: "none",
+                                p: 0,
+                                border: `1px solid ${colors.grey300}`,
+                                borderRadius: 1,
+                                overflow: "hidden",
+                                display: "flex",
+                                alignItems: "stretch",
+                                backgroundColor: "#fff",
+                                minHeight: { mobile: 120, tablet: 140 },
+                                boxShadow: "0 1px 0 rgba(0,0,0,0.04)",
+                                "&:hover": {
+                                    boxShadow: "0 3px 14px rgba(0,0,0,0.10)",
                                 },
                             }}>
-                            <Button
-                                variant="text"
-                                component={Link}
-                                endIcon={
-                                    <ArrowForwardIosIcon color="primary" />
-                                }
-                                href={RouteName.NEWS_EVENTS}>
-                                {t("newsEvents.seeAllLink")}
-                            </Button>
+                            <Box
+                                sx={{
+                                    p: 0,
+                                    position: "relative",
+                                    width: { mobile: 170, tablet: 280, desktop: 340 },
+                                    flexShrink: 0,
+                                    backgroundColor: colors.grey100,
+                                }}>
+                                <Image
+                                    src="/images/crh.png"
+                                    alt=""
+                                    fill
+                                    sizes="150px"
+                                    style={{
+                                        objectFit: "cover",
+                                        objectPosition: "left center",
+                                        display: "block",
+                                    }}
+                                />
+                            </Box>
+                            <Box
+                                sx={{
+                                    flexGrow: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    px: { mobile: 2, tablet: 6 },
+                                    py: 0,
+                                    textAlign: "center",
+                                }}>
+                                <Typography
+                                    sx={{
+                                        fontWeight: 700,
+                                        color: colors.blue400,
+                                        fontSize: { mobile: 16, tablet: 18, desktop: 20 },
+                                        lineHeight: 1.2,
+                                    }}>
+                                    {t("finderPanel.horizonsLink")}
+                                </Typography>
+                            </Box>
                         </Box>
-                    </Box>
-                    <NewsSection posts={posts} />
+                    </Link>
                 </Container>
             </Box>
-            <Box
-                sx={{
-                    background: `linear-gradient(170deg, ${colors.darkGreen50} 50%, #fff calc(50% + 1px))`,
-                }}
-                textAlign="center">
-                <Container>
-                    <TitleWithBg
-                        size="md"
-                        variant="h2"
-                        mb={2}
-                        title={meetTheTeam.sectionName}
-                        bgcolor="transparent"
-                        color="secondary.main"
-                        fontWeight="600"
-                    />
-                    <TeamWrapper>
-                        <TeamImage
-                            src={meetTheTeam.image.node.sourceUrl}
-                            alt={meetTheTeam.image.node.altText}
-                        />
 
-                        <TeamContent>
-                            <Typography
-                                sx={{
-                                    fontSize: { mobile: 20, desktop: 28 },
-                                }}>
-                                {meetTheTeam.title}
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    fontSize: 15,
-                                }}>
-                                {meetTheTeam.intro}
-                            </Typography>
+            {/* Our Research Partners */}
+            <Box sx={{ bgcolor: "#fff", py: { mobile: 4, tablet: 5 }, borderTop: `1px solid ${colors.grey300}` }}>
+                <Container>
+                    <Typography
+                        variant="h2"
+                        sx={{
+                            fontWeight: 700,
+                            color: colors.grey800,
+                            fontSize: { mobile: 24, tablet: 28 },
+                            mb: 3,
+                        }}>
+                        {t("researchPartners.title")}
+                    </Typography>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                mobile: "1fr",
+                                tablet: "repeat(2, 1fr)",
+                                desktop: "repeat(3, 1fr)",
+                            },
+                            gap: 2,
+                        }}>
+                        {RESEARCH_PARTNERS.map(partner => (
                             <Link
-                                href={RouteName.MEET_THE_TEAM}
-                                color="primary"
-                                passHref>
-                                <Button
-                                    variant="text"
-                                    endIcon={<ArrowForward color="primary" />}>
-                                    {t("meetTheTeam")}
-                                </Button>
+                                key={`${partner.href}-${partner.name}`}
+                                href={partner.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                    textDecoration: "none",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    textAlign: "center",
+                                    minHeight: 68,
+                                    px: 2,
+                                    py: 1,
+                                    border: `1px solid ${colors.grey300}`,
+                                    backgroundColor: colors.white,
+                                    borderRadius: 1,
+                                    "&:hover": {
+                                        boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                                    },
+                                }}>
+                                <Image
+                                    src={partner.logoSrc}
+                                    alt={partner.name}
+                                    width={partner.logoWidth}
+                                    height={partner.logoHeight}
+                                    style={{
+                                        objectFit: "contain",
+                                        maxWidth: "100%",
+                                        maxHeight: 46,
+                                        height: "auto",
+                                    }}
+                                />
                             </Link>
-                        </TeamContent>
-                    </TeamWrapper>
+                        ))}
+                    </Box>
                 </Container>
             </Box>
-            <NewsletterSignup
-                title={newsletterSignupHeader}
-                description={newsletterSignupDescription}
-            />
+
+            {/* CTA strip */}
             <Box
                 sx={{
-                    background: "white",
-                    position: "relative",
-                    zIndex: 1,
-                    [theme.breakpoints.up(810)]: {
-                        marginTop: "-70px",
-                    },
+                    bgcolor: colors.grey100,
+                    py: 3,
+                    borderTop: `1px solid ${colors.grey300}`,
                 }}>
-                <Container
-                    sx={{
-                        display: { tablet: "flex" },
-                        gap: 2,
-                        alignItems: "center",
-                    }}>
-                    <a
-                        href={affiliateLink.url}
-                        target="_blank"
-                        rel="noreferrer">
-                        <Button
+                <Container>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 2,
+                        }}>
+                        <Link
+                            href="/search"
                             sx={{
-                                minWidth: 200,
-                                width: "100%",
-                                whiteSpace: {
-                                    mobile: "unset",
-                                    desktop: "nowrap",
-                                },
+                                color: colors.pink400,
+                                fontWeight: 600,
+                                px: 2,
+                                "&:hover": { textDecoration: "underline" },
+                            }}>
+                            {t("cta.discoverData")}
+                        </Link>
+                        <Box
+                            component="span"
+                            sx={{
+                                width: "2px",
+                                height: 24,
+                                bgcolor: colors.grey400,
+                                display: { mobile: "none", tablet: "block" },
                             }}
-                            color="secondary"
-                            variant="outlined">
-                            {affiliateLink.title}
-                        </Button>
-                    </a>
-                    <LogoSlider logos={logosFormatted} />
+                        />
+                        <Link
+                            href="/search"
+                            sx={{
+                                color: colors.pink400,
+                                fontWeight: 600,
+                                px: 2,
+                                "&:hover": { textDecoration: "underline" },
+                            }}>
+                            {t("cta.findStudies")}
+                        </Link>
+                        <Box
+                            component="span"
+                            sx={{
+                                width: "2px",
+                                height: 24,
+                                bgcolor: colors.grey400,
+                                display: { mobile: "none", tablet: "block" },
+                            }}
+                        />
+                        <Link
+                            href={RouteName.SUPPORT}
+                            sx={{
+                                color: colors.pink400,
+                                fontWeight: 600,
+                                px: 2,
+                                "&:hover": { textDecoration: "underline" },
+                            }}>
+                            {t("cta.collaborate")}
+                        </Link>
+                    </Box>
                 </Container>
             </Box>
-            <Box
-                sx={{
-                    display: "none",
-                    [theme.breakpoints.up(810)]: {
-                        position: "relative",
-                        zIndex: 0,
-                        height: "65px",
-                        width: "100%",
-                        backgroundColor: "#fff",
-                        display: "block",
-                    },
-                }}
-            />
         </>
     );
 };

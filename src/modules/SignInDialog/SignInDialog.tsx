@@ -15,6 +15,7 @@ import useDialog from "@/hooks/useDialog";
 import useAuth from "@/hooks/useAuth";
 import apis from "@/config/apis";
 import notificationService from "@/services/notification";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 const TRANSLATION_PATH = "modules.dialogs.SignInDialog";
 
@@ -59,6 +60,7 @@ const SignInDialog = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...getPartnerHeaders(),
                 },
                 body: JSON.stringify(values),
             });

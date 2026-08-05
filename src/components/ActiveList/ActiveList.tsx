@@ -10,6 +10,7 @@ interface ActiveListProps {
     iconColour?: colourType;
     activeItem: number;
     handleClick: (id: number) => void;
+    variant?: "default" | "sidebar";
 }
 
 const ActiveList = ({
@@ -18,25 +19,27 @@ const ActiveList = ({
     handleClick,
     activeItem = 1,
     iconColour = "primary",
+    variant = "default",
 }: ActiveListProps) => {
     const Icon = icon || CircleIcon;
     return (
         <ul
             style={{
-                gap: 8,
+                gap: variant === "sidebar" ? 2 : 8,
                 display: "flex",
                 flexDirection: "column",
                 listStyle: "none",
                 padding: 0,
             }}>
             {items.map((item, index) => {
+                const isActive = activeItem === index + 1;
                 return (
                     <li
                         key={item.label}
                         style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: 5,
+                            gap: variant === "sidebar" ? 0 : 5,
                         }}>
                         <Button
                             onClick={() => handleClick(index + 1)}
@@ -44,15 +47,36 @@ const ActiveList = ({
                             sx={{
                                 whiteSpace: "inherit",
                                 textAlign: "left",
+                                width: "100%",
+                                justifyContent: "flex-start",
+                                ...(variant === "sidebar"
+                                    ? {
+                                          px: 1.5,
+                                          py: 0.85,
+                                          borderRadius: 1,
+                                          color: isActive
+                                              ? "primary.main"
+                                              : "text.primary",
+                                          backgroundColor: isActive
+                                              ? "rgba(0, 70, 140, 0.08)"
+                                              : "transparent",
+                                          "&:hover": {
+                                              backgroundColor: isActive
+                                                  ? "rgba(0, 70, 140, 0.12)"
+                                                  : "rgba(0, 0, 0, 0.04)",
+                                          },
+                                      }
+                                    : {}),
                             }}
                             startIcon={
-                                <Icon
-                                    color={iconColour}
-                                    sx={{
-                                        opacity:
-                                            activeItem === index + 1 ? 1 : 0.3,
-                                    }}
-                                />
+                                variant === "sidebar" ? undefined : (
+                                    <Icon
+                                        color={iconColour}
+                                        sx={{
+                                            opacity: isActive ? 1 : 0.3,
+                                        }}
+                                    />
+                                )
                             }>
                             <Typography fontSize="14" sx={{ width: "100%" }}>
                                 {item.label}

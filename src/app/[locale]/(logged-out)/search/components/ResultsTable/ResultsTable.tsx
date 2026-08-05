@@ -1,4 +1,4 @@
-import { TableContainer, Tooltip } from "@mui/material";
+import { Box, Stack, TableContainer, Tooltip, Typography } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import { get } from "lodash";
 import { useTranslations } from "next-intl";
@@ -15,18 +15,83 @@ import { useCohortStatus } from "@/hooks/useCohortStatus";
 import useGet from "@/hooks/useGet";
 import apis from "@/config/apis";
 import { RouteName } from "@/consts/routeName";
-import { getDateRange } from "@/utils/search";
 import ActionDropdown from "../ActionDropdown";
+import { getAccessibility, getDateRange, getLeadResearcher, getPopulationSize } from "@/utils/search";
+import { formatTextDelimiter } from "@/utils/dataset";
+
+const ICON_OPTS = [
+    { url: "/images/icons/animal.webp", label: "Model Organism Study" },
+    { url: "/images/icons/background.webp", label: "Background Information" },
+    { url: "/images/icons/biobank.webp", label: "Samples Available" },
+    { url: "/images/icons/invitro.webp", label: "In Vitro Study" },
+    { url: "/images/icons/lab_results.webp", label: "Lab Results" },
+    { url: "/images/icons/longitudinal.webp", label: "Longitudinal Study" },
+    { url: "/images/icons/medical_imaging.webp", label: "Medical Imaging" },
+    { url: "/images/icons/omics.webp", label: "Omics" },
+    { url: "/images/icons/population.webp", label: "Patient Study" },
+    { url: "/images/icons/treatments.webp", label: "Treatments" },
+];
+
+function pickTitleBandIcons(row: SearchResultDataset) {
+    const id = Number(row._id) || 0;
+    const first = ICON_OPTS[id % ICON_OPTS.length];
+    const second = ICON_OPTS[(id + 4) % ICON_OPTS.length];
+    if (first.url === second.url) {
+        return [first];
+    }
+    return [first, second];
+}
+
+function TitleBandStudyIcons({ row }: { row: SearchResultDataset }) {
+    const icons = pickTitleBandIcons(row);
+    return (
+        <Stack direction="row" spacing={0.75} alignItems="center" useFlexGap>
+            {icons.map(opt => (
+                <Tooltip
+                    key={`${row._id}-${opt.url}`}
+                    title={opt.label}
+                    arrow
+                    placement="top"
+                    enterDelay={200}>
+                    <Box
+                        component="span"
+                        sx={{
+                            display: "inline-flex",
+                            lineHeight: 0,
+                            cursor: "default",
+                            verticalAlign: "middle",
+                        }}>
+                        <Box
+                            component="img"
+                            src={opt.url}
+                            alt={opt.label}
+                            sx={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 0,
+                                objectFit: "cover",
+                                border: "2px solid rgba(209, 10, 111, 0.35)",
+                                bgcolor: "#e8f4fc",
+                                display: "block",
+                            }}
+                        />
+                    </Box>
+                </Tooltip>
+            ))}
+        </Stack>
+    );
+}
 
 interface ResultTableProps {
     results: SearchResultDataset[];
     showLibraryModal: (props: { datasetId: number }) => void;
     cohortDiscovery: PageTemplatePromo;
+    /** When false, synopsis rows under each result are hidden. */
+    showSynopsis?: boolean;
 }
-
-const PUBLISHER_NAME_PATH = "metadata.summary.publisher.name";
-const PUBLISHERS_ID = "metadata.summary.publisher.gatewayId";
-
+const CONFORMS_TO_PATH = "metadata.accessibility.formatAndStandards.conformsTo";
+const ACCESS_SERVICE_PATH =
+    "metadata.accessibility.access.accessServiceCategory";
 const columnHelper = createColumnHelper<SearchResultDataset>();
 
 const getColumns = ({
@@ -39,7 +104,7 @@ const getColumns = ({
     translations: { [id: string]: string };
     libraryData?: Library[];
     showLibraryModal: (props: { datasetId: number }) => void;
-    mutateLibraries: KeyedMutator<Library[]>;
+    mutateLibraries: KeyedMutator<Library[] | undefined>;
     isCohortDiscoveryDisabled: boolean;
     cohortDiscovery: PageTemplatePromo;
 }) => [
@@ -51,59 +116,50 @@ const getColumns = ({
 
             return (
                 <Link href={linkHref}>
-                    <EllipsisLineLimit
-                        text={get(original, "metadata.summary.title")}
-                    />
+                    <EllipsisLineLimit text={getLeadResearcher(original)} />
                 </Link>
             );
         },
         meta: { isPinned: true, hasPinnedBorder: true },
-        header: () => <span>{translations.metaDataLabel}</span>,
+        header: () => <span>Lead Researcher</span>,
         minSize: 300,
-        size: 700,
+        size: 400,
+    }),
+     columnHelper.display({
+        id: "populationSize",
+        cell: ({ row: { original } }) => (
+            <div style={{ textAlign: "center" }}>
+                {getPopulationSize(
+                    original,
+                    translations.populationSizeNotReported
+                )}
+            </div>
+        ),
+        header: () => (
+            <Tooltip
+                describeChild
+                title={translations.populationSizeTooltip}
+                tabIndex={0}>
+                <span>Pop. Size</span>
+            </Tooltip>
+        ),
+        size: 120,
     }),
 
     columnHelper.display({
         id: "dataProvider",
         cell: ({ row: { original } }) => {
-            const dataCustodianId = get(original, PUBLISHERS_ID);
-            // if the below is false, its because the api has failed to find the team id based off the original uid for gatewayId
-            const isNumber = !Number.isNaN(Number(dataCustodianId));
-            const linkHref = `/${RouteName.DATA_CUSTODIANS_ITEM}/${dataCustodianId}`;
+            const accessibility = getAccessibility(original);
 
             return (
                 <div style={{ textAlign: "center" }}>
-                    {isNumber && (
-                        <Link
-                            href={linkHref}
-                            onFocus={e => {
-                                e.currentTarget.scrollIntoView({
-                                    behavior: "smooth",
-                                    inline: "center",
-                                    block: "nearest",
-                                });
-                            }}>
-                            <EllipsisLineLimit
-                                text={get(original, PUBLISHER_NAME_PATH)}
-                            />
-                        </Link>
-                    )}
-                    {!isNumber && (
-                        <EllipsisLineLimit
-                            text={get(original, PUBLISHER_NAME_PATH)}
-                        />
-                    )}
+                    {accessibility ? (
+                        <EllipsisLineLimit text={accessibility} />
+                    ) : null}
                 </div>
             );
         },
-        header: () => (
-            <Tooltip
-                describeChild
-                title={translations.dataProviderTooltip}
-                tabIndex={0}>
-                <span>{translations.dataProviderLabel}</span>
-            </Tooltip>
-        ),
+        header: () => <span>Accessibility</span>,
         size: 400,
     }),
     columnHelper.display({
@@ -113,35 +169,31 @@ const getColumns = ({
                 {getDateRange(info.row.original?.metadata)}
             </div>
         ),
-        header: () => (
-            <Tooltip
-                describeChild
-                title={translations.dateRangePublisherTooltip}
-                tabIndex={0}>
-                <span>{translations.dateRangePublisherLabel}</span>
-            </Tooltip>
+        header: () => <span>Earliest Data</span>,
+        size: 120,
+    }),
+       columnHelper.display({
+        id: "accessService",
+        cell: ({ row: { original } }) => (
+            <div style={{ textAlign: "center" }}>
+                {get(original, ACCESS_SERVICE_PATH)}
+            </div>
         ),
+        header: () => <span>Start Date</span>,
+        minSize: 100,
         size: 120,
     }),
-    columnHelper.display({
-        id: "actions",
-        meta: { isPinned: true },
-        cell: ({ row: { original } }) => {
-            return (
-                <div style={{ textAlign: "center" }}>
-                    <ActionDropdown
-                        result={original}
-                        showLibraryModal={showLibraryModal}
-                        mutateLibraries={mutateLibraries}
-                        isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
-                        cohortDiscovery={cohortDiscovery}
-                    />
-                </div>
-            );
-        },
-        header: () => <span>{translations.actionLabel}</span>,
-        size: 120,
+      columnHelper.display({
+        id: "conformsTo",
+        cell: ({ row: { original } }) => (
+            <div style={{ textAlign: "center" }}>
+                {formatTextDelimiter(get(original, CONFORMS_TO_PATH))}
+            </div>
+        ),
+        header: () => <span>Updated</span>,
+        size: 180,
     }),
+
 ];
 
 const RESULTS_TABLE_TRANSLATION_PATH = "pages.search.components.ResultsTable";
@@ -149,6 +201,7 @@ const ResultTable = ({
     results,
     showLibraryModal,
     cohortDiscovery,
+    showSynopsis = true,
 }: ResultTableProps) => {
     const t = useTranslations(RESULTS_TABLE_TRANSLATION_PATH);
     const { isLoggedIn, user } = useAuth();
@@ -191,9 +244,70 @@ const ResultTable = ({
                 borderRadius: 2,
                 mb: 4,
             }}>
-            <TableContainer>
+            <TableContainer sx={{ width: "100%" }}>
                 <Table<SearchResultDataset>
+                    variant="searchResults"
+                    pinHeader={true}
                     style={{ background: "background.paper", borderRadius: 2 }}
+                    showSynopsis={showSynopsis}
+                    renderSynopsis={row => {
+                        const highlight = row.highlight;
+                        const raw =
+                            highlight?.abstract?.[0] ??
+                            highlight?.description?.[0] ??
+                            get(row, "metadata.summary.abstract");
+                        if (
+                            raw == null ||
+                            String(raw).replace(/<[^>]*>/g, "").trim() === ""
+                        ) {
+                            return null;
+                        }
+                        return (
+                            <Typography
+                                variant="body1"
+                                component="div"
+                                sx={{
+                                    fontSize: "1.0625rem",
+                                    color: "text.secondary",
+                                    fontStyle: "italic",
+                                    lineHeight: 1.5,
+                                    "& strong": {
+                                        fontWeight: 700,
+                                        fontStyle: "italic",
+                                    },
+                                }}>
+                                <strong>Synopsis: </strong>
+                                <span
+                                    dangerouslySetInnerHTML={{
+                                        __html: String(raw),
+                                    }}
+                                />
+                            </Typography>
+                        );
+                    }}
+                    renderActionCell={row => (
+                        <ActionDropdown
+                            result={row}
+                            libraryData={libraryData ?? []}
+                            showLibraryModal={showLibraryModal}
+                            mutateLibraries={mutateLibraries}
+                            isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
+                            cohortDiscovery={cohortDiscovery}
+                        />
+                    )}
+                    renderTitleBandCell={row => {
+                        const linkHref = `/${RouteName.DATASET_ITEM}/${row._id}`;
+                        return (
+                            <Link href={linkHref}>
+                                <EllipsisLineLimit
+                                    text={get(row, "metadata.summary.title")}
+                                />
+                            </Link>
+                        );
+                    }}
+                    renderTitleBandExtras={row => (
+                        <TitleBandStudyIcons row={row} />
+                    )}
                     columns={getColumns({
                         translations,
                         libraryData,

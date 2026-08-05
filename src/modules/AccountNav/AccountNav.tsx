@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Box, Skeleton } from "@mui/material";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
@@ -11,8 +12,13 @@ import useAccountMenu from "@/hooks/useAccountMenu";
 import useAuth from "@/hooks/useAuth";
 import useDialog from "@/hooks/useDialog";
 import { colors } from "@/config/theme";
+import { RouteName } from "@/consts/routeName";
 
-const AccountNav = () => {
+interface AccountNavProps {
+    headerVariant?: "light" | "dark";
+}
+
+const AccountNav = ({ headerVariant = "dark" }: AccountNavProps) => {
     const { showDialog } = useDialog();
     const t = useTranslations("components");
     const [anchorElement, setAnchorElement] = useState<null | HTMLElement>(
@@ -23,6 +29,8 @@ const AccountNav = () => {
     const handleOpenNav = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElement(event.currentTarget);
     };
+    const textColor = headerVariant === "light" ? colors.grey800 : colors.white;
+    const focusOutline = headerVariant === "light" ? colors.purple500 : colors.white;
 
     if (isLoading) {
         return (
@@ -42,10 +50,10 @@ const AccountNav = () => {
                         disableRipple
                         sx={{
                             marginLeft: "5px",
-                            color: colors.white,
+                            color: textColor,
 
                             "&:focus&.Mui-focusVisible": {
-                                outlineColor: colors.white,
+                                outlineColor: focusOutline,
                                 borderRadius: 0,
                                 textDecoration: "underline",
                             },
@@ -67,14 +75,13 @@ const AccountNav = () => {
     }
 
     return (
-        <Box sx={{ flexDirection: "horizontal" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Button
                 size="medium"
                 variant="contained"
-                color="secondary"
+                color="primary"
                 sx={{
                     color: "white",
-                    marginRight: 2,
                 }}
                 onClick={() =>
                     showDialog(ProvidersDialog, { isProvidersDialog: true })
@@ -85,12 +92,11 @@ const AccountNav = () => {
                 size="medium"
                 variant="contained"
                 color="secondary"
+                component={Link}
+                href={`/${RouteName.HELP}`}
                 sx={{
                     color: "white",
-                }}
-                onClick={() =>
-                    showDialog(ProvidersDialog, { isProvidersDialog: true })
-                }>
+                }}>
                 {t("DesktopNav.labels.help")}
             </Button>
         </Box>

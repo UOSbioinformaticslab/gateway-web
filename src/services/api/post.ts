@@ -1,6 +1,7 @@
-import Cookies from "js-cookie";
-import { sessionCookie, sessionHeader, sessionPrefix } from "@/config/session";
+import { sessionHeader, sessionPrefix } from "@/config/session";
+import getClientSessionId from "@/utils/getClientSessionId";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 import { errorNotification, successNotification } from "./utils";
 
 const postFetch = async <T>(
@@ -17,7 +18,7 @@ const postFetch = async <T>(
 
     try {
         const isFormData = data instanceof FormData;
-        const session = Cookies.get(sessionCookie)!;
+        const session = getClientSessionId();
 
         if (process.env.NEXT_PUBLIC_LOG_LEVEL === "debug") {
             const message = {
@@ -31,12 +32,13 @@ const postFetch = async <T>(
             method: "POST",
             body: !isFormData ? JSON.stringify(data) : data,
             credentials: "include",
-            headers: !isFormData
-                ? {
-                      "Content-Type": "application/json",
-                      [sessionHeader]: sessionPrefix + session,
-                  }
-                : {},
+            headers: {
+                ...(!isFormData
+                    ? { "Content-Type": "application/json" }
+                    : {}),
+                [sessionHeader]: sessionPrefix + session,
+                ...getPartnerHeaders(),
+            },
         });
 
         if (response.ok) {
@@ -91,8 +93,25 @@ const postFetch = async <T>(
             }
         }
     } catch (error) {
-        if (process.env.NODE_ENV === "development") {
-            console.error(error);
+        const sessionForLog = getClientSessionId();
+        const isNetworkFailure =
+            error instanceof TypeError &&
+            typeof (error as Error).message === "string" &&
+            ((error as Error).message === "Failed to fetch" ||
+                (error as Error).message.includes("Failed to fetch") ||
+                (error as Error).message.includes("NetworkError") ||
+                (error as Error).message.includes("Load failed"));
+
+        if (isNetworkFailure) {
+            if (process.env.NEXT_PUBLIC_LOG_LEVEL === "debug") {
+                logger.warn(
+                    { message: "Network request failed", url },
+                    sessionForLog,
+                    "post"
+                );
+            }
+        } else if (process.env.NODE_ENV === "development") {
+            logger.error(error, sessionForLog, "post");
         }
 
         if (errorNotificationsOn) {

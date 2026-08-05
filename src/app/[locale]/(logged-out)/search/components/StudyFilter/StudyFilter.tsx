@@ -11,8 +11,6 @@ import {
     Checkbox,
     Chip,
     Paper,
-    Tabs,
-    Tab,
     List,
     ListItem,
     Collapse,
@@ -23,9 +21,14 @@ import {
     Card,
     CardActionArea,
     CardContent,
-    Badge,
-    Divider
+    Divider,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 // Icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -34,7 +37,6 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { colors } from "@/config/theme";
 // Preserved Logic Imports
@@ -53,8 +55,8 @@ const COLORS = {
 
 // --- Utility Components ---
 
-const SearchInput = ({ searchTerm, setSearchTerm, isSearching, placeholder }) => (
-    <Box sx={{ mb: 3 }}>
+const SearchInput = ({ searchTerm, setSearchTerm, isSearching, placeholder, sx = {}, textFieldSx = undefined }) => (
+    <Box sx={{ mb: 3, ...sx }}>
         <TextField
             fullWidth
             placeholder={placeholder || "Search terms (min 4 characters)..."}
@@ -63,13 +65,21 @@ const SearchInput = ({ searchTerm, setSearchTerm, isSearching, placeholder }) =>
             size="small"
             variant="outlined"
             helperText={searchTerm && searchTerm.length < 4 ? "Please enter at least 4 characters to search." : ""}
+            sx={[
+                {
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        bgcolor: 'white',
+                    },
+                },
+                ...(textFieldSx ? [textFieldSx] : []),
+            ]}
             InputProps={{
                 startAdornment: (
                     <InputAdornment position="start">
                         {isSearching ? <CircularProgress size={20} sx={{ color: COLORS.pink }} /> : <SearchIcon color="disabled" />}
                     </InputAdornment>
                 ),
-                sx: { bgcolor: 'white' }
             }}
         />
     </Box>
@@ -205,8 +215,14 @@ const FilterLogicSummary = ({
 }) => {
     // Utility references passed down conceptually or imported
     const handleReset = useCallback(() => {
-        const filters = Array.from(selectedFilters);
-        const autoMessage = calculateLogicMessage(filters);
+        const filters = Array.from(selectedFilters).map(id => ({ id }));
+        const autoMessage = calculateLogicMessage({
+            filters,
+            filterType,
+            plusParents,
+            includeParents,
+            getMessage,
+        });
         setLogicMessage(autoMessage);
         setIsMessageManuallyEdited(false);
     }, [selectedFilters, setLogicMessage, setIsMessageManuallyEdited]);
@@ -325,8 +341,14 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
     const filteredTopography = pruneHierarchy(cancerGroups['0_0_0']?.children, filteredIds);
     const filteredHistology = pruneHierarchy(cancerGroups['0_0_1']?.children, filteredIds);
     const filteredCruk = pruneHierarchy(cancerGroups['0_0_2']?.children, filteredIds);
-    const filteredSnomed = pruneHierarchy(cancerGroups['0_0_3']?.children || {}, filteredIds);
-    const filteredTcga = pruneHierarchy(cancerGroups['0_0_4']?.children || {}, filteredIds);
+
+
+    // SNOMED-CT (0_0_3)
+    const snomedData = cancerGroups['0_0_3'] || { children: {} };
+    const filteredSnomedItems = pruneHierarchy(snomedData.children, filteredIds);
+        // TCGA (0_0_4)
+    const tcgaData = cancerGroups['0_0_4'] || { children: {} };
+    const filteredTcgaItems = pruneHierarchy(tcgaData.children, filteredIds);
 
     const listProps = { handleFilterChange, selectedFilters };
     const scrollContainerStyle = { maxHeight: 400, overflowY: 'auto', pr: 1 };
@@ -456,7 +478,7 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
                         <Typography variant="h6" fontWeight="bold" gutterBottom>TCGA Terms</Typography>
                         {searchBox}
                         <Box sx={scrollContainerStyle}>
-                            <NestedFilterList items={filteredTcga} {...listProps} />
+                            <NestedFilterList items={filteredTcgaItems} {...listProps} />
                         </Box>
                     </Box>
                 );
@@ -466,35 +488,91 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
                         <Typography variant="h6" fontWeight="bold" gutterBottom>SNOMED-CT Terms</Typography>
                         {searchBox}
                         <Box sx={scrollContainerStyle}>
-                            <NestedFilterList items={filteredSnomed} {...listProps} />
+                            <NestedFilterList items={filteredSnomedItems} {...listProps} />
                         </Box>
                     </Box>
                 );
-            case 'icdo':
+            case 'icdo': {
+                const icdoPanelSx = {
+                    flex: 1,
+                    minWidth: 0,
+                    p: 2,
+                    bgcolor: 'white',
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: COLORS.border,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    maxHeight: 480,
+                    overflow: 'hidden',
+                };
+                const icdoListScrollSx = {
+                    flex: 1,
+                    minHeight: 0,
+                    overflowY: 'auto',
+                    pr: 1,
+                };
                 return (
-                    <Box>
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>ICD-O Classification</Typography>
-                        {searchBox}
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <Paper variant="outlined" sx={{ p: 2, bgcolor: COLORS.lightBg }}>
-                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Topography</Typography>
-                                    <Box sx={scrollContainerStyle}>
-                                        <NestedFilterList items={filteredTopography} {...listProps} />
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <Paper variant="outlined" sx={{ p: 2, bgcolor: COLORS.lightBg }}>
-                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Histology</Typography>
-                                    <Box sx={scrollContainerStyle}>
-                                        <NestedFilterList items={filteredHistology} {...listProps} />
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                        </Grid>
+                    <Box
+                        sx={{
+                            bgcolor: COLORS.lightBg,
+                            borderRadius: 2,
+                            p: { mobile: 2, tablet: 2.5 },
+                        }}
+                    >
+                        <Typography
+                            variant="h5"
+                            component="h2"
+                            sx={{
+                                color: colors.black,
+                                fontWeight: 700,
+                                mb: 2,
+                                fontSize: { mobile: '1.25rem', tablet: '1.375rem' },
+                            }}
+                        >
+                            ICD-O Classification
+                        </Typography>
+                        <SearchInput
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            isSearching={isSearching}
+                            placeholder="Search ICDO terms"
+                            sx={{ mb: 2.5 }}
+                        />
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: { mobile: 'column', tablet: 'row' },
+                                gap: 2,
+                                alignItems: 'stretch',
+                            }}
+                        >
+                            <Paper elevation={0} sx={icdoPanelSx}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{ color: colors.black, fontWeight: 700, mb: 1.5 }}
+                                >
+                                    Topography
+                                </Typography>
+                                <Box sx={icdoListScrollSx}>
+                                    <NestedFilterList items={filteredTopography} {...listProps} />
+                                </Box>
+                            </Paper>
+                            <Paper elevation={0} sx={icdoPanelSx}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{ color: colors.black, fontWeight: 700, mb: 1.5 }}
+                                >
+                                    Histology
+                                </Typography>
+                                <Box sx={icdoListScrollSx}>
+                                    <NestedFilterList items={filteredHistology} {...listProps} />
+                                </Box>
+                            </Paper>
+                        </Box>
                     </Box>
                 );
+            }
             default:
                 return null;
         }
@@ -516,39 +594,33 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
                 </Box>
             ) : (
                 <Box>
-                    <Box
-  sx={{
-    display: "flex",
-    flexDirection: { xs: "column", sm: "row" },
-    alignItems: { sm: "center" },
-    gap: 2,
-    textAlign: { xs: "center", sm: "left" },
-  }}
->
-  <Typography
-    variant="h5"
-    sx={{ fontWeight: "bold", color: COLORS.blue }}
-  >
-    Select Classification Method
-  </Typography>
-
-  <Typography color="text.secondary">
-    Choose a terminology standard to begin filtering
-  </Typography>
-</Box>
+                    <Typography
+                        sx={{
+                            display: 'block',
+                            color: colors.black,
+                            fontSize: { mobile: '1.125rem', tablet: '1.25rem' },
+                            fontWeight: 600,
+                            lineHeight: 1.4,
+                            textAlign: { mobile: 'center', tablet: 'left' },
+                            mb: 2,
+                            mt: { mobile: -0.5, tablet: -1 },
+                        }}
+                    >
+                        Click on your choice of classification to begin
+                    </Typography>
 
                     <Grid container spacing={3}>
                         <Grid size={3}>
-                            <ClassificationCard title="CRUK Terms" description="Simplified terms." classificationKey="cruk" emoji="🏥" />
+                            <ClassificationCard title="CRUK  Cancer Terms" description="Patient-friendly, simplified cancer terms." classificationKey="cruk" emoji="🏥" />
                         </Grid>
                         <Grid size={3}>
-                            <ClassificationCard title="TCGA Terms" description="The Cancer Genome Atlas." classificationKey="tcga" emoji="🧬" />
+                            <ClassificationCard title="TCGA Terms" description="The Cancer Genome Atlas terminology." classificationKey="tcga" emoji="🧬" />
                         </Grid>
                         <Grid size={3}>
-                            <ClassificationCard title="SNOMED-CT" description="Systematized Nomenclature." classificationKey="snomed" emoji="🏷️" />
+                            <ClassificationCard title="SNOMED-CT" description="Systematized Nomenclature of Medicine." classificationKey="snomed" emoji="🏷️" />
                         </Grid>
                         <Grid size={3}>
-                            <ClassificationCard title="ICD-O" description="Official pathology terms." classificationKey="icdo" emoji="🔬" />
+                            <ClassificationCard title="ICD-O Classification" description="Official pathology terms (Topography & Histology)." classificationKey="icdo" emoji="🔬" />
                         </Grid>
                     </Grid>
                 </Box>
@@ -622,7 +694,7 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
 
     return (
         <Paper elevation={0} sx={{ p: 3 }}>
-            <Typography variant="h5" fontWeight="bold" sx={{ mb: 1, color: COLORS.blue }}>Accessibility</Typography>
+            <Typography variant="h3" fontWeight="bold" sx={{ mb: 1, color: COLORS.blue }}>Accessibility and Source</Typography>
             <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} isSearching={isSearching} placeholder="Search access terms" />
 
             <Paper variant="outlined" sx={{ p: 2, maxHeight: 400, overflowY: 'auto' }}>
@@ -648,13 +720,96 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
         </Paper>
     );
 };
+
+// --- Filter category cards (replaces Cancer / Data / Access tabs) ---
+
+const FilterCategoryCard = ({
+    title,
+    count,
+    selected,
+    onClick,
+}: {
+    title: string;
+    count: number;
+    selected: boolean;
+    onClick: () => void;
+}) => (
+    <Paper
+        elevation={0}
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+            }
+        }}
+        sx={{
+            minWidth: 0,
+            width: '100%',
+            minHeight: { mobile: 100, tablet: 108 },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: { mobile: 1.125, tablet: 1.5 },
+            cursor: 'pointer',
+            textAlign: 'center',
+            bgcolor: COLORS.white,
+            borderRadius: 2,
+            border: '2px solid',
+            borderColor: selected ? COLORS.pink : COLORS.border,
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.06)',
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+            '&:hover': {
+                borderColor: selected ? COLORS.pink : COLORS.blue,
+                boxShadow: '0px 6px 16px rgba(0, 0, 0, 0.08)',
+            },
+            '&:focus-visible': {
+                outline: `2px solid ${COLORS.blue}`,
+                outlineOffset: 2,
+            },
+        }}
+    >
+        <Typography
+            sx={{
+                fontWeight: 800,
+                fontSize: { mobile: '1.025rem', tablet: '1.125rem' },
+                lineHeight: 1.35,
+                color: COLORS.blue,
+                px: 0.5,
+            }}
+        >
+            {title}
+        </Typography>
+        <Typography
+            component="span"
+            sx={{
+                display: 'block',
+                mt: 0.5,
+                fontWeight: 600,
+                fontSize: { mobile: '1.0625rem', tablet: '1.125rem' },
+                color: 'text.secondary',
+            }}
+        >
+            ({count})
+        </Typography>
+    </Paper>
+);
+
 // --- Main App Component ---
 
  const StudyFilter = () => {
-    // CHANGE 1: Set initial state to null so no panel is open by default
-    const [activePanel, setActivePanel] = useState<string | null>(null);
+    const theme = useTheme();
+    const helpDialogIsNarrow = useMediaQuery(theme.breakpoints.down('tablet'));
 
-    const [selectedFilters, setSelectedFilters] = useState(new Set());
+    const [activePanel, setActivePanel] = useState<string | null>('cancer');
+    const [helpOpen, setHelpOpen] = useState(false);
+
+    const [selectedFilters, setSelectedFilters] = useState<Set<string>>(
+        () => new Set<string>()
+    );
     const [logicMessage, setLogicMessage] = useState("");
     const [isMessageManuallyEdited, setIsMessageManuallyEdited] = useState(false);
 
@@ -668,8 +823,14 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
     // Effect: Update Logic Message
     useEffect(() => {
         if (!isMessageManuallyEdited) {
-            const filters = Array.from(selectedFilters);
-            const newMessage = calculateLogicMessage(filters);
+            const filters = Array.from(selectedFilters).map(id => ({ id }));
+            const newMessage = calculateLogicMessage({
+                filters,
+                filterType,
+                plusParents,
+                includeParents,
+                getMessage,
+            });
             setLogicMessage(newMessage);
         }
     }, [selectedFilters, isMessageManuallyEdited]);
@@ -763,15 +924,6 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
         }
     }, [counts.total, logicMessage]);
 
-    interface TabChangeEvent extends React.SyntheticEvent {
-        target: EventTarget;
-    }
-
-    const handleTabChange = (event: TabChangeEvent, newValue: string | false): void => {
-        setActivePanel(newValue as string | null);
-        setSearchTerm('');
-    };
-
     const commonProps = {
         handleFilterChange, selectedFilters, searchTerm, setSearchTerm, filteredIds, isSearching, pruneHierarchy
     };
@@ -788,112 +940,133 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
 
                      }}>
           <Box
-              sx={{
-                 display: "flex",
-                   height: 96,
-                    maxHeight: 96,
-                    width: "100%",
-                   borderBottom: "1px solid #e5e7eb",
-                   flexDirection: { xs: "column", sm: "row" },
+                sx={{
+                    display: 'flex',
+                    flexDirection: { mobile: 'column', tablet: 'row' },
+                    alignItems: { tablet: 'stretch' },
+                    width: '100%',
+                    borderBottom: '1px solid',
+                    borderColor: 'grey.200',
+                    columnGap: { mobile: 0, tablet: 2, laptop: 3 },
+                    rowGap: { mobile: 2, tablet: 0 },
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        flexWrap: 'wrap',
+                        px: { mobile: 2, tablet: 2.5 },
+                        py: 2,
+                        borderRight: { tablet: `1px solid ${colors.grey300}` },
+                        flexShrink: 0,
+                        minWidth: { tablet: 200, laptop: 220 },
                     }}
-                  >
-
-              <Box
-                  sx={{
-                   px: 4,
-                  minWidth: 240,
-                  display: "flex",
-                  alignItems: "center",
-                   borderRight: "1px solid",
-                  borderColor: "grey.200",
-                  justifyContent: "center",
-                     pt: 2,
-                     }}
-                       >
+                >
                     <Typography
-                      component="h2"
-                    variant="h1"
-                          sx={{
+                        component="h2"
+                        variant="h2"
+                        sx={{
                             fontWeight: 700,
-                        color: colors.blue400,
-                         }}
-                        >
-                        Study Filters
-                    </Typography>
-
-                 </Box>
-                  <Box sx={{ display: "flex", flexGrow: 1 }}>
-                {/* Tabs */}
-                {/* CHANGE 2: Ensure value handles 'false' correctly */}
-              <Tabs
-  value={activePanel || false}
-  onChange={handleTabChange}
-  variant="fullWidth"
-  sx={{
-    width: "100%",
-    minHeight: 96,
-
-    "& .MuiTab-root": {
-      minHeight: 96,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      textAlign: "center",
-      fontSize: "1.2rem",
-      fontWeight: 600,
-      textTransform: "none",
-    },
-
-    "& .Mui-selected": {
-      color: COLORS.pink,
-    },
-
-    "& .MuiTabs-indicator": {
-      bgcolor: COLORS.pink,
-      height: 4,
-    },
-  }}
->
-                    <Tab
-                        label={<Badge badgeContent={counts.cancer} color="primary">Cancer Type</Badge>}
-                        value="cancer"
-                        sx={{ 
-            py: 0,
-            borderRadius: 0,
-            fontSize: "1.2rem",
-            fontWeight: 600,}}
-                    />
-                    <Tab
-                        label={<Badge badgeContent={counts.data} color="primary">Data Type</Badge>}
-                        value="data"
-                        sx={{ py: 3, fontWeight: 'bold' }}
-                    />
-                    <Tab
-                        label={<Badge badgeContent={counts.access} color="primary">Accessibility</Badge>}
-                        value="access"
-                        sx={{ py: 3, fontWeight: 'bold',}}
-                    />
-                </Tabs>
-                     </Box>   
-                     <Box
-                          sx={{
-                        px: 3,
-                           display: "flex",
-                             flexDirection: "column",
-                            justifyContent: "center",
-                            gap: 1,
-                            borderLeft: "1px solid",
-                              borderColor: "grey.200",
-                                  }}
-                            >
-
-                    <Button
-                        startIcon={<DeleteOutlineIcon />}
-                        onClick={clearAllFilters}
-                        color="inherit"
-                        disabled={counts.total === 0}
+                            color: colors.blue400,
+                            lineHeight: 1.2,
+                            m: 0,
+                        }}
                     >
-                        Clear Filters
+                        First filter the studies
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={() => setHelpOpen(true)}
+                        sx={{
+                            flexShrink: 0,
+                            alignSelf: 'center',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            minWidth: 0,
+                            py: 0.375,
+                            px: 1.25,
+                            lineHeight: 1.25,
+                        }}
+                    >
+                        Help
+                    </Button>
+                </Box>
+
+                <Box
+                    sx={{
+                        flex: 1,
+                        display: 'grid',
+                        gridTemplateColumns: {
+                            mobile: '1fr',
+                            tablet: 'repeat(3, minmax(0, 1fr))',
+                        },
+                        alignItems: 'stretch',
+                        columnGap: { mobile: 0, tablet: 2, laptop: 3 },
+                        rowGap: { mobile: 2, tablet: 0 },
+                        px: { mobile: 2, tablet: 1.5 },
+                        py: 2,
+                        minWidth: 0,
+                    }}
+                >
+                    <FilterCategoryCard
+                        title="Which Cancers are you interested in?"
+                        count={counts.cancer}
+                        selected={activePanel === 'cancer'}
+                        onClick={() => {
+                            setActivePanel('cancer');
+                            setSearchTerm('');
+                        }}
+                    />
+                    <FilterCategoryCard
+                        title="What kind of data do you need?"
+                        count={counts.data}
+                        selected={activePanel === 'data'}
+                        onClick={() => {
+                            setActivePanel('data');
+                            setSearchTerm('');
+                        }}
+                    />
+                    <FilterCategoryCard
+                        title="Which access restrictions apply?"
+                        count={counts.access}
+                        selected={activePanel === 'access'}
+                        onClick={() => {
+                            setActivePanel('access');
+                            setSearchTerm('');
+                        }}
+                    />
+                </Box>
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        gap: 1.25,
+                        px: { mobile: 2, tablet: 2.5 },
+                        py: 2,
+                        borderLeft: { tablet: `1px solid ${colors.grey300}` },
+                        flexShrink: 0,
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        color="inherit"
+                        onClick={clearAllFilters}
+                        disabled={counts.total === 0}
+                        sx={{
+                            textTransform: 'none',
+                            bgcolor: COLORS.white,
+                            borderColor: COLORS.border,
+                            fontWeight: 600,
+                        }}
+                    >
+                        Clear
                     </Button>
                     <Button
                         variant="contained"
@@ -903,14 +1076,15 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
                         sx={{
                             bgcolor: COLORS.pink,
                             '&:hover': { bgcolor: '#b0085d' },
-                            fontWeight: 'bold',
-                            px: 4
+                            fontWeight: 700,
+                            px: 3,
+                            textTransform: 'none',
                         }}
                     >
-                        Find Studies ({counts.total})
+                        Find ({counts.total})
                     </Button>
-                  </Box>
                 </Box>
+            </Box>
                     {/* Chip Area / Logic Summary (Always visible if filters exist) */}
                         <FilterChipArea
                             selectedFilters={selectedFilters}
@@ -927,8 +1101,155 @@ const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, s
                         {activePanel === 'data' && <DataTypePanel {...commonProps} />}
                         {activePanel === 'access' && <AccessibilityPanel {...commonProps} />}
                     </Box>
-              
-             
+
+            <Dialog
+                open={helpOpen}
+                onClose={() => setHelpOpen(false)}
+                maxWidth={false}
+                scroll="paper"
+                aria-labelledby="study-filter-help-title"
+                PaperProps={{
+                    /* Inline width/maxWidth so sizing wins over MUI Dialog’s default
+                       maxWidth: calc(100% - 64px) when maxWidth={false}. */
+                    style: {
+                        width: helpDialogIsNarrow ? 'min(92vw, calc(100vw - 32px))' : '42vw',
+                        maxWidth: helpDialogIsNarrow ? 'min(92vw, calc(100vw - 32px))' : '42vw',
+                    },
+                    sx: {
+                        borderRadius: '10px',
+                        boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.14)',
+                        m: 2,
+                        height: '85vh',
+                        maxHeight: '85vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                        boxSizing: 'border-box',
+                    },
+                }}
+            >
+                <DialogTitle
+                    id="study-filter-help-title"
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        flexShrink: 0,
+                        py: 2.5,
+                        px: 3,
+                        pr: 1,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        fontWeight: 700,
+                        fontSize: '1.5rem',
+                        lineHeight: 1.3,
+                        color: COLORS.blue,
+                    }}
+                >
+                    How to use filters
+                    <IconButton
+                        type="button"
+                        aria-label="Close help"
+                        onClick={() => setHelpOpen(false)}
+                        edge="end"
+                        size="medium"
+                        sx={{ color: 'text.secondary' }}
+                    >
+                        <CloseIcon fontSize="medium" />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent
+                    sx={{
+                        flex: 1,
+                        minHeight: 0,
+                        px: { xs: 2.5, sm: 3 },
+                        py: 3,
+                        overflowY: 'auto',
+                        '& .MuiTypography-body1': {
+                            fontSize: '1.125rem',
+                            lineHeight: 1.75,
+                        },
+                        '& .MuiTypography-subtitle1': {
+                            fontSize: '1.25rem',
+                            lineHeight: 1.35,
+                        },
+                    }}
+                >
+                    <Typography variant="body1" sx={{ lineHeight: 1.75, color: 'text.primary', mb: 0 }}>
+                        The list of studies can be filtered to pick out those relating to specific cancers, including
+                        particular data or matching your accessibility needs.
+                    </Typography>
+
+                    <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 700, color: COLORS.pink, mt: 3, mb: 1 }}>
+                        1. Selecting Categories
+                    </Typography>
+                    <Typography variant="body1" sx={{ lineHeight: 1.75, color: 'text.primary' }}>
+                        Use the three cards above to move between{' '}
+                        <strong>Which Cancers are you interested in?</strong>,{' '}
+                        <strong>What kind of data do you need?</strong>, and{' '}
+                        <strong>Which access restrictions apply?</strong> You can search for cancers using CRUK terms,
+                        TCGA codes, or ICD-O classifications.
+                    </Typography>
+
+                    <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 700, color: COLORS.pink, mt: 3, mb: 1 }}>
+                        2. Searching for Terms
+                    </Typography>
+                    <Typography variant="body1" sx={{ lineHeight: 1.75, color: 'text.primary' }}>
+                        In each category, use the search bar to find specific terms. You must enter at least{' '}
+                        <strong>4 characters</strong> to start the search.
+                    </Typography>
+
+                    <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 700, color: COLORS.pink, mt: 3, mb: 1 }}>
+                        3. Expanding Options
+                    </Typography>
+                    <Typography variant="body1" sx={{ lineHeight: 1.75, color: 'text.primary' }}>
+                        Wherever there is a <strong>chevron (&gt;)</strong> next to a filter name, you can click to see more
+                        specific sub-categories.
+                    </Typography>
+
+                    <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 700, color: COLORS.pink, mt: 3, mb: 1 }}>
+                        4. Adjusting Logic
+                    </Typography>
+                    <Typography variant="body1" sx={{ lineHeight: 1.75, color: 'text.primary' }}>
+                        Filters appear as chips. You can manually edit the <strong>Filter Logic</strong> text box if you need
+                        to customise how your selections are combined.
+                    </Typography>
+                </DialogContent>
+                <DialogActions
+                    sx={{
+                        flexShrink: 0,
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                        px: 3,
+                        py: 2,
+                        justifyContent: 'flex-end',
+                        bgcolor: 'background.paper',
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        onClick={() => setHelpOpen(false)}
+                        sx={{
+                            bgcolor: COLORS.blue,
+                            color: COLORS.white,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '1.0625rem',
+                            px: 2.75,
+                            py: 1.125,
+                            borderRadius: 1.5,
+                            boxShadow: 'none',
+                            '&:hover': {
+                                bgcolor: '#003d7a',
+                                boxShadow: 'none',
+                            },
+                        }}
+                    >
+                        Got it
+                    </Button>
+                </DialogActions>
+            </Dialog>
       </Box>
     );
 };

@@ -4,9 +4,33 @@ import { NextRequest, NextResponse } from "next/server";
 import apis from "@/config/apis";
 import config from "@/config/config";
 import { sessionHeader, sessionPrefix } from "@/config/session";
-import { extractSubdomain } from "@/utils/general";
+import { getJwtCookieDomain } from "@/utils/general";
 import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders, withPartnerAuthBody } from "@/utils/partnerHeaders";
+
+function getPartnerContextFromRequest(request: NextRequest): string | undefined {
+    const raw = request.headers.get("x-partner-context")?.trim();
+    return raw ? raw : undefined;
+}
+
+function getPartnerHeadersForRequest(request: NextRequest) {
+    const partner = getPartnerContextFromRequest(request);
+    if (partner) return { "x-partner-context": partner };
+    return getPartnerHeaders();
+}
+
+function withPartnerProviderFromRequest<T extends Record<string, unknown>>(
+    request: NextRequest,
+    body: T
+): T & { provider?: string } {
+    const partner = getPartnerContextFromRequest(request)?.toLowerCase();
+    if (partner === "cruk" && body.provider == null) {
+        return { ...body, provider: "cruk" };
+    }
+
+    return withPartnerAuthBody(body);
+}
 
 export async function POST(request: NextRequest) {
     const session = await getSessionCookie();
@@ -38,8 +62,11 @@ export async function POST(request: NextRequest) {
             headers: {
                 "Content-Type": "application/json",
                 [sessionHeader]: sessionPrefix + session,
+                ...getPartnerHeadersForRequest(request),
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify(
+                withPartnerProviderFromRequest(request, { email, password })
+            ),
         });
 
         if (!response.ok) {
@@ -128,15 +155,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const cookieDomain = getJwtCookieDomain(
+            request.nextUrl.hostname,
+            apis.apiV1IPUrl as string
+        );
+
         const cookie = serialize(config.JWT_COOKIE, token, {
             maxAge: 60 * 60 * 24 * 30, // 30 days
             path: "/",
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            ...(process.env.NODE_ENV !== "development" && {
-                domain: extractSubdomain(apis.apiV1IPUrl as string) || "",
-            }),
+            ...(cookieDomain && { domain: cookieDomain }),
         });
 
         const nextResponse = NextResponse.json(

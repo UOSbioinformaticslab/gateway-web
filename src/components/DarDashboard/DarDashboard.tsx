@@ -371,8 +371,11 @@ export default function DarDashboard({
             <Pagination
                 sx={{ mt: 2 }}
                 isLoading={isLoading}
-                page={data?.currentPage}
-                count={data?.lastPage}
+                page={
+                    data?.currentPage ??
+                    Math.max(1, Number.parseInt(queryParams.page, 10) || 1)
+                }
+                count={data?.lastPage ?? 1}
                 onChange={(_, page: number) =>
                     setQueryParams({
                         ...queryParams,

@@ -14,6 +14,7 @@ const CheckboxRow = <
     TName extends Path<TFieldValues>
 >({
     title,
+    formControlSx,
     ...rest
 }: CheckboxRowProps<FieldValues, TName>) => {
     return (
@@ -21,9 +22,11 @@ const CheckboxRow = <
             sx={{
                 display: "flex",
                 alignItems: "center",
+                mb: 0,
+                ...formControlSx,
             }}>
             <Typography sx={{ width: "100px" }}>{title}</Typography>
-            <StyledCheckbox formControlSx={{ marginBottom: 0 }} {...rest} />
+            <StyledCheckbox {...rest} />
         </Box>
     );
 };

@@ -25,13 +25,8 @@ export interface DatasetSection {
 
 const datasetFields: DatasetSection[] = [
     {
-        sectionName: "Keywords",
-        fields: [
-            {
-                path: "metadata.metadata.summary.keywords",
-                type: FieldType.TAG_LIST,
-            },
-        ],
+        sectionName: "Project",
+        fields: [],
     },
     {
         sectionName: "Summary",
@@ -103,100 +98,50 @@ const datasetFields: DatasetSection[] = [
         ],
     },
     {
-        sectionName: "Data Access Request",
+        sectionName: "Other Data Types",
+        fields: [],
+    },
+    {
+        sectionName: "Entity Relationship Diagrams",
         fields: [
             {
-                path: "metadata.metadata.documentation.inPipeline",
-                type: FieldType.TEXT,
-                label: "Dataset pipeline status",
-                tooltip:
-                    "Indication of whether the dataset is available for access requests, or if the Data Custodian is preparing this dataset for research use in the future.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.accessRights",
-                type: FieldType.LIST,
-                label: "Access rights",
-                tooltip:
-                    "The webpage where the data access request process and/or guidance is provided.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.deliveryLeadTime",
-                type: FieldType.TEXT,
-                label: "Time to dataset access",
-                tooltip:
-                    "Indication of the typical processing times based on the types of requests typically received.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.accessRequestCost",
-                type: FieldType.LIST,
-                label: "Access request cost",
-                tooltip:
-                    "Webpage or description detailing the service or cost model for processing data access requests.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.accessServiceCategory",
-                type: FieldType.TEXT,
-                label: "Access method category",
-                tooltip:
-                    "The method a Researcher will use to access the dataset, if approved.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.accessMode",
-                type: FieldType.TEXT,
-                label: "Access mode",
-                tooltip:
-                    "Indication of the application type to enable research access.",
-            },
-
-            {
-                path: "metadata.metadata.accessibility.access.accessService",
-                type: FieldType.TEXT,
-                label: "Access service description",
-                tooltip:
-                    "A brief description of the data access services that are available from the Data Custodian.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.jurisdiction",
-                type: FieldType.LIST,
-                label: "Jurisdiction",
-                tooltip:
-                    "ISO 3166-1 country codes and the associated SO 3166-2 for regions, cities, states, etc. for the country/state under whose laws the data subject's data is collected, processed and stored. Multiple jurisdictions might be provided.",
-            },
-            {
-                path: "metadata.metadata.accessibility.usage.dataUseLimitation",
-                type: FieldType.TEXT,
-                label: "Data use limitation",
-                tooltip:
-                    "Indication of consent permissions for datasets and/or materials, and relates to the purposes for which datasets and/or material might be removed, stored or used.",
-            },
-            {
-                path: "metadata.metadata.accessibility.usage.dataUseRequirements",
-                type: FieldType.TEXT,
-                label: "Data use requirements",
-                tooltip:
-                    "Indication of whether there are any additional conditions set for use if any, multiple requirements may be provided.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.dataController",
-                type: FieldType.LIST,
-                label: "Data Controller",
-                tooltip:
-                    "The person/entity who (either alone or jointly or in common with other persons/entities) determines the purposes for which and the way any Data Subject data, specifically personal data or are to be processed.",
-            },
-            {
-                path: "metadata.metadata.accessibility.access.dataProcessor",
-                type: FieldType.LIST,
-                label: "Data Processor",
-                tooltip:
-                    "The person(s)/entity (other than an employee of the Data Controller) who process the data on behalf of the Data Controller.",
-            },
-            {
+                label: "Investigations",
                 path: "metadata.metadata.enrichmentAndLinkage.investigations",
                 type: FieldType.LIST,
-                label: "Investigations",
-                tooltip: "Weblink to any active projects using the dataset.",
+                tooltip:
+                    "Website address(es) which document information related to active projects utilising the Dataset and or BioSample(s).",
+            },
+            {
+                label: "Tools",
+                path: "metadata.metadata.enrichmentAndLinkage.tools",
+                type: FieldType.LIST,
+                tooltip:
+                    "URL(s) of any analysis tool(s) or models that have been created for this Dataset & BioSample and are available for further use.",
             },
         ],
+    },
+    {
+        sectionName: "Observations",
+        fields: [
+            {
+                path: "metadata.metadata.observations",
+                type: FieldType.TEXT,
+            },
+        ],
+    },
+    {
+        sectionName: "Demographics",
+        fields: [
+            {
+                path: "metadata.metadata.demographicFrequency",
+                // Not rendered via standard field rendering; handled specially in UI.
+                type: FieldType.TEXT,
+            },
+        ],
+    },
+    {
+        sectionName: "Omics",
+        fields: [],
     },
     {
         sectionName: "Provenance",
@@ -244,39 +189,27 @@ const datasetFields: DatasetSection[] = [
         ],
     },
     {
-        sectionName: "Observations",
+        sectionName: "Enrichment & Linkage",
         fields: [
             {
-                path: "metadata.metadata.observations",
-                type: FieldType.TEXT,
-            },
-        ],
-    },
-    {
-        sectionName: "Demographics",
-        fields: [
-            {
-                path: "metadata.metadata.demographicFrequency",
-                type: FieldType.TAG,
-            },
-        ],
-    },
-    {
-        sectionName: "Enrichment and Linkage",
-        fields: [
-            {
-                label: "Investigations",
-                path: "metadata.metadata.enrichmentAndLinkage.investigations",
+                path: "metadata.metadata.enrichmentAndLinkage.datasetLinkage.isDerivedFrom",
                 type: FieldType.LIST,
-                tooltip:
-                    "Website address(es) which document information related to active projects utilising the Dataset and or BioSample(s).",
+                label: "Derived From",
             },
             {
-                label: "Tools",
                 path: "metadata.metadata.enrichmentAndLinkage.tools",
                 type: FieldType.LIST,
-                tooltip:
-                    "URL(s) of any analysis tool(s) or models that have been created for this Dataset & BioSample and are available for further use.",
+                label: "Tools",
+            },
+            {
+                path: "metadata.metadata.enrichmentAndLinkage.investigations",
+                type: FieldType.LIST,
+                label: "Investigations",
+            },
+            {
+                path: "metadata.metadata.enrichmentAndLinkage.datasetLinkage.linkedDatasets",
+                type: FieldType.LIST,
+                label: "Similar To Datasets",
             },
         ],
     },

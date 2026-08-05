@@ -11,7 +11,7 @@ export const FormWrapper = styled(Box)(() => ({
     flexDirection: "column",
     justifyContent: "center",
     maxWidth: "100%",
-    width: "100%",
+    width: "auto",
     padding: 0,
     paddingBottom: 5,
     paddingTop: 0,
@@ -21,8 +21,8 @@ export const SearchForm = styled(Form)(({ theme }) => ({
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(1),
-    marginTop: 8,
-    marginBottom: 18,
+    marginTop: 0,
+    marginBottom: 0,
 
     [theme.breakpoints.up("tablet")]: {
         gap: theme.spacing(6),
@@ -37,9 +37,9 @@ export const InputWrapper = styled(Box)(() => ({
 
 export const SearchInput = styled(TextFieldBase)(() => ({
     fontSize: "1.25rem",
-    marginBottom: 0,
-    paddingBottom: 8,
-    paddingTop: 8,
+    marginBottom: 1,
+    paddingBottom: 4,
+    paddingTop: 5,
     backgroundColor: "white",
 
     "& fieldset": { border: "none" },

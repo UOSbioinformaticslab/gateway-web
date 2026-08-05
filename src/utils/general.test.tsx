@@ -3,6 +3,7 @@ import {
     splitCamelcase,
     getTrimmedpathname,
     extractSubdomain,
+    getJwtCookieDomain,
     convertToCamelCase,
     parseStaticImagePaths,
 } from "./general";
@@ -24,6 +25,51 @@ describe("General utils", () => {
         expect(extractSubdomain("https://api.foo.bar.baz.uk/api/v1")).toEqual(
             ".foo.bar.baz.uk"
         );
+    });
+
+    describe("getJwtCookieDomain", () => {
+        const apiUrl = "https://api.hub.cancerresearchuk.org/api/v1";
+        const originalNodeEnv = process.env.NODE_ENV;
+
+        afterEach(() => {
+            Object.defineProperty(process.env, "NODE_ENV", {
+                value: originalNodeEnv,
+                configurable: true,
+            });
+        });
+
+        it("returns undefined in development", () => {
+            Object.defineProperty(process.env, "NODE_ENV", {
+                value: "development",
+                configurable: true,
+            });
+            expect(
+                getJwtCookieDomain("hub.cancerresearchuk.org", apiUrl)
+            ).toBeUndefined();
+        });
+
+        it("returns shared parent domain for matching hosts", () => {
+            Object.defineProperty(process.env, "NODE_ENV", {
+                value: "production",
+                configurable: true,
+            });
+            expect(getJwtCookieDomain("hub.cancerresearchuk.org", apiUrl)).toBe(
+                ".hub.cancerresearchuk.org"
+            );
+            expect(
+                getJwtCookieDomain("www.hub.cancerresearchuk.org", apiUrl)
+            ).toBe(".hub.cancerresearchuk.org");
+        });
+
+        it("returns undefined for unrelated hosts such as Vercel previews", () => {
+            Object.defineProperty(process.env, "NODE_ENV", {
+                value: "production",
+                configurable: true,
+            });
+            expect(
+                getJwtCookieDomain("gateway-web-five.vercel.app", apiUrl)
+            ).toBeUndefined();
+        });
     });
 
     it("should convert path string to camelcase", async () => {

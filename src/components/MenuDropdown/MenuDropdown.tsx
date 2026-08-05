@@ -2,7 +2,7 @@ import { MouseEvent, MouseEventHandler } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import Link from "next/link";
 import useDialog from "@/hooks/useDialog";
-import theme, { colors } from "@/config/theme";
+import { colors } from "@/config/theme";
 import { MarkDownSanitizedWithHtml } from "../MarkDownSanitizedWithHTML";
 
 interface MenuDropdownProps {
@@ -70,7 +70,9 @@ function MenuDropdown({
                         <MenuItem
                             sx={{
                                 maxWidth: 250,
-                                color: theme.palette.primary.main,
+                                color: colors.black,
+                                fontWeight: 700,
+                                fontSize: "1.125rem",
                                 textWrap: "initial",
                                 borderBottom: `${colors.grey300} 1px solid`,
                             }}
@@ -122,7 +124,9 @@ function MenuDropdown({
                         key={menuItem.key ?? menuItem.label}
                         sx={{
                             maxWidth: 250,
-                            color: theme.palette.primary.main,
+                            color: colors.black,
+                            fontWeight: 700,
+                            fontSize: "1.125rem",
                             textWrap: "initial",
                             borderBottom: `${colors.grey300} 1px solid`,
                         }}

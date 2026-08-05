@@ -1,5 +1,6 @@
 import type { Adapter } from "@vercel/flags";
 import apis from "@/config/apis";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 let cache: Record<string, boolean> | null = null;
 let cacheTimestamp: number | null = null;
@@ -10,19 +11,41 @@ type FeatureFlagNode = {
     features?: Record<string, FeatureFlagNode>;
 };
 
-type FeatureFlagsApiResponse = Record<string, FeatureFlagNode>;
-
-const flattenFlags = (
-    obj: FeatureFlagsApiResponse,
+const parseFeatureFlagPayload = (
+    json: unknown,
     prefix = ""
 ): Record<string, boolean> => {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        acc[fullKey] = !!value.enabled;
+    const unwrapped =
+        json &&
+        typeof json === "object" &&
+        "data" in json &&
+        (json as { data?: unknown }).data != null &&
+        typeof (json as { data: unknown }).data === "object"
+            ? (json as { data: Record<string, unknown> }).data
+            : (json as Record<string, unknown>);
 
-        if (value.features) {
-            const nested = flattenFlags(value.features, fullKey);
-            Object.assign(acc, nested);
+    if (!unwrapped || typeof unwrapped !== "object") {
+        return {};
+    }
+
+    return Object.entries(unwrapped).reduce((acc, [key, value]) => {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+
+        if (typeof value === "boolean") {
+            acc[fullKey] = value;
+            return acc;
+        }
+
+        if (value && typeof value === "object" && "enabled" in value) {
+            const node = value as FeatureFlagNode;
+            acc[fullKey] = !!node.enabled;
+
+            if (node.features) {
+                Object.assign(
+                    acc,
+                    parseFeatureFlagPayload(node.features, fullKey)
+                );
+            }
         }
 
         return acc;
@@ -30,19 +53,36 @@ const flattenFlags = (
 };
 
 const setCache = async (): Promise<Record<string, boolean>> => {
+    const urls = [apis.enabledFeatureFlags, apis.enabledFeatures];
+    const errors: string[] = [];
+
     try {
-        const res = await fetch(apis.enabledFeatures);
-        if (!res.ok) {
-            console.error(`Failed to fetch feature flags: ${res.statusText}`);
-            return {};
+        for (const url of urls) {
+            const res = await fetch(url, {
+                headers: {
+                    ...getPartnerHeaders(),
+                },
+            });
+
+            if (!res.ok) {
+                errors.push(`${url}: ${res.statusText}`);
+                continue;
+            }
+
+            const json = await res.json();
+            cacheTimestamp = Date.now();
+            return parseFeatureFlagPayload(json);
         }
 
-        const json: FeatureFlagsApiResponse = await res.json();
+        if (errors.length > 0) {
+            console.warn(`Failed to fetch feature flags: ${errors.join("; ")}`);
+        }
+
         cacheTimestamp = Date.now();
-        return flattenFlags(json);
+        return {};
     } catch (err) {
-        console.error(
-            "Error fetching feature flags:, will retry after cache is stale",
+        console.warn(
+            "Error fetching feature flags, will retry after cache is stale",
             err
         );
         cacheTimestamp = Date.now();
@@ -54,6 +94,11 @@ const isCacheStale = () => {
     if (!cacheTimestamp) return true;
     return Date.now() - cacheTimestamp > CACHE_TTL_MS;
 };
+
+export function resetGatewayFlagCache() {
+    cache = null;
+    cacheTimestamp = null;
+}
 
 export function createGatewayFlagAdapter() {
     return function gatewayFlagAdapter<ValueType, EntitiesType>(): Adapter<

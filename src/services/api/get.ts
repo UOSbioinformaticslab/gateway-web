@@ -1,6 +1,7 @@
-import Cookies from "js-cookie";
-import { sessionCookie, sessionHeader, sessionPrefix } from "@/config/session";
+import { sessionHeader, sessionPrefix } from "@/config/session";
+import getClientSessionId from "@/utils/getClientSessionId";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 import { errorNotification } from "./utils";
 
 const CONTENT_TYPE_EXCEL =
@@ -13,7 +14,7 @@ const getRequest = async <T>(
 ): Promise<T | unknown> => {
     const { withPagination, notificationOptions } = options;
     const { errorNotificationsOn = true, ...props } = notificationOptions;
-    const session = Cookies.get(sessionCookie)!;
+    const session = getClientSessionId();
 
     if (process.env.NEXT_PUBLIC_LOG_LEVEL === "debug") {
         const message = {
@@ -26,7 +27,10 @@ const getRequest = async <T>(
     try {
         const response = await fetch(url, {
             credentials: "include",
-            headers: { [sessionHeader]: sessionPrefix + session },
+            headers: {
+                [sessionHeader]: sessionPrefix + session,
+                ...getPartnerHeaders(),
+            },
         });
 
         if (response.ok) {

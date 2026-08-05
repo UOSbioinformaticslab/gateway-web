@@ -21,6 +21,7 @@ interface StructuralMetadataColumn {
 interface StructuralMetadata {
     name: string;
     description: string;
+    size?: string;
     columns: StructuralMetadataColumn[];
 }
 

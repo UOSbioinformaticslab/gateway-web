@@ -11,7 +11,7 @@ import Button from "@/components/Button";
 import { ChevronThinIcon } from "@/consts/icons";
 import {
     ActiveLinkWrapper,
-    BookmarkText,
+    OverviewText,
     Wrapper,
 } from "./ActiveListSidebar.styles";
 
@@ -20,10 +20,12 @@ const MOBILE_SCROLL_OFFSET = 60;
 
 const ActiveListSidebar = ({
     items,
+    footer,
 }: {
     items: {
         label: string;
     }[];
+    footer?: React.ReactNode;
 }) => {
     const t = useTranslations(TRANSLATION_PATH);
 
@@ -86,13 +88,15 @@ const ActiveListSidebar = ({
             {!isMobile && (
                 <Wrapper
                     sx={{ gridColumn: { tablet: "span 1", laptop: "span 1" } }}>
-                    <BookmarkText>{t("bookmarks")}</BookmarkText>
+                    <OverviewText variant="h3">{t("overview")}</OverviewText>
                     <ActiveLinkWrapper>
                         <ActiveList
                             items={items}
                             handleClick={handleScroll}
                             activeItem={activeItem}
+                            variant="sidebar"
                         />
+                        {footer && <Box sx={{ mt: 2 }}>{footer}</Box>}
                     </ActiveLinkWrapper>
                 </Wrapper>
             )}
@@ -128,7 +132,7 @@ const ActiveListSidebar = ({
                             }}
                             variant="text"
                             endIcon={<ChevronThinIcon color="primary" />}>
-                            {t("bookmarks")}
+                            {t("overview")}
                         </Button>
                         <Menu
                             id="bookmark-menu"

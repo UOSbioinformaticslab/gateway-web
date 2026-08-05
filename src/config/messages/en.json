@@ -159,8 +159,8 @@
             "readMore": "Read more"
         },
         "dataCustodianSupport": {
-            "title": "Data Custodian Area",
-            "backToSupport": "Back to Data Custodian Area",
+            "title": "Data Custodians",
+            "backToSupport": "Back to Data Custodians",
             "gatewaySchemaTitle": "Gateway Schema",
             "uploadingToolsTitle": "Uploading Analysis Scripts & Software",
             "metadataOnboardingTitle": "Metadata Onboarding and Integrations",
@@ -207,6 +207,20 @@
             "faqs": {
                 "title": "FAQs"
             }
+        },
+        "help": {
+            "title": "Help",
+            "supportCentreHeading": "Support Centre",
+            "exploringDatahubTitle": "Exploring Datahub Page",
+            "exploringDatahubDescription": "Browse and access curated data resources for your research.",
+            "uploadingMetadataTitle": "Uploading Metadata",
+            "uploadingMetadataDescription": "Upload and manage your metadata quickly and correctly with the guidance provided in this section.",
+            "researcherFaqsTitle": "Researcher FAQs",
+            "researcherFaqsDescription": "Find answers to common questions about using the data hub.",
+            "dataUsesTitle": "Exploring Data Uses or Research Projects",
+            "darTitle": "Submitting Data Access Requests",
+            "publicationsTitle": "Uploading Publications",
+            "comingSoon": "Coming Soon..."
         },
         "releases": {
             "noResults": "There are no releases for {year}",
@@ -507,7 +521,8 @@
                             "guidance": "Guidance",
                             "next": "Next",
                             "previous": "Previous",
-                            "welcomeMessage": "Welcome to dataset metadata on-boarding",
+                            "metadataSections": "Metadata Sections",
+                            "welcomeMessage": "Guide to Uploading and Modifying Metadata",
                             "legendIntro": "You will see a legend to help you as you on-board your dataset metadata",
                             "toolTipText": "This has automatically been populated with the name of this Team. To change this, start typing or select a Data Custodian from the drop down list.",
                             "progressLegend": "Progress legend:",
@@ -549,23 +564,17 @@
                             },
                             "errorLoading": "An error occured while loading the Dataset",
                             "structuralMetadata": {
-                                "intro": "Upload a file with the description of all table and data elements that are included in the dataset. This will be rendered in tabular format for a researcher to review the dataset table(s).",
-                                "metadataFieldHeader": "Metadata field",
-                                "metadataField1": "Table name <red>*</red>",
-                                "metadataField2": "Table description",
-                                "metadataField3": "Column name <red>*</red>",
-                                "metadataField4": "Column description <red>*</red>",
-                                "metadataField5": "Data type <red>*</red>",
-                                "metadataField6": "Sensitive <red>*</red>",
-                                "completionGuidanceHeader": "Completion Guidance",
-                                "completionGuidance1": "Name of the table in the dataset. Use a fully qualified name if appropriate.",
-                                "completionGuidance2": "Description of the table in the dataset.",
-                                "completionGuidance3": "Name of the column in the table dataset.",
-                                "completionGuidance4": "Description of the column in the table dataset.",
-                                "completionGuidance5": "Type of data contained in the column.",
-                                "completionGuidance6": "Please indicate (using True / False) whether the information must be treated as sensitive and may need additional constraints / removal / anonymisation / masking through the data access request process. <bold>Definition:</bold> An ODRL conformant policy expressing the rights associated with the resource.",
-                                "downloadTemplate": "Download data dictionary template",
-                                "uploadSuccess": "Warning! Uploaded files are automatically saved to the dataset metadata. Uploading a new file will delete the previously uploaded structural metadata.",
+                                "tableNameHeader": "Table Name",
+                                "tableDescriptionHeader": "Table Description",
+                                "tableSizeHeader": "Table Size",
+                                "columnNameHeader": "Column Name",
+                                "dataTypeHeader": "Data Type",
+                                "placeholderTableName": "[Enter new table name]",
+                                "placeholderTableDescription": "[Enter table description]",
+                                "placeholderTableSize": "[Enter table size]",
+                                "placeholderColumnName": "[Enter column name]",
+                                "placeholderDataType": "[Enter data type]",
+                                "uploadSuccess": "Structural metadata uploaded successfully.",
                                 "uploadMessage": "Please wait while we scan and process your file. When processing has finished, your data will display below and you will be able to submit the Metadata to the Gateway. Scanning and processing typically takes 30-45 seconds, please do not leave this page"
                             },
                             "discardChanges": "Discard changes",
@@ -1014,6 +1023,44 @@
             },
             "newsEvents": {
                 "seeAllLink": "See all events"
+            },
+            "hero": {
+                "headline": "Accelerating Progress in Cancer Research",
+                "searchPlaceholder": "Search cancer research data & studies...",
+                "searchButton": "Search"
+            },
+            "finderPanel": {
+                "title": "What would you like to find today?",
+                "intro": "Welcome to the CRUK Data Hub, your gateway to data produced by research funded through Cancer Research UK",
+                "horizonsLink": "Explore Cancer Research Horizons Data Resources",
+                "browseSearchDatasets": "Browse or Search Datasets",
+                "browseSearchProjects": "Browse or Search Projects",
+                "browseSearchAssociatedTools": "Browse or Search Associated Tools",
+                "browseSearchAssociatedPublications": "Browse or Search Associated Publications"
+            },
+            "featuredResearch": {
+                "title": "Featured Research",
+                "viewAll": "View all studies",
+                "card1": {
+                    "title": "Genomics and Cancer Risk",
+                    "description": "Exploring genetic factors in cancer susceptibility"
+                },
+                "card2": {
+                    "title": "Immunotherapy Trials",
+                    "description": "New advances in cancer immunotherapy"
+                },
+                "card3": {
+                    "title": "AI in Cancer Detection",
+                    "description": "Harnessing AI for early cancer diagnosis"
+                }
+            },
+            "researchPartners": {
+                "title": "Our Research Partners"
+            },
+            "cta": {
+                "discoverData": "Discover Data",
+                "findStudies": "Find Studies",
+                "collaborate": "Collaborate for a Cure"
             }
         },
         "saved_searches": {
@@ -1062,7 +1109,7 @@
             "dataCustodianNetworksTooltip": "Discover networks of Data Custodians to learn about the resources available across a network e.g. the NHS England SDE Network or the Research Data Scotland Network.",
             "collectionsHeader": "Collections",
             "searchHeader": "Search the Gateway",
-            "searchExplainerDatasets": "Search, for example, by Dataset, SNOMED code, LOINC term, Read code, ICD10 code, MESH term, keywords",
+            "searchExplainerDatasets": "",
             "searchExplainerDataUse": "Search, for example, by project title, lay or technical summary, funders and sponsors, keywords",
             "searchExplainerPublications": "Search, for example, by Publication title, Publication DOI, journal name, authors, Dataset title, Dataset DOI, keywords",
             "searchExplainerCollections": "Search, for example, by Collection name, keywords",
@@ -1606,7 +1653,7 @@
             "noFilters": "No filters available"
         },
         "Footer": {
-            "copyright": "HDR UK {year}. All rights reserved.",
+            "copyright": "University of Sussex {year}. All rights reserved.",
             "visitHDRUKSite": "Visit the HDR UK Site",
             "termsConditions": "Terms and conditions",
             "privacyPolicy": "Privacy policy",
@@ -1618,7 +1665,9 @@
             "labels": {
                 "myAccount": "My Account",
                 "signIn": "Sign in",
-                "help": "Help"
+                "help": "Help",
+                "forResearchers": "For Researchers",
+                "joinUs": "Join Us"
             }
         },
         "Loading": {
@@ -1694,7 +1743,11 @@
             }
         },
         "ActiveListSidebar": {
-            "bookmarks": "Bookmarks"
+            "bookmarks": "Bookmarks",
+            "overview": "Overview"
+        },
+        "FilterTags": {
+            "filterTags": "Filters & Tags"
         },
         "dialogs": {
             "DarEnquiryDialog": {

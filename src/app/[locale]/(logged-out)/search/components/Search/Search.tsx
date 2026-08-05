@@ -108,9 +108,11 @@ import { FILTER_TYPE_MAPPING } from "@/consts/search";
 import {
     cleanSearchFilters,
     getAllSelectedFilters,
+    isQueryEmpty,
     pickOnlyFilters,
 } from "@/utils/filters";
 import { getAllParams, getSaveSearchFilters } from "@/utils/search";
+import { getPartnerContext } from "@/utils/partnerHeaders";
 import useAddLibraryModal from "../../hooks/useAddLibraryModal";
 import DataCustodianNetwork from "../DataCustodianNetwork";
 import FilterChips from "../FilterChips";
@@ -188,6 +190,8 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             ViewType.TABLE
     );
 
+    const [synopsesExpanded, setSynopsesExpanded] = useState(true);
+
     const updateQueryString = useCallback(
         (name: string, value: string) => {
             const params = new URLSearchParams(searchParams?.toString());
@@ -240,6 +244,8 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         [FILTER_COHORT_DISCOVERY]: getParamArray(FILTER_COHORT_DISCOVERY),
         [FILTER_STUDY]: getParamArray(FILTER_STUDY),
     });
+
+    const showDatasetFilterPanel = queryParams.type === SearchCategory.DATASETS;
 
     const [datasetNamesArray, setDatasetNamesArray] = useState<string[]>([]);
 
@@ -337,12 +343,23 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         queryParams
     );
 
+    const hasSearchCriteria = useMemo(() => {
+        const hasQuery = !!queryParams.query && queryParams.query.trim() !== "";
+        const hasFilters = !isQueryEmpty(selectedFilters);
+        return hasQuery || hasFilters;
+    }, [queryParams.query, selectedFilters]);
+
     const {
         data,
         isLoading: isSearching,
         mutate,
     } = usePostSwr<SearchPaginationType<SearchResult>>(
-        `${apis.searchV1Url}/${queryParams.type}?view_type=mini&per_page=${
+        `${apis.searchV1Url}/${queryParams.type}?${
+            queryParams.type === SearchCategory.DATASETS &&
+            getPartnerContext().toUpperCase() === "CRUK"
+                ? ""
+                : "view_type=mini&"
+        }per_page=${
             queryParams.per_page
         }&page=${queryParams.page}&sort=${queryParams.sort}${
             queryParams.type === SearchCategory.PUBLICATIONS
@@ -356,10 +373,12 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         {
             keepPreviousData: true,
             withPagination: true,
+            errorNotificationsOn: false,
             shouldFetch:
                 forceSearch ||
                 queryParams.type !== SearchCategory.PUBLICATIONS ||
-                queryParams.source === GATEWAY_SOURCE_FIELD ||
+                (queryParams.source === GATEWAY_SOURCE_FIELD &&
+                    hasSearchCriteria) ||
                 (queryParams.source === EUROPE_PMC_SOURCE_FIELD &&
                     !!queryParams.query),
         }
@@ -372,6 +391,18 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             filter_list: cleanSearchFilters(queryParams, filtersList),
         });
     }, [queryParams]);
+
+    useEffect(() => {
+        if (isSearching || data?.lastPage == null) {
+            return;
+        }
+
+        const currentPage = parseInt(queryParams.page, 10);
+        if (currentPage > data.lastPage) {
+            setQueryParams(prev => ({ ...prev, page: "1" }));
+            updatePath(PAGE_FIELD, "1");
+        }
+    }, [data?.lastPage, isSearching, queryParams.page, updatePath]);
 
     const saveSearchQuery = usePost<SavedSearchPayload>(
         apis.saveSearchesV1Url,
@@ -478,6 +509,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                         libraryData={libraryData}
                         isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
                         cohortDiscovery={cohortDiscovery}
+                        showSynopsis={synopsesExpanded}
                     /> 
                 ); */
                 return null;
@@ -486,6 +518,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                     <ResultCardPublication
                         result={result as SearchResultPublication}
                         key={resultId}
+                        showSynopsis={synopsesExpanded}
                     />
                 );
             case SearchCategory.COLLECTIONS:
@@ -501,7 +534,12 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                     />
                 );
             case SearchCategory.TOOLS:
-                return <ResultCardTool result={result as SearchResultTool} />;
+                return (
+                    <ResultCardTool
+                        result={result as SearchResultTool}
+                        showSynopsis={synopsesExpanded}
+                    />
+                );
             default:
                 return (
                     <ResultCardDataUse
@@ -520,12 +558,26 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         onContinue: () => mutateLibraries(),
     });
 
-    const renderResults = () =>
-        resultsView === ViewType.TABLE && !isMobile && !isTabletOrLaptop ? (
+    const renderResults = () => {
+        // Dataset cards for list view are currently not implemented (renderResultCard returns null),
+        // so on smaller breakpoints we must keep the table visible to avoid an empty results area.
+        if (queryParams.type === SearchCategory.DATASETS) {
+            return (
+                <ResultsTable
+                    results={data?.list as SearchResultDataset[]}
+                    showLibraryModal={showLibraryModal}
+                    cohortDiscovery={cohortDiscovery}
+                    showSynopsis={synopsesExpanded}
+                />
+            );
+        }
+
+        return resultsView === ViewType.TABLE && !isMobile && !isTabletOrLaptop ? (
             <ResultsTable
                 results={data?.list as SearchResultDataset[]}
                 showLibraryModal={showLibraryModal}
                 cohortDiscovery={cohortDiscovery}
+                showSynopsis={synopsesExpanded}
             />
         ) : (
             <ResultsList
@@ -538,6 +590,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                 {data?.list.map(result => renderResultCard(result))}
             </ResultsList>
         );
+    };
 
     const handleSaveSubmit = ({ name }: SaveSearchValues) => {
         saveSearchQuery({
@@ -666,6 +719,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         showDialog(PublicationSearchDialogMemoised);
     console.log(setPostLoginActionCookie);
     const filterPanel = useMemo(() => {
+        if (!showDatasetFilterPanel) return null;
         return (
             <FilterPanel
                 selectedFilters={selectedFilters}
@@ -717,6 +771,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             />
         );
     }, [
+        cancerTypeFilters,
         data?.aggregations,
         europePmcModalAction,
         filters,
@@ -725,6 +780,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         resetQueryParamState,
         schema.$defs,
         selectedFilters,
+        showDatasetFilterPanel,
         updatePath,
         updatePathMultiple,
     ]);
@@ -784,19 +840,22 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
 
     const mainContentStyles = {
         flexGrow: 1,
+        flexBasis: 0,
+        minWidth: 0,
         transition: theme.transitions.create("margin", {
             easing,
             duration,
         }),
         marginLeft: filterSidebarOpen || isMobile ? 0 : `-280px`,
         padding: `0 ${theme.spacing(2)}`,
-        width: `calc(100% - ${filterSidebarWidth}px)`,
+        width: "100%",
+        maxWidth: "100%",
     };
 
     return (
         <>
             {/* Filter Drawer */}
-            {isMobile && (
+            {showDatasetFilterPanel && isMobile && (
                 <Drawer
                     anchor="top"
                     open={filterDrawerOpen}
@@ -827,25 +886,6 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                 }}>
                 <Box
                     sx={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                    }}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            flexDirection: "column",
-                            maxWidth: "70%",
-                            
-                            marginX: 1,
-                            flexGrow: 1,
-                        }}
-                    />
-                </Box>
-
-                <Box
-                    sx={{
                         display: "flex",
                         width: "100%",
                         position: "relative",
@@ -873,14 +913,16 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                     "aria-label": "filter controls",
                                     role: "region",
                                 })}>
-                                <FilterChips
-                                    selectedFilters={selectedFilters}
-                                    handleDelete={removeFilter}
-                                    filterCategory={
-                                        FILTER_TYPE_MAPPING[queryParams.type]
-                                    }
-                                />
-                                {isMobile && (
+                                {showDatasetFilterPanel && (
+                                    <FilterChips
+                                        selectedFilters={selectedFilters}
+                                        handleDelete={removeFilter}
+                                        filterCategory={
+                                            FILTER_TYPE_MAPPING[queryParams.type]
+                                        }
+                                    />
+                                )}
+                                {showDatasetFilterPanel && isMobile && (
                                     <Button
                                         variant="outlined"
                                         color="secondary"
@@ -907,7 +949,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                             )}
                             {!isSearching &&
                                 !isEuropePmcSearchNoQuery &&
-                                !!data?.list?.length &&
+                                data != null &&
                                 data?.path?.includes(queryParams.type) && (
                                     <Box
                                         sx={{
@@ -932,25 +974,31 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                         )}
      
                                         <Box>
-                                       <FilterHeader />
-                                            </Box>
-                                        <Box mb={2}
-                                        >
-                                        
-                                        <StudyFilter
-                                            filterData={undefined}
-                                            onFilterChange={(selectedFilters) => {
-                                                // Handle filter changes - integrate with existing filter system
-                                                console.log("Selected filters:", Array.from(selectedFilters));
-                                            }}
-                                        />
+                                            <FilterHeader />
                                         </Box>
+                                        {queryParams.type ===
+                                            SearchCategory.DATASETS && (
+                                            <Box mb={2}>
+                                                <StudyFilter
+                                                    filterData={undefined}
+                                                    onFilterChange={selectedFilters => {
+                                                        // eslint-disable-next-line no-console
+                                                        console.log(
+                                                            "Selected filters:",
+                                                            Array.from(
+                                                                selectedFilters as Set<unknown>
+                                                            )
+                                                        );
+                                                    }}
+                                                />
+                                            </Box>
+                                        )}
                                                                            <Box
                                             sx={{
                                                 display: "flex",
                                                 justifyContent: "center",
                                                 width: "100%",
-                                                maxWidth: "70%",
+                                                maxWidth: "97%",
                                                 marginX: "auto",
                                             }}>
                                             <SearchBar
@@ -975,16 +1023,31 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                                         ? queryParams.query
                                                         : undefined
                                                 }
+                                                synopsesExpanded={
+                                                    synopsesExpanded
+                                                }
+                                                onSynopsesToggle={() =>
+                                                    setSynopsesExpanded(
+                                                        v => !v
+                                                    )
+                                                }
                                             />
                                         </Box>
                                         <Box
+                                            id="search-results-synopses"
                                             component="section"
                                             aria-describedby="result-summary"
                                             aria-label="results list"
                                             sx={{
                                                 p: `0 ${theme.spacing(2)}`,
                                             }}>
-                                            {renderResults()}
+                                            {data?.list?.length ? (
+                                                renderResults()
+                                            ) : (
+                                                <Box sx={{ pb: 2 }}>
+                                                    {t("noResults")}
+                                                </Box>
+                                            )}
                                         </Box>
                                     </Box>
                                 )}

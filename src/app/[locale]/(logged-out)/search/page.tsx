@@ -16,14 +16,7 @@ export const metadata = metaData(
 const SearchPage = async () => {
     const filters: Filter[] = await getFilters();
     const cohortDiscovery = await getCohortDiscovery();
-    let cancerTypeFilters: { key: string; doc_count?: number }[] | undefined;
-    try {
-        cancerTypeFilters = await getCancerTypeFilters();
-    } catch (error) {
-        // If cancer type filters API fails, continue without it
-        console.warn("Failed to fetch cancer type filters:", error);
-        cancerTypeFilters = undefined;
-    }
+    const cancerTypeFilters = await getCancerTypeFilters();
 
     const adjustedFilters = filters.map(filter => {
         if (filter.keys === FILTER_DATA_SUBTYPE) {
@@ -37,8 +30,8 @@ const SearchPage = async () => {
         return filter;
     });
 
-    const SCHEMA_NAME = "HDRUK";
-    const SCHEMA_VERSION = "4.0.0";
+    const SCHEMA_NAME = "CRUK";
+    const SCHEMA_VERSION = "1.0.0";
 
     const { schema } = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
     return (

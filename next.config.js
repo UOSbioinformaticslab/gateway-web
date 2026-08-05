@@ -45,6 +45,11 @@ const nextConfig = {
                 hostname: "storage.googleapis.com",
                 pathname: "/hdr-gw-wordpress-prod/**",
             },
+            {
+                protocol: "https",
+                hostname: "uploads.codesandbox.io",
+                pathname: "/uploads/user/**",
+            },
         ],
     },
     async headers() {

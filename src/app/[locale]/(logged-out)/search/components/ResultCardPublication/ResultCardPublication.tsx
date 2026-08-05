@@ -1,4 +1,9 @@
-import { ListItem, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Collapse,
+    ListItem,
+    useMediaQuery,
+    useTheme,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
 import { SearchResultPublication } from "@/interfaces/Search";
 import EllipsisLineLimit from "@/components/EllipsisLineLimit";
@@ -16,11 +21,16 @@ import {
 
 interface ResultCardPublicationProps {
     result: SearchResultPublication;
+    /** When false, the abstract synopsis is hidden. */
+    showSynopsis?: boolean;
 }
 
 const TRANSLATION_PATH = "pages.search.components.ResultCardPublication";
 
-const ResultCardPublication = ({ result }: ResultCardPublicationProps) => {
+const ResultCardPublication = ({
+    result,
+    showSynopsis = true,
+}: ResultCardPublicationProps) => {
     const t = useTranslations(TRANSLATION_PATH);
 
     const theme = useTheme();
@@ -87,10 +97,12 @@ const ResultCardPublication = ({ result }: ResultCardPublicationProps) => {
                             <PublicationText>
                                 {journal_name || t("notAvailable")}
                             </PublicationText>
-                            <PublicationAbstract
-                                maxLine={2}
-                                text={abstract || t("notAvailable")}
-                            />
+                            <Collapse in={showSynopsis} timeout="auto" unmountOnExit>
+                                <PublicationAbstract
+                                    maxLine={2}
+                                    text={abstract || t("notAvailable")}
+                                />
+                            </Collapse>
                         </>
                     }
                 />

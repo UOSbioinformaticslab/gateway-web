@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { sessionCookie, sessionHeader, sessionPrefix } from "@/config/session";
 import { logger } from "@/utils/logger";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 import { errorNotification, successNotification } from "./utils";
 
 const deleteRequest = async <T>(
@@ -26,7 +27,10 @@ const deleteRequest = async <T>(
         const response = await fetch(url, {
             method: "DELETE",
             credentials: "include",
-            headers: { [sessionHeader]: sessionPrefix + session },
+            headers: {
+                [sessionHeader]: sessionPrefix + session,
+                ...getPartnerHeaders(),
+            },
         });
 
         if (response.ok) {

@@ -1,10 +1,17 @@
-const apiV1Url = process.env.NEXT_PUBLIC_API_V1_URL;
+// In the browser, route API calls through Next.js so it can attach the httpOnly JWT cookie.
+const apiV1Url =
+    typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_API_V1_URL
+        : "/api/v1";
 const apiV1IPUrl =
     process.env.NODE_ENV === "development"
         ? process.env.NEXT_PUBLIC_API_V1_IP_URL
         : process.env.NEXT_PUBLIC_API_V1_URL;
 
-const apiV2Url = process.env.NEXT_PUBLIC_API_V2_URL;
+const apiV2Url =
+    typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_API_V2_URL
+        : "/api/v2";
 const apiV2IPUrl =
     process.env.NODE_ENV === "development"
         ? process.env.NEXT_PUBLIC_API_V2_IP_URL
@@ -13,7 +20,10 @@ const apiV2IPUrl =
 const apis = {
     apiV1Url,
     apiV1IPUrl,
-    enabledFeatures: `${apiV1IPUrl}/feature-flags/enabled`,
+    apiV2Url,
+    apiV2IPUrl,
+    enabledFeatureFlags: `${apiV1IPUrl}/feature-flags/enabled`,
+    enabledFeatures: `${apiV1IPUrl}/features`,
     logoutInternalUrl: "/api/logout",
     signInInternalUrl: "/api/signIn",
     authInternalUrl: "/api/auth",
@@ -37,7 +47,8 @@ const apis = {
     logoutV1UrlIP: `${apiV1IPUrl}/logout`,
     filtersV1Url: `${apiV1Url}/filters`,
     filtersV1UrlIP: `${apiV1IPUrl}/filters`,
-    sectorsV1Url: `${apiV1Url}/sectors`,
+    sectorsV1Url: "/api/sectors",
+    sectorsV1UrlIP: `${apiV1IPUrl}/sectors`,
     tagsV1Url: `${apiV1Url}/tags`,
     applicationsV1Url: `${apiV1Url}/applications`,
     applicationsV1UrlIP: `${apiV1IPUrl}/applications`,
@@ -66,7 +77,9 @@ const apis = {
     teamsV2UrlIP: `${apiV2IPUrl}/teams`,
     teamsSearchV1Url: `${apiV1Url}/teams/search`,
     wordPressApiUrl: `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}`,
-    searchV1Url: `${apiV1Url}/search`,
+    searchV1Url: "/api/search",
+    searchV1UrlIP: `${apiV1IPUrl}/search`,
+    searchInternalUrl: "/api/search",
     saveSearchesV1Url: `${apiV1Url}/saved_searches`,
     collectionsV2Url: `${apiV2Url}/collections`,
     collectionsV2UrlIP: `${apiV2IPUrl}/collections`,
@@ -84,7 +97,7 @@ const apis = {
     categoriesV1Url: `${apiV1Url}/categories`,
     fileUploadV1Url: `${apiV1Url}/files`,
     fileProcessedV1Url: `${apiV1Url}/files/processed`,
-    librariesV1Url: `${apiV1Url}/libraries`,
+    librariesV1Url: "/api/libraries",
     librariesV1UrlIP: `${apiV1IPUrl}/libraries`,
     toolCategoriesV1Url: `${apiV1Url}/type_categories`,
     programmingLanguagesV1Url: `${apiV1Url}/programming_languages`,

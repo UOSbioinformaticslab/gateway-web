@@ -12,6 +12,7 @@ import { Wrapper, LegendIcon } from "./FormLegend.styles";
 
 interface FormLegendProps {
     items: LegendItem[];
+    title?: string;
     offsetTop?: string;
     level?: number;
     removeMarginLeft?: boolean;
@@ -48,6 +49,7 @@ const getBackgroundColour = (status: LegendStatus) => {
 
 const FormLegend = ({
     items,
+    title,
     offsetTop,
     level = 1,
     removeMarginLeft,
@@ -57,6 +59,17 @@ const FormLegend = ({
         <Wrapper
             offsetTop={offsetTop || "initial"}
             sx={{ justifyContent: "center" }}>
+            {title && (
+                <Typography
+                    sx={{
+                        fontWeight: 700,
+                        fontSize: "1.25rem",
+                        mb: 1,
+                        px: 1,
+                    }}>
+                    {title}
+                </Typography>
+            )}
             {items.map((item, index) => {
                 const Icon = item.icon;
 
@@ -111,7 +124,9 @@ const FormLegend = ({
                                                 ? 600
                                                 : "normal",
                                     }}>
-                                    {capitalise(splitCamelcase(item.name))}
+                                    {capitalise(
+                                        splitCamelcase(item.label ?? item.name)
+                                    )}
                                 </Typography>
 
                                 {item.count !== undefined && (

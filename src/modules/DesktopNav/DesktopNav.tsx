@@ -7,7 +7,11 @@ import navItems from "@/config/nav";
 import { colors } from "@/config/theme";
 import { ExpandMoreIcon } from "@/consts/icons";
 
-function DesktopNav() {
+interface DesktopNavProps {
+    headerVariant?: "light" | "dark";
+}
+
+function DesktopNav({ headerVariant = "dark" }: DesktopNavProps) {
     const [anchorElement, setAnchorElement] = useState<null | HTMLElement>(
         null
     );
@@ -30,6 +34,8 @@ function DesktopNav() {
         setAnchorElement(event);
     };
 
+    const dividerColor = headerVariant === "light" ? colors.grey300 : "white";
+
     return (
         <Box
             sx={{
@@ -46,7 +52,7 @@ function DesktopNav() {
                         <Fragment key={item.label}>
                             <Divider
                                 orientation="vertical"
-                                sx={{ bgcolor: "white", ml: 2, mr: 2 }}
+                                sx={{ bgcolor: dividerColor, ml: 2, mr: 2 }}
                             />
                         </Fragment>
                     );

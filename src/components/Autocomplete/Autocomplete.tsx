@@ -86,6 +86,7 @@ const Autocomplete = <T extends FieldValues>(props: AutocompleteProps<T>) => {
         clearIcon = false,
         chipColor,
         maxLabelLength = 40,
+        showClearButton: _showClearButton,
         ...restProps
     } = props;
 

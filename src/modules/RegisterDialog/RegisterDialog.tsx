@@ -15,6 +15,7 @@ import useDialog from "@/hooks/useDialog";
 import useAuth from "@/hooks/useAuth";
 import apis from "@/config/apis";
 import notificationService from "@/services/notification";
+import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
 const TRANSLATION_PATH = "modules.dialogs.RegisterDialog";
 
@@ -77,6 +78,7 @@ const RegisterDialog = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...getPartnerHeaders(),
                 },
                 body: JSON.stringify(registerData),
             });

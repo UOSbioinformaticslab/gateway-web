@@ -19,8 +19,8 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
             <MuiLink
                 ref={ref}
                 href={href}
-                component={NextLink}
-                passHref={passHref}
+                component={isExternal ? "a" : NextLink}
+                {...(!isExternal && { passHref })}
                 {...(variant && { variant })}
                 {...props}
                 {...(isExternal && { target: "_blank", rel: "noopener" })}>

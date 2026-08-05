@@ -1,26 +1,18 @@
-import { notFound } from "next/navigation";
-import { getContentPageByParentQuery } from "@/utils/cms";
 import metaData from "@/utils/metadata";
-import "@/styles/wpStyles.css";
 import SupportPage from "../components/SupportPage";
+import ManagingCollectionsContent from "./ManagingCollectionsContent";
 
 export const metadata = metaData({
-    title: "Managing Collections, Data Custodians and Data Custodian Networks - Data Custodians",
-    description: "",
+    title:
+        "Exploring Collections, Data Custodians and Data Custodian Networks - Data Custodians",
+    description:
+        "Collections, Data Custodian pages, networks, data access requirements, and the access process on the Cancer Data Hub.",
 });
 
-const ManagingPage = async () => {
-    const cmsPage = await getContentPageByParentQuery("Managing", {
-        id: "managing-collections-data-custodians-and-data-custodian-networks",
-        idType: "URI",
-        parentId: "/data-custodian-support",
-    });
-
-    if (!cmsPage) {
-        notFound();
-    }
-
-    return <SupportPage title={cmsPage?.title} content={cmsPage?.content} />;
-};
-
-export default ManagingPage;
+export default function ManagingPage() {
+    return (
+        <SupportPage title="Exploring Collections, Data Custodians and Data Custodian Networks">
+            <ManagingCollectionsContent />
+        </SupportPage>
+    );
+}

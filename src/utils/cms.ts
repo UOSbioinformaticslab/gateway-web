@@ -44,6 +44,7 @@ import { GetTermsAndConditionsQuery } from "@/config/queries/termsAndConditions"
 import { sessionHeader, sessionPrefix } from "@/config/session";
 import { getSessionCookie } from "./getSessionCookie";
 import { logger } from "./logger";
+import { getPartnerHeaders } from "./partnerHeaders";
 
 const DEFAULT_OPTIONS = {
     next: { revalidate: 10 },
@@ -110,6 +111,7 @@ async function fetchCMS(
     const headers = {
         "Content-Type": "application/json",
         [sessionHeader]: sessionPrefix + session,
+        ...getPartnerHeaders(),
     };
 
     const res = await fetch(apis.wordPressApiUrl, {

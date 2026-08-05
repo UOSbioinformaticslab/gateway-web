@@ -27,10 +27,10 @@ import { getLastSplitPart } from "./string";
 type FormValues = Record<string, unknown>;
 
 const formGetAllSectionFields = (
-    schemaFields: FormHydration[],
+    schemaFields: FormHydration[] | undefined,
     section: string
 ) =>
-    schemaFields
+    (schemaFields ?? [])
         .filter(schemaField => !schemaField.field?.hidden)
         .filter(({ location }) => location && location.startsWith(section));
 
@@ -59,15 +59,16 @@ const formSectionHasAllEmptyFields = (
 };
 
 const formGetFieldsCompletedCount = (
-    schemaFields: FormHydration[],
+    schemaFields: FormHydration[] | undefined,
     getValues: UseFormGetValues<FieldValues>,
     optionalFieldsOnly: boolean
 ) => {
+    const fields = schemaFields ?? [];
     let fieldCount = 0;
     let fieldsWithValue = 0;
 
     // Filter out hidden fields and any array fields
-    const allFields = schemaFields
+    const allFields = fields
         .filter(
             schemaField =>
                 !schemaField.field?.hidden &&
@@ -90,7 +91,7 @@ const formGetFieldsCompletedCount = (
         fieldsWithValue = nonEmptyCount;
     }
 
-    const arrayFields = schemaFields.filter(
+    const arrayFields = fields.filter(
         schemaField => schemaField?.is_array_form
     );
 
@@ -119,7 +120,7 @@ const formGetFieldsCompletedCount = (
         }
     });
 
-    return Math.round((fieldsWithValue / fieldCount) * 100);
+    return fieldCount === 0 ? 0 : Math.round((fieldsWithValue / fieldCount) * 100);
 };
 
 const formSectionHasEmptyOptionalFields = (
@@ -187,12 +188,16 @@ const formValidateSection = async (
 ) => {
     const allSectionFields = formGetAllSectionFields(schemaFields, section);
     const isArrayForm = allSectionFields[0]?.is_array_form;
-    const fields = isArrayForm
-        ? allSectionFields[0].title
+    const rawFields = isArrayForm
+        ? [allSectionFields[0]?.title]
         : allSectionFields
               .filter(schemaField => !schemaField?.field?.hidden)
               .map(field => field.title);
+    const fields = rawFields.filter(
+        (name): name is string => name != null && typeof name === "string"
+    );
 
+    if (fields.length === 0) return true;
     return await trigger(fields, { shouldFocus: false });
 };
 
@@ -200,10 +205,11 @@ const formIsSectionActive = (section: string, activeSectionName: string) =>
     section === activeSectionName;
 
 const hasVisibleFieldsForLocation = (
-    schemaFields: FormHydration[],
+    schemaFields: FormHydration[] | undefined,
     location: string
 ): boolean => {
-    const fieldsForLocation = schemaFields
+    const fields = schemaFields ?? [];
+    const fieldsForLocation = fields
         .filter(field => field.location)
         .filter(field => field.location?.startsWith(location))
         .some(field => !field?.field?.hidden);
@@ -245,6 +251,59 @@ const formGenerateLegendItems = async (
 
             return {
                 name: section,
+                label:
+                    section === "Other"
+                        ? schemaFields.find(
+                              field => field.location === "Other.data.types"
+                          )?.title
+                        : section === ENTITY_RELATIONSHIP_DIAGRAM_SECTION
+                          ? schemaFields.find(
+                                field =>
+                                    field.location ===
+                                    ENTITY_RELATIONSHIP_DIAGRAM_SECTION
+                            )?.title
+                          : section === COVERAGE_SECTION
+                            ? schemaFields.find(
+                                  field => field.location === COVERAGE_SECTION
+                              )?.title
+                            : section === PROVENANCE_SECTION
+                              ? schemaFields.find(
+                                    field =>
+                                        field.location === PROVENANCE_SECTION
+                                )?.title
+                              : section === ACCESSIBILITY_SECTION
+                                ? schemaFields.find(
+                                      field =>
+                                          field.location ===
+                                          ACCESSIBILITY_SECTION
+                                  )?.title
+                                : section === TOOLS_AND_PUBLICATIONS_SECTION
+                                  ? schemaFields.find(
+                                        field =>
+                                            field.location ===
+                                            TOOLS_AND_PUBLICATIONS_SECTION
+                                    )?.title
+                                  : section === OBSERVATIONS_SECTION
+                                    ? schemaFields
+                                          .find(
+                                              field =>
+                                                  field.location ===
+                                                  OBSERVATIONS_SECTION
+                                          )
+                                          ?.title?.replace(" Array", "")
+                                    : section === DEMOGRAPHIC_FREQUENCY_SECTION
+                                      ? schemaFields.find(
+                                            field =>
+                                                field.location ===
+                                                DEMOGRAPHIC_FREQUENCY_SECTION
+                                        )?.title
+                                      : section === OMICS_SECTION
+                                        ? schemaFields.find(
+                                              field =>
+                                                  field.location ===
+                                                  OMICS_SECTION
+                                          )?.title
+                                        : undefined,
                 status: getSectionStatus,
             };
         })
@@ -259,14 +318,337 @@ const isFirstSection = (currentSectionIndex: number) =>
 const isLastSection = (formSections: string[], currentSectionIndex: number) =>
     formSections.length - 1 <= currentSectionIndex;
 
-const getFirstLocationValues = (schemaFields: FormHydration[]) => {
+const getFirstLocationValues = (schemaFields: FormHydration[] | undefined) => {
+    const fields = schemaFields ?? [];
     const locationSet = new Set<string>(
-        schemaFields
+        fields
             .filter(field => field.location)
             .map(({ location }) => location.split(".")[0])
     );
 
     return Array.from(locationSet);
+};
+
+const getFormHydrationFieldHeaderProps = ({
+    title,
+    description,
+    field,
+}: {
+    title: string;
+    description?: string | null;
+    field?: { label?: string | null };
+}) => {
+    const trimmedDescription = description?.trim();
+
+    if (!trimmedDescription) {
+        return { show: false as const, title, description: undefined };
+    }
+
+    const trimmedLabel = field?.label?.trim();
+
+    return {
+        show: true as const,
+        title,
+        description:
+            trimmedLabel && trimmedDescription === trimmedLabel
+                ? undefined
+                : trimmedDescription,
+    };
+};
+
+const ASSOCIATED_PROJECT_GRANTS_SECTION = "Associated Project Grants";
+const ENTITY_RELATIONSHIP_DIAGRAM_SECTION = "Entity Relationship Diagram";
+const COVERAGE_SECTION = "coverage";
+const PROVENANCE_SECTION = "provenance";
+const ACCESSIBILITY_SECTION = "accessibility";
+const TOOLS_AND_PUBLICATIONS_SECTION = "enrichmentAndLinkage";
+const OBSERVATIONS_SECTION = "observations";
+const DEMOGRAPHIC_FREQUENCY_SECTION = "demographicFrequency";
+const OMICS_SECTION = "omics";
+
+const SUMMARY_SECTION = "summary";
+const DOCUMENTATION_SECTION = "documentation";
+const SUMMARY_DATA_CUSTODIAN_PREFIX = `${SUMMARY_SECTION}.dataCustodian.`;
+
+const SUMMARY_DATA_CUSTODIAN_ACCORDION_LOCATIONS = new Set([
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}identifier`,
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}name`,
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}description`,
+]);
+
+const isPanelOnlyFormField = (location?: string) =>
+    location?.startsWith(`${ASSOCIATED_PROJECT_GRANTS_SECTION}.`) ||
+    location?.startsWith(`${ENTITY_RELATIONSHIP_DIAGRAM_SECTION}.`) ||
+    location?.startsWith(`${COVERAGE_SECTION}.`) ||
+    location?.startsWith(`${PROVENANCE_SECTION}.`) ||
+    location?.startsWith(`${ACCESSIBILITY_SECTION}.`) ||
+    location?.startsWith(`${TOOLS_AND_PUBLICATIONS_SECTION}.`) ||
+    location === OBSERVATIONS_SECTION ||
+    location?.startsWith(`${OBSERVATIONS_SECTION}.`) ||
+    location?.startsWith(`${SUMMARY_SECTION}.`) ||
+    location?.startsWith(`${DOCUMENTATION_SECTION}.`) ||
+    location?.startsWith(`${OMICS_SECTION}.`);
+
+const isSummaryDataCustodianAccordionField = (location?: string) =>
+    !!location && SUMMARY_DATA_CUSTODIAN_ACCORDION_LOCATIONS.has(location);
+
+const SUMMARY_STANDALONE_ACCORDION_LOCATIONS = new Set([
+    `${SUMMARY_DATA_CUSTODIAN_PREFIX}contactPoint`,
+    `${SUMMARY_SECTION}.keywords`,
+    `${SUMMARY_SECTION}.datasetAliases`,
+]);
+
+const isSummaryStandaloneAccordionField = (location?: string) =>
+    !!location && SUMMARY_STANDALONE_ACCORDION_LOCATIONS.has(location);
+
+const DOCUMENTATION_STANDALONE_ACCORDION_LOCATIONS = new Set([
+    `${DOCUMENTATION_SECTION}.associatedMedia`,
+]);
+
+const isDocumentationStandaloneAccordionField = (location?: string) =>
+    !!location && DOCUMENTATION_STANDALONE_ACCORDION_LOCATIONS.has(location);
+
+const getAssociatedProjectGrantsGuidance = (
+    schemaFields: FormHydration[]
+) =>
+    schemaFields.find(
+        ({ location }) => location === ASSOCIATED_PROJECT_GRANTS_SECTION
+    )?.guidance;
+
+const getSummarySectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const summarySection = schemaFields.find(
+        ({ location }) => location === SUMMARY_SECTION
+    );
+
+    if (!summarySection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(summarySection);
+};
+
+const getSummarySectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === SUMMARY_SECTION)?.guidance;
+
+const getDocumentationSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const documentationSection = schemaFields.find(
+        ({ location }) => location === DOCUMENTATION_SECTION
+    );
+
+    if (!documentationSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(documentationSection);
+};
+
+const getDocumentationSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === DOCUMENTATION_SECTION)
+        ?.guidance;
+
+const getEntityRelationshipDiagramSectionHeaderProps = (
+    schemaFields: FormHydration[]
+) => {
+    const entityRelationshipDiagramSection = schemaFields.find(
+        ({ location }) => location === ENTITY_RELATIONSHIP_DIAGRAM_SECTION
+    );
+
+    if (!entityRelationshipDiagramSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(entityRelationshipDiagramSection);
+};
+
+const getCoverageSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const coverageSection = schemaFields.find(
+        ({ location }) => location === COVERAGE_SECTION
+    );
+
+    if (!coverageSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(coverageSection);
+};
+
+const getCoverageSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === COVERAGE_SECTION)?.guidance;
+
+const getDatasetTimelinesSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === PROVENANCE_SECTION)?.guidance;
+
+const getAccessibilitySectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const accessibilitySection = schemaFields.find(
+        ({ location }) => location === ACCESSIBILITY_SECTION
+    );
+
+    if (!accessibilitySection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(accessibilitySection);
+};
+
+const getAccessibilitySectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === ACCESSIBILITY_SECTION)
+        ?.guidance;
+
+const getToolsAndPublicationsSectionHeaderProps = (
+    schemaFields: FormHydration[]
+) => {
+    const toolsAndPublicationsSection = schemaFields.find(
+        ({ location }) => location === TOOLS_AND_PUBLICATIONS_SECTION
+    );
+
+    if (!toolsAndPublicationsSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(toolsAndPublicationsSection);
+};
+
+const getToolsAndPublicationsSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(
+        ({ location }) => location === TOOLS_AND_PUBLICATIONS_SECTION
+    )?.guidance;
+
+const getObservationsSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const observationsSection = schemaFields.find(
+        ({ location }) => location === OBSERVATIONS_SECTION
+    );
+
+    if (!observationsSection) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps({
+        ...observationsSection,
+        title: observationsSection.title.replace(" Array", ""),
+    });
+};
+
+const getObservationsSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === OBSERVATIONS_SECTION)
+        ?.guidance;
+
+const getDemographicFrequencySectionHeaderProps = (
+    schemaFields: FormHydration[]
+) => {
+    const section = schemaFields.find(
+        ({ location }) => location === DEMOGRAPHIC_FREQUENCY_SECTION
+    );
+
+    if (!section) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(section);
+};
+
+const getDemographicFrequencySectionGuidance = (
+    schemaFields: FormHydration[]
+) =>
+    schemaFields.find(
+        ({ location }) => location === DEMOGRAPHIC_FREQUENCY_SECTION
+    )?.guidance;
+
+const getOmicsSectionHeaderProps = (schemaFields: FormHydration[]) => {
+    const section = schemaFields.find(
+        ({ location }) => location === OMICS_SECTION
+    );
+
+    if (!section) {
+        return null;
+    }
+
+    return getFormHydrationFieldHeaderProps(section);
+};
+
+const getOmicsSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === OMICS_SECTION)?.guidance;
+
+const isDemographicBreakdownArray = (location?: string) =>
+    location === "demographicFrequency.age" ||
+    location === "demographicFrequency.ethnicity";
+
+const getDemographicBreakdownBinOptions = (
+    fieldParent: FormHydration
+): string[] => {
+    const binField = fieldParent.fields?.find(field =>
+        field.location?.endsWith(".bin")
+    );
+
+    return (binField?.field?.options ?? []).map(option => String(option.value));
+};
+
+const getDemographicBreakdownFieldTitles = (fieldParent: FormHydration) => {
+    const binField = fieldParent.fields?.find(field =>
+        field.location?.endsWith(".bin")
+    );
+    const countField = fieldParent.fields?.find(field =>
+        field.location?.endsWith(".count")
+    );
+
+    return {
+        binTitle: binField?.title ?? "",
+        countTitle: countField?.title ?? "",
+        countField: countField?.field,
+    };
+};
+
+const buildDemographicBreakdownRows = (
+    fieldParent: FormHydration,
+    existingRows: Record<string, unknown>[] = []
+) => {
+    const options = getDemographicBreakdownBinOptions(fieldParent);
+    const { binTitle, countTitle } =
+        getDemographicBreakdownFieldTitles(fieldParent);
+
+    return options.map(option => {
+        const match = existingRows.find(row => row[binTitle] === option);
+
+        return {
+            [binTitle]: option,
+            [countTitle]: match?.[countTitle] ?? "",
+        };
+    });
+};
+
+const getWelcomeSectionGuidance = (schemaFields: FormHydration[]) =>
+    schemaFields.find(({ location }) => location === INITIAL_FORM_SECTION)
+        ?.guidance;
+
+const withFormHydrationFieldPanelContent = (
+    field: FormHydrationField,
+    fieldParent: Pick<FormHydration, "title" | "description" | "field">
+): FormHydrationField => {
+    const header = getFormHydrationFieldHeaderProps(fieldParent);
+
+    if (!header.show) {
+        return field;
+    }
+
+    const description = fieldParent.description?.trim();
+
+    return {
+        ...field,
+        ...(description && !field.info ? { info: description } : {}),
+    };
+};
+
+const withFormHydrationPanelOnlyFieldContent = (
+    field: FormHydrationField,
+    fieldParent: Pick<FormHydration, "title" | "description" | "field">
+): FormHydrationField => {
+    const title = fieldParent.title?.trim();
+    const description = fieldParent.description?.trim();
+
+    return {
+        ...field,
+        ...(title ? { label: title } : {}),
+        ...(description && !field.info ? { info: description } : {}),
+    };
 };
 
 const renderFormHydrationField = (
@@ -277,11 +659,53 @@ const renderFormHydrationField = (
     fileUploadFields?: FileUploadFields
 ) => {
     const componentType = inputComponents[component as ComponentTypes];
-    const { options } = rest;
+    const {
+        options,
+        selectOnFocus: _selectOnFocus,
+        clearOnBlur: _clearOnBlur,
+        handleHomeEndKeys: _handleHomeEndKeys,
+        ...safeRest
+    } = rest;
 
     if (!componentType) {
         return null;
     }
+
+    const fieldOptions = options ?? [];
+
+    const autocompleteOnlyProps =
+        component === "Autocomplete"
+            ? {
+                  options: fieldOptions,
+                  selectOnFocus: true,
+                  clearOnBlur: true,
+                  handleHomeEndKeys: true,
+                  multiple: true,
+                  isOptionEqualToValue: (
+                      option: {
+                          value: string | number;
+                          label: string;
+                      },
+                      value: string | number
+                  ) => option.value === value,
+                  getChipLabel: (
+                      options: {
+                          value: string | number;
+                          label: string;
+                      }[],
+                      selectedOption: {
+                          value: string | number;
+                          label: string;
+                      }
+                  ) =>
+                      options.find(option => option === selectedOption)?.label ||
+                      selectedOption?.value ||
+                      selectedOption,
+              }
+            : {};
+
+    const selectOnlyProps =
+        component === "Select" ? { options: fieldOptions } : {};
 
     return (
         <InputWrapper
@@ -292,35 +716,12 @@ const renderFormHydrationField = (
             required={required}
             control={control}
             showClearButton={false}
-            canCreate={component === "Autocomplete" && !options?.length}
-            selectOnFocus={component === "Autocomplete"}
-            clearOnBlur={component === "Autocomplete"}
-            handleHomeEndKeys={component === "Autocomplete"}
-            multiple={component === "Autocomplete"}
-            isOptionEqualToValue={(
-                option: {
-                    value: string | number;
-                    label: string;
-                },
-                value: string | number
-            ) => option.value === value}
-            getChipLabel={(
-                options: {
-                    value: string | number;
-                    label: string;
-                }[],
-                selectedOption: {
-                    value: string | number;
-                    label: string;
-                }
-            ) =>
-                options.find(option => option === selectedOption)?.label ||
-                selectedOption?.value ||
-                selectedOption
-            }
+            canCreate={component === "Autocomplete" && !fieldOptions.length}
+            {...autocompleteOnlyProps}
+            {...selectOnlyProps}
             onFocus={() => setActiveField && setActiveField(name)}
-            {...rest}
-            label={name || ""}
+            {...safeRest}
+            label={(safeRest.label as string | undefined) ?? name ?? ""}
             {...fileUploadFields}
         />
     );
@@ -382,9 +783,29 @@ const mapFormFieldsForSubmission = (
         (acc: { [key: string]: string }, [key, value]) => {
             if (mappedSchemaFields[key]) {
                 if (parentField(key)?.is_array_form) {
-                    value.forEach(
+                    const fieldParent = parentField(key);
+                    const arrayEntries = isDemographicBreakdownArray(
+                        fieldParent?.location
+                    )
+                        ? (value as Record<string, unknown>[]).filter(entry => {
+                              const countTitle = fieldParent?.fields?.find(
+                                  field => field.location?.endsWith(".count")
+                              )?.title;
+                              const count = countTitle
+                                  ? entry[countTitle]
+                                  : undefined;
+
+                              return (
+                                  count !== "" &&
+                                  count !== null &&
+                                  count !== undefined
+                              );
+                          })
+                        : value;
+
+                    arrayEntries.forEach(
                         (entry: { [x: string]: string }, index: number) => {
-                            const arrayLocation = parentField(key)?.location;
+                            const arrayLocation = fieldParent?.location;
 
                             Object.keys(entry).forEach(entryKey => {
                                 acc[
@@ -566,6 +987,23 @@ const mapExistingDatasetToFormFields = (
     // Start traversal from the root of the schema
     traverseSchema(schema);
 
+    schema.forEach(field => {
+        if (!isDemographicBreakdownArray(field.location)) {
+            return;
+        }
+
+        const existingRows = get(values, field.title, []) as Record<
+            string,
+            unknown
+        >[];
+
+        set(
+            values,
+            field.title,
+            buildDemographicBreakdownRows(field, existingRows)
+        );
+    });
+
     return values as Metadata;
 };
 
@@ -580,6 +1018,37 @@ export {
     isFirstSection,
     getFirstLocationValues,
     hasVisibleFieldsForLocation,
+    getFormHydrationFieldHeaderProps,
+    isPanelOnlyFormField,
+    isSummaryDataCustodianAccordionField,
+    isSummaryStandaloneAccordionField,
+    isDocumentationStandaloneAccordionField,
+    getAssociatedProjectGrantsGuidance,
+    getSummarySectionHeaderProps,
+    getSummarySectionGuidance,
+    getDocumentationSectionHeaderProps,
+    getDocumentationSectionGuidance,
+    getEntityRelationshipDiagramSectionHeaderProps,
+    getCoverageSectionHeaderProps,
+    getCoverageSectionGuidance,
+    getDatasetTimelinesSectionGuidance,
+    getAccessibilitySectionHeaderProps,
+    getAccessibilitySectionGuidance,
+    getToolsAndPublicationsSectionHeaderProps,
+    getToolsAndPublicationsSectionGuidance,
+    getObservationsSectionHeaderProps,
+    getObservationsSectionGuidance,
+    getDemographicFrequencySectionHeaderProps,
+    getDemographicFrequencySectionGuidance,
+    getOmicsSectionHeaderProps,
+    getOmicsSectionGuidance,
+    isDemographicBreakdownArray,
+    getDemographicBreakdownBinOptions,
+    getDemographicBreakdownFieldTitles,
+    buildDemographicBreakdownRows,
+    getWelcomeSectionGuidance,
+    withFormHydrationFieldPanelContent,
+    withFormHydrationPanelOnlyFieldContent,
     renderFormHydrationField,
     formatValidationItems,
     formGetFieldsCompletedCount,

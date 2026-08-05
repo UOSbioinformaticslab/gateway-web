@@ -49,6 +49,7 @@ import {
 import { getUserFromToken } from "@/utils/cookies";
 import { getSessionCookie } from "./getSessionCookie";
 import { logger } from "./logger";
+import { getPartnerHeaders } from "./partnerHeaders";
 import { revalidateCache } from "./revalidateCache";
 
 type Payload<T> = T | (() => BodyInit & T);
@@ -83,6 +84,7 @@ async function get<T>(
             ...headers,
             Authorization: `Bearer ${jwt?.value}`,
             [sessionHeader]: sessionPrefix + session,
+            ...getPartnerHeaders(),
         },
         ...nextConfig,
     });
@@ -146,6 +148,7 @@ async function patch<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
+            ...getPartnerHeaders(),
         },
         body: JSON.stringify(payload),
     });
@@ -195,6 +198,7 @@ async function put<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
+            ...getPartnerHeaders(),
         },
         body: JSON.stringify(payload),
     });
@@ -244,6 +248,7 @@ async function post<T>(
             Authorization: `Bearer ${jwt?.value}`,
             "Content-Type": "application/json",
             [sessionHeader]: sessionPrefix + session,
+            ...getPartnerHeaders(),
         },
         body: JSON.stringify(payload),
     });
@@ -282,15 +287,19 @@ async function getFilters(): Promise<Filter[]> {
     );
 }
 
-async function getCancerTypeFilters(): Promise<{ key: string; doc_count?: number }[]> {
+async function getCancerTypeFilters(): Promise<
+    { key: string; doc_count?: number }[] | undefined
+> {
     const cache: Cache = {
         tags: ["cancer_type_filters"],
     };
-    // The get function already unwraps json.data, so response should be an array
-    return get<{ key: string; doc_count?: number }[]>(
+
+    const response = await get<{ key: string; doc_count?: number }[] | undefined>(
         apis.cancerTypeFiltersV1UrlIP,
-        { cache, suppressError: false }
+        { cache, suppressError: true }
     );
+
+    return Array.isArray(response) ? response : undefined;
 }
 
 async function getKeywords(): Promise<Keyword[]> {
@@ -531,6 +540,7 @@ async function getSchemaFromTraser(
             cache: {
                 tags: [`traser-schema-${schemaName}-${schemaVersion}`],
             },
+            suppressError: true,
             serveRaw: true,
         }
     );

@@ -1,13 +1,25 @@
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import theme from "@/config/theme";
+import theme, { colors } from "@/config/theme";
 import { SearchIcon } from "@/consts/icons";
 import {
+    ExplainerText,
     FormWrapper,
     InputWrapper,
     SearchForm,
     SearchInput,
 } from "./SearchBar.styles";
+import Paper from "../Paper";
+import Button from "../Button";
+
+import MenuItem from "@mui/material/MenuItem";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Badge,TextField, Checkbox, FormControlLabel, IconButton } from "@mui/material";
+
 
 interface SearchBarProps {
     resetAction: () => void;
@@ -18,6 +30,13 @@ interface SearchBarProps {
     queryName: string;
     queryPlaceholder: string;
     fullWidth?: boolean;
+    /** Explainer shown below the search field (e.g. search scope hint). */
+    explainerText?: string;
+    /** Disables the search input when true. */
+    isDisabled?: boolean;
+    /** When set with `onSynopsesToggle`, synopses visibility is controlled by the parent (e.g. search results). */
+    synopsesExpanded?: boolean;
+    onSynopsesToggle?: () => void;
 }
 export const TEST_ID_WRAPPER = "search-bar";
 export const TEST_ID_RESET_BUTTON = "reset-btn";
@@ -33,47 +52,146 @@ const SearchBar = ({
     queryName,
     queryPlaceholder,
     fullWidth = false,
+    explainerText,
+    isDisabled = false,
+    synopsesExpanded: synopsesExpandedProp,
+    onSynopsesToggle,
 }: SearchBarProps) => {
     const { control, handleSubmit, setValue } = useForm({
         defaultValues: { [queryName]: defaultValue },
     });
-
+    const [cart, setCart] = useState([]);
+    const [isDeepSearch, setIsDeepSearch] = useState(false);
+    const [synopsesExpandedInternal, setSynopsesExpandedInternal] =
+        useState(true);
+    const isSynopsesControlled =
+        synopsesExpandedProp !== undefined && onSynopsesToggle !== undefined;
+    const synopsesExpanded = isSynopsesControlled
+        ? synopsesExpandedProp!
+        : synopsesExpandedInternal;
+    const [showCartModal, setShowCartModal] = useState(false);
+    const [sortConfig, setSortConfig] = useState({ column: 'dateAdded', direction: 'desc' });
+    const handleSort = (column) => {
+        setSortConfig(prevConfig => ({
+            column,
+            direction: prevConfig.column === column && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
     useEffect(() => {
         setValue(queryName, valueOverride);
     }, [queryName, setValue, valueOverride]);
 
     return (
-        <FormWrapper 
-            data-testid={TEST_ID_WRAPPER}
-            sx={fullWidth ? { maxWidth: "100%" } : undefined}
+        <Paper
+            elevation={0}
+            variant="outlined"
+            sx={{
+                p: 1,
+                mb: 0,
+                bgcolor: '#f1f1f1',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                width: '100%',
+                flexWrap: 'nowrap',
+            }}
         >
-            <SearchForm onSubmit={handleSubmit(submitAction)} role="search">
-                <InputWrapper
-                    onClick={() =>
-                        inputOverrideAction && inputOverrideAction()
-                    }>
-                    <SearchInput
-                        control={control}
-                        name={queryName}
-                        label=""
-                        placeholder={queryPlaceholder}
-                        sx={{
-                            border: `2px solid ${theme.palette.greyCustom.main}`,
-                        }}
-                        inputProps={{
-                            "aria-label": "Search",
-                        }}
-                        icon={SearchIcon}
-                        startAdornmentSize={SEARCH_ICON_SIZE}
-                        showClearButton
-                        clearButtonSize={CROSS_ICON_SIZE}
-                        resetAction={resetAction}
-                        setValue={setValue}
+            <FormWrapper
+                data-testid={TEST_ID_WRAPPER}
+                sx={{ flex: "0 0 50%", minWidth: 0, marginTop: 1 }}
+            >
+                <SearchForm onSubmit={handleSubmit(submitAction)} role="search">
+                    <InputWrapper
+                        onClick={() =>
+                            inputOverrideAction && inputOverrideAction()
+                        }>
+                        <SearchInput
+                            control={control}
+                            name={queryName}
+                            label=""
+                            placeholder={queryPlaceholder}
+                            disabled={isDisabled}
+                            sx={{
+                                border: `2px solid ${theme.palette.greyCustom.main}`,
+                            }}
+                            inputProps={{
+                                "aria-label": "Search",
+                            }}
+                            icon={SearchIcon}
+                            startAdornmentSize={SEARCH_ICON_SIZE}
+                            showClearButton
+                            clearButtonSize={CROSS_ICON_SIZE}
+                            resetAction={resetAction}
+                            setValue={setValue}
+                        />
+                    </InputWrapper>
+                </SearchForm>
+                {explainerText ? (
+                    <ExplainerText sx={{ mt: 0.5 }}>{explainerText}</ExplainerText>
+                ) : null}
+            </FormWrapper>
+
+            {/* Cart Badge */}
+            <IconButton onClick={() => setShowCartModal(true)} color="primary" sx={{ flexShrink: 0 }}>
+                <Badge badgeContent={cart.length} color="error">
+                    <ShoppingCartIcon sx={{ fontSize: 28 }} />
+                </Badge>
+            </IconButton>
+
+            {/* Deep Search Checkbox */}
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={isDeepSearch}
+                        onChange={(e) => setIsDeepSearch(e.target.checked)}
+                        color="primary"
                     />
-                </InputWrapper>
-            </SearchForm>
-        </FormWrapper>
+                }
+                label="Deep Search"
+                sx={{ flexShrink: 0 }}
+            />
+
+            {/* Sort Dropdown */}
+            <TextField
+                select
+                label="Sort by"
+                size="small"
+                value={sortConfig.column}
+                onChange={(e) => handleSort(e.target.value)}
+                sx={{ width: 180, bgcolor: 'white', flexShrink: 0 }}
+            >
+                <MenuItem value="favourite">Favourites</MenuItem>
+                <MenuItem value="dateAdded">Updated Date</MenuItem>
+                <MenuItem value="studyTitle">Study Title</MenuItem>
+                <MenuItem value="leadResearcherInstitute">Lead Researcher</MenuItem>
+                <MenuItem value="populationSize">Population Size</MenuItem>
+                <MenuItem value="position">Accessibility</MenuItem>
+                <MenuItem value="earliestData">Earliest Data</MenuItem>
+                <MenuItem value="dateStarted">Start Date</MenuItem>
+            </TextField>
+
+            {/* Collapse/Expand Toggle */}
+            <Button
+                type="button"
+                aria-expanded={synopsesExpanded}
+                aria-controls="search-results-synopses"
+                onClick={() =>
+                    isSynopsesControlled
+                        ? onSynopsesToggle!()
+                        : setSynopsesExpandedInternal(v => !v)
+                }
+                sx={{
+                    ml: "auto",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    flexShrink: 0,
+                }}
+            >
+                {synopsesExpanded ? "Collapse Synopses" : "Expand Synopses"}
+            </Button>
+        </Paper>
     );
 };
 
 export default SearchBar;
+
