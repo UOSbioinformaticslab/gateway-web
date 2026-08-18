@@ -45,3 +45,5 @@ tiltconf.json
 build-storybook.log
 
 /public/embed/widget.js
+# Sentry Config File
+.env.sentry-build-plugin

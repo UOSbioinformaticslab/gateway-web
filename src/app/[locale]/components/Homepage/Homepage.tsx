@@ -1,23 +1,27 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Close } from "@mui/icons-material";
+import { IconButton, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Typography } from "@mui/material";
-import Link from "@/components/Link";
-import Box from "@/components/Box";
-import Button from "@/components/Button";
-import Container from "@/components/Container";
-import { StaticImages } from "@/config/images";
-import { colors } from "@/config/theme";
-import { RouteName } from "@/consts/routeName";
+import Image from "next/image";
 import { PageTemplateHome } from "@/interfaces/Cms";
 import { SearchCategory } from "@/interfaces/Search";
-import Image from "next/image";
+import Box from "@/components/Box";
+import Container from "@/components/Container";
+import Link from "@/components/Link";
+import ProvidersDialog from "@/modules/ProvidersDialog";
 import useAuth from "@/hooks/useAuth";
 import useDialog from "@/hooks/useDialog";
-import ProvidersDialog from "@/modules/ProvidersDialog";
+import { colors } from "@/config/theme";
+import { RouteName } from "@/consts/routeName";
 
-const PANEL_ITEMS: { labelKey: string; href: string; loggedInOnly?: boolean; span2?: boolean }[] = [
+const PANEL_ITEMS: {
+    labelKey: string;
+    href: string;
+    loggedInOnly?: boolean;
+    span2?: boolean;
+}[] = [
     {
         labelKey: "finderPanel.browseSearchDatasets",
         href: `/search?type=${SearchCategory.DATASETS}`,
@@ -95,6 +99,7 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
     const t = useTranslations("pages.home");
     const { isLoggedIn } = useAuth();
     const { showDialog } = useDialog();
+    const [isCrukBannerVisible, setIsCrukBannerVisible] = useState(true);
 
     const {
         homeFields: { logos },
@@ -112,6 +117,86 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
 
     return (
         <>
+            {isCrukBannerVisible && (
+                <Box
+                    sx={{
+                        bgcolor: colors.purple500,
+                        color: colors.white,
+                        py: 1.5,
+                        px: { mobile: 2, tablet: 3 },
+                    }}>
+                    <Container
+                        sx={{
+                            position: "relative",
+                            pr: { mobile: 5, tablet: 6 },
+                        }}>
+                        <Typography
+                            sx={{
+                                color: colors.pink400,
+                                fontWeight: 600,
+                                fontSize: { mobile: 15, tablet: 16 },
+                                lineHeight: 1.4,
+                            }}>
+                            {t("crukBanner.title")}
+                        </Typography>
+                        <Typography
+                            sx={{
+                                color: colors.white,
+                                fontSize: { mobile: 14, tablet: 15 },
+                                lineHeight: 1.45,
+                            }}>
+                            {t("crukBanner.intro")}
+                        </Typography>
+                        <Typography
+                            sx={{
+                                color: colors.white,
+                                fontSize: { mobile: 14, tablet: 15 },
+                                lineHeight: 1.45,
+                            }}>
+                            {t("crukBanner.step1Prefix")}
+                            <Typography
+                                component="button"
+                                type="button"
+                                onClick={() =>
+                                    showDialog(ProvidersDialog, {
+                                        isProvidersDialog: true,
+                                    })
+                                }
+                                sx={{
+                                    display: "inline",
+                                    p: 0,
+                                    m: 0,
+                                    border: 0,
+                                    background: "none",
+                                    color: `${colors.yellow400} !important`,
+                                    textDecoration: "underline",
+                                    cursor: "pointer",
+                                    font: "inherit",
+                                    "&:hover": {
+                                        opacity: 0.9,
+                                    },
+                                }}>
+                                {t("crukBanner.registerEmail")}
+                            </Typography>
+                            {t("crukBanner.step1Suffix")}{" "}
+                            {t("crukBanner.step2")} {t("crukBanner.step3")}
+                        </Typography>
+                        <IconButton
+                            onClick={() => setIsCrukBannerVisible(false)}
+                            aria-label={t("crukBanner.ariaCloseButtonLabel")}
+                            size="small"
+                            sx={{
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                                color: colors.white,
+                            }}>
+                            <Close fontSize="small" />
+                        </IconButton>
+                    </Container>
+                </Box>
+            )}
+
             {/* Hero section */}
             <Box
                 sx={{
@@ -145,7 +230,11 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                             sx={{
                                 color: colors.purple500,
                                 fontWeight: 700,
-                                fontSize: { mobile: 24, tablet: 34, desktop: 40 },
+                                fontSize: {
+                                    mobile: 24,
+                                    tablet: 34,
+                                    desktop: 40,
+                                },
                                 lineHeight: 1.05,
                                 mb: 2,
                             }}>
@@ -271,7 +360,11 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                                 sx={{
                                     p: 0,
                                     position: "relative",
-                                    width: { mobile: 170, tablet: 280, desktop: 340 },
+                                    width: {
+                                        mobile: 170,
+                                        tablet: 280,
+                                        desktop: 340,
+                                    },
                                     flexShrink: 0,
                                     backgroundColor: colors.grey100,
                                 }}>
@@ -301,7 +394,11 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                                     sx={{
                                         fontWeight: 700,
                                         color: colors.blue400,
-                                        fontSize: { mobile: 16, tablet: 18, desktop: 20 },
+                                        fontSize: {
+                                            mobile: 16,
+                                            tablet: 18,
+                                            desktop: 20,
+                                        },
                                         lineHeight: 1.2,
                                     }}>
                                     {t("finderPanel.horizonsLink")}
@@ -313,7 +410,12 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
             </Box>
 
             {/* Our Research Partners */}
-            <Box sx={{ bgcolor: "#fff", py: { mobile: 4, tablet: 5 }, borderTop: `1px solid ${colors.grey300}` }}>
+            <Box
+                sx={{
+                    bgcolor: "#fff",
+                    py: { mobile: 4, tablet: 5 },
+                    borderTop: `1px solid ${colors.grey300}`,
+                }}>
                 <Container>
                     <Typography
                         variant="h2"
@@ -354,7 +456,8 @@ const HomePage = ({ cmsContent: { page } }: HomePageProps) => {
                                     backgroundColor: colors.white,
                                     borderRadius: 1,
                                     "&:hover": {
-                                        boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                                        boxShadow:
+                                            "0 2px 10px rgba(0,0,0,0.08)",
                                     },
                                 }}>
                                 <Image

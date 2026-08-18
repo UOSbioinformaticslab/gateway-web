@@ -1061,6 +1061,16 @@
                 "discoverData": "Discover Data",
                 "findStudies": "Find Studies",
                 "collaborate": "Collaborate for a Cure"
+            },
+            "crukBanner": {
+                "title": "Funded by CRUK? Showcase your data.",
+                "intro": "Join the researchers making their metadata discoverable in three easy steps:",
+                "step1Prefix": "1) ",
+                "registerEmail": "Register your email",
+                "step1Suffix": ".",
+                "step2": "2) Register your team",
+                "step3": "3) Upload your metadata using quick AI tools.",
+                "ariaCloseButtonLabel": "Close banner"
             }
         },
         "saved_searches": {

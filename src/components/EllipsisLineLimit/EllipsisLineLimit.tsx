@@ -4,15 +4,17 @@ import ConditionalWrapper from "../ConditionalWrapper";
 import Typography from "../Typography";
 
 interface EllipsisLineLimitProps {
-    text: string;
+    text: ReactNode;
     maxLine?: number;
     showToolTip?: boolean;
     component?: ElementType;
 }
 
-const tooltipWrapper = (text: string) => (children: ReactNode) => {
+const tooltipWrapper = (text: ReactNode) => (children: ReactNode) => {
     return (
-        <Tooltip title={text} placement="bottom">
+        <Tooltip
+            title={typeof text === "string" ? text : ""}
+            placement="bottom">
             <span>{children}</span>
         </Tooltip>
     );

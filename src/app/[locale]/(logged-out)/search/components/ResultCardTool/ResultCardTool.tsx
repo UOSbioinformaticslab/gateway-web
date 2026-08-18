@@ -84,6 +84,7 @@ const ResultCardTool = ({
                     <Collapse in={showSynopsis} timeout="auto" unmountOnExit>
                         <ToolDescription
                             maxLine={2}
+                            component="div"
                             text={
                                 description ? (
                                     <MarkDownSanitizedWithHtml
