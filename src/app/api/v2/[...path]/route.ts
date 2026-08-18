@@ -7,17 +7,27 @@ import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
 import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
-async function getAuthHeaders() {
+const PUBLIC_V2_PATHS = [["search", "aggregation"]];
+
+function isPublicV2Path(path: string[]) {
+    return PUBLIC_V2_PATHS.some(
+        publicPath =>
+            publicPath.length === path.length &&
+            publicPath.every((segment, i) => segment === path[i])
+    );
+}
+
+async function getForwardHeaders(path: string[]) {
     const session = await getSessionCookie();
     const cookieStore = await cookies();
     const jwtToken = cookieStore.get(config.JWT_COOKIE)?.value;
 
-    if (!jwtToken) {
+    if (!jwtToken && !isPublicV2Path(path)) {
         return null;
     }
 
     return {
-        Authorization: `Bearer ${jwtToken}`,
+        ...(jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {}),
         [sessionHeader]: sessionPrefix + session,
         ...getPartnerHeaders(),
     };
@@ -28,7 +38,8 @@ async function proxy(
     context: { params: Promise<{ path: string[] }> }
 ) {
     const session = await getSessionCookie();
-    const headers = await getAuthHeaders();
+    const { path } = await context.params;
+    const headers = await getForwardHeaders(path);
 
     if (!headers) {
         return NextResponse.json(
@@ -53,7 +64,6 @@ async function proxy(
     }
 
     try {
-        const { path } = await context.params;
         const query = request.nextUrl.search;
         const url = `${apis.apiV2IPUrl}/${path.join("/")}${query}`;
 

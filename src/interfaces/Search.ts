@@ -179,6 +179,24 @@ export type SearchResult =
     | SearchResultDataProvider
     | SearchResultDataCustodianCol;
 
+export interface SearchAggregationProviderResult {
+    hits?: SearchResult[];
+    total?: number;
+    aggregations?: Aggregations;
+    ids?: Array<string | number>;
+    provider_logo?: string | null;
+    about?: string | null;
+}
+
+export interface SearchAggregationData {
+    query?: string;
+    type?: string;
+    results?: Record<string, SearchAggregationProviderResult>;
+    pending?: string[];
+    token?: string;
+    token_ttl?: number;
+}
+
 export interface SearchForm {
     query: string;
     sort: string;

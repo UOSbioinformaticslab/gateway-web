@@ -80,6 +80,8 @@ const apis = {
     searchV1Url: "/api/search",
     searchV1UrlIP: `${apiV1IPUrl}/search`,
     searchInternalUrl: "/api/search",
+    searchAggregationV2Url: `${apiV2Url}/search/aggregation`,
+    searchAggregationV2UrlIP: `${apiV2IPUrl}/search/aggregation`,
     saveSearchesV1Url: `${apiV1Url}/saved_searches`,
     collectionsV2Url: `${apiV2Url}/collections`,
     collectionsV2UrlIP: `${apiV2IPUrl}/collections`,

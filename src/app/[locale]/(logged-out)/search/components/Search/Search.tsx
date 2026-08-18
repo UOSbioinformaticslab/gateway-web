@@ -25,6 +25,7 @@ import { Filter } from "@/interfaces/Filter";
 import { Library } from "@/interfaces/Library";
 import {
     SavedSearchPayload,
+    SearchAggregationData,
     SearchCategory,
     SearchPaginationType,
     SearchQueryParams,
@@ -42,7 +43,6 @@ import Button from "@/components/Button";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
 import SearchBar from "@/components/SearchBar";
-import StudyFilter from "../StudyFilter/StudyFilter";
 import FeasibilityEnquiryDialog from "@/modules/FeasibilityEnquiryDialog";
 import GeneralEnquirySidebar from "@/modules/GeneralEnquirySidebar";
 import PublicationSearchDialog from "@/modules/PublicationSearchDialog";
@@ -104,15 +104,17 @@ import {
 } from "@/consts/icons";
 import { PostLoginActions } from "@/consts/postLoginActions";
 import { RouteName } from "@/consts/routeName";
-import { FILTER_TYPE_MAPPING } from "@/consts/search";
+import { FILTER_TYPE_MAPPING, SEARCH_AGGREGATION_PROVIDER } from "@/consts/search";
+import type { FilterData } from "@/utils/filter-setup";
 import {
     cleanSearchFilters,
     getAllSelectedFilters,
     isQueryEmpty,
     pickOnlyFilters,
 } from "@/utils/filters";
-import { getAllParams, getSaveSearchFilters } from "@/utils/search";
+import { mapSearchAggregation } from "@/utils/mapSearchAggregation";
 import { getPartnerContext } from "@/utils/partnerHeaders";
+import { getAllParams, getSaveSearchFilters } from "@/utils/search";
 import useAddLibraryModal from "../../hooks/useAddLibraryModal";
 import DataCustodianNetwork from "../DataCustodianNetwork";
 import FilterChips from "../FilterChips";
@@ -125,6 +127,7 @@ import ResultCardTool from "../ResultCardTool/ResultCardTool";
 import ResultsList from "../ResultsList";
 import ResultsTable from "../ResultsTable";
 import { FilterHeader } from "../StudyFilter/FilterHeader";
+import StudyFilter from "../StudyFilter/StudyFilter";
 
 const TRANSLATION_PATH = "pages.search";
 const STATIC_FILTER_SOURCE = "source";
@@ -135,7 +138,7 @@ interface SearchProps {
     filters: Filter[];
     cohortDiscovery: PageTemplatePromo;
     schema: V4Schema;
-    cancerTypeFilters?: { key: string; doc_count?: number }[];
+    cancerTypeFilters?: FilterData;
 }
 
 const filterSidebarWidth = 350;
@@ -152,7 +155,12 @@ const filterSidebarStyles = {
     },
 };
 
-const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchProps) => {
+const Search = ({
+    filters,
+    cohortDiscovery,
+    schema,
+    cancerTypeFilters,
+}: SearchProps) => {
     const { showDialog, hideDialog } = useDialog();
     const [hasSearched, setHasSearched] = useState(false);
     const router = useRouter();
@@ -343,46 +351,90 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
         queryParams
     );
 
+    const useSearchAggregation =
+        queryParams.type === SearchCategory.DATASETS &&
+        getPartnerContext().toUpperCase() === "CRUK";
+
     const hasSearchCriteria = useMemo(() => {
         const hasQuery = !!queryParams.query && queryParams.query.trim() !== "";
         const hasFilters = !isQueryEmpty(selectedFilters);
         return hasQuery || hasFilters;
     }, [queryParams.query, selectedFilters]);
 
+    const shouldFetchSearch = useMemo(
+        () =>
+            forceSearch ||
+            queryParams.type !== SearchCategory.PUBLICATIONS ||
+            (queryParams.source === GATEWAY_SOURCE_FIELD &&
+                hasSearchCriteria) ||
+            (queryParams.source === EUROPE_PMC_SOURCE_FIELD &&
+                !!queryParams.query),
+        [
+            forceSearch,
+            hasSearchCriteria,
+            queryParams.query,
+            queryParams.source,
+            queryParams.type,
+        ]
+    );
+
+    const searchUrl = useSearchAggregation
+        ? `${apis.searchAggregationV2Url}?providers[]=${SEARCH_AGGREGATION_PROVIDER}`
+        : `${apis.searchV1Url}/${queryParams.type}?view_type=mini&per_page=${
+              queryParams.per_page
+          }&page=${queryParams.page}&sort=${queryParams.sort}${
+              queryParams.type === SearchCategory.PUBLICATIONS
+                  ? `&${STATIC_FILTER_SOURCE}=${queryParams.source}`
+                  : ``
+          }`;
+
     const {
-        data,
+        data: searchResponse,
         isLoading: isSearching,
         mutate,
-    } = usePostSwr<SearchPaginationType<SearchResult>>(
-        `${apis.searchV1Url}/${queryParams.type}?${
-            queryParams.type === SearchCategory.DATASETS &&
-            getPartnerContext().toUpperCase() === "CRUK"
-                ? ""
-                : "view_type=mini&"
-        }per_page=${
-            queryParams.per_page
-        }&page=${queryParams.page}&sort=${queryParams.sort}${
-            queryParams.type === SearchCategory.PUBLICATIONS
-                ? `&${STATIC_FILTER_SOURCE}=${queryParams.source}`
-                : ``
-        }`,
-        {
-            query: queryParams.query,
-            ...pickedFilters,
-        },
+    } = usePostSwr<SearchPaginationType<SearchResult> | SearchAggregationData>(
+        searchUrl,
+        useSearchAggregation
+            ? {
+                  query: queryParams.query ?? "",
+                  type: SearchCategory.DATASETS,
+                  page: Number(queryParams.page),
+                  per_page: Number(queryParams.per_page),
+                  sort: queryParams.sort,
+                  ...pickedFilters,
+              }
+            : {
+                  query: queryParams.query,
+                  ...pickedFilters,
+              },
         {
             keepPreviousData: true,
-            withPagination: true,
+            withPagination: !useSearchAggregation,
             errorNotificationsOn: false,
-            shouldFetch:
-                forceSearch ||
-                queryParams.type !== SearchCategory.PUBLICATIONS ||
-                (queryParams.source === GATEWAY_SOURCE_FIELD &&
-                    hasSearchCriteria) ||
-                (queryParams.source === EUROPE_PMC_SOURCE_FIELD &&
-                    !!queryParams.query),
+            shouldFetch: shouldFetchSearch,
         }
     );
+
+    const data = useMemo(() => {
+        if (!useSearchAggregation) {
+            return searchResponse as
+                | SearchPaginationType<SearchResult>
+                | null
+                | undefined;
+        }
+
+        return mapSearchAggregation(
+            searchResponse as SearchAggregationData | null | undefined,
+            SEARCH_AGGREGATION_PROVIDER,
+            Number(queryParams.page),
+            Number(queryParams.per_page)
+        );
+    }, [
+        useSearchAggregation,
+        searchResponse,
+        queryParams.page,
+        queryParams.per_page,
+    ]);
 
     useEffect(() => {
         fireGTMEvent({
@@ -525,18 +577,21 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                 return (
                     <ResultCardCollection
                         result={result as SearchResultCollection}
+                        key={resultId}
                     />
                 );
             case SearchCategory.DATA_CUSTODIANS:
                 return (
                     <ResultCardDataProvider
                         result={result as SearchResultDataProvider}
+                        key={resultId}
                     />
                 );
             case SearchCategory.TOOLS:
                 return (
                     <ResultCardTool
                         result={result as SearchResultTool}
+                        key={resultId}
                         showSynopsis={synopsesExpanded}
                     />
                 );
@@ -572,7 +627,9 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             );
         }
 
-        return resultsView === ViewType.TABLE && !isMobile && !isTabletOrLaptop ? (
+        return resultsView === ViewType.TABLE &&
+            !isMobile &&
+            !isTabletOrLaptop ? (
             <ResultsTable
                 results={data?.list as SearchResultDataset[]}
                 showLibraryModal={showLibraryModal}
@@ -754,7 +811,6 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                     });
                 }}
                 aggregations={data?.aggregations}
-                cancerTypeFilters={cancerTypeFilters}
                 updateStaticFilter={(filterName: string, value: string) => {
                     setQueryParams({
                         ...queryParams,
@@ -771,7 +827,6 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
             />
         );
     }, [
-        cancerTypeFilters,
         data?.aggregations,
         europePmcModalAction,
         filters,
@@ -890,7 +945,6 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                         width: "100%",
                         position: "relative",
                     }}>
-
                     <Box component="section" sx={mainContentStyles}>
                         <Box
                             sx={{
@@ -918,7 +972,9 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                         selectedFilters={selectedFilters}
                                         handleDelete={removeFilter}
                                         filterCategory={
-                                            FILTER_TYPE_MAPPING[queryParams.type]
+                                            FILTER_TYPE_MAPPING[
+                                                queryParams.type
+                                            ]
                                         }
                                     />
                                 )}
@@ -944,13 +1000,18 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                     </Button>
                                 )}
                             </Box>
-                            {(isSearching || data === undefined) && (
+                            {(isSearching ||
+                                (shouldFetchSearch && data === undefined)) && (
                                 <Loading ariaLabel={t("loadingAriaLabel")} />
                             )}
                             {!isSearching &&
                                 !isEuropePmcSearchNoQuery &&
-                                data != null &&
-                                data?.path?.includes(queryParams.type) && (
+                                (!shouldFetchSearch ||
+                                    data === null ||
+                                    (data != null &&
+                                        data?.path?.includes(
+                                            queryParams.type
+                                        ))) && (
                                     <Box
                                         sx={{
                                             display: "flex",
@@ -972,7 +1033,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                                 }}
                                             />
                                         )}
-     
+
                                         <Box>
                                             <FilterHeader />
                                         </Box>
@@ -980,7 +1041,9 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                             SearchCategory.DATASETS && (
                                             <Box mb={2}>
                                                 <StudyFilter
-                                                    filterData={undefined}
+                                                    filterData={
+                                                        cancerTypeFilters
+                                                    }
                                                     onFilterChange={selectedFilters => {
                                                         // eslint-disable-next-line no-console
                                                         console.log(
@@ -993,7 +1056,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                                 />
                                             </Box>
                                         )}
-                                                                           <Box
+                                        <Box
                                             sx={{
                                                 display: "flex",
                                                 justifyContent: "center",
@@ -1027,9 +1090,7 @@ const Search = ({ filters, cohortDiscovery, schema, cancerTypeFilters }: SearchP
                                                     synopsesExpanded
                                                 }
                                                 onSynopsesToggle={() =>
-                                                    setSynopsesExpanded(
-                                                        v => !v
-                                                    )
+                                                    setSynopsesExpanded(v => !v)
                                                 }
                                             />
                                         </Box>
