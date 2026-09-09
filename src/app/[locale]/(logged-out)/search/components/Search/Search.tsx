@@ -104,7 +104,7 @@ import {
 } from "@/consts/icons";
 import { PostLoginActions } from "@/consts/postLoginActions";
 import { RouteName } from "@/consts/routeName";
-import { FILTER_TYPE_MAPPING, SEARCH_AGGREGATION_PROVIDER } from "@/consts/search";
+import { FILTER_TYPE_MAPPING, SEARCH_AGGREGATION_PROVIDER, SEARCH_AGGREGATION_PROVIDERS } from "@/consts/search";
 import type { FilterData } from "@/utils/filter-setup";
 import {
     cleanSearchFilters,
@@ -379,7 +379,7 @@ const Search = ({
     );
 
     const searchUrl = useSearchAggregation
-        ? `${apis.searchAggregationV2Url}?providers[]=${SEARCH_AGGREGATION_PROVIDER}`
+        ? apis.searchAggregationV2Url
         : `${apis.searchV1Url}/${queryParams.type}?view_type=mini&per_page=${
               queryParams.per_page
           }&page=${queryParams.page}&sort=${queryParams.sort}${
@@ -398,6 +398,7 @@ const Search = ({
             ? {
                   query: queryParams.query ?? "",
                   type: SearchCategory.DATASETS,
+                  providers: [...SEARCH_AGGREGATION_PROVIDERS],
                   page: Number(queryParams.page),
                   per_page: Number(queryParams.per_page),
                   sort: queryParams.sort,

@@ -66,6 +66,7 @@ import {
     OBSERVATIONS_FORM_SECTION,
     DEMOGRAPHIC_FREQUENCY_FORM_SECTION,
     OMICS_FORM_SECTION,
+    FORM_SECTION_ORDER,
     SUBMISSON_FORM_SECTION,
 } from "@/consts/createDataset";
 import { ArrowBackIosNewIcon, ArrowForwardIosIcon } from "@/consts/icons";
@@ -120,6 +121,8 @@ import FormHydrationFieldHeader from "./FormHydrationFieldHeader";
 import FormHydrationFieldItem from "./FormHydrationFieldItem";
 import { capitalise, decodeHtmlEntity, splitCamelcase } from "@/utils/general";
 import IntroScreen from "../IntroScreen";
+import GuidanceDownloads from "../GuidanceDownloads";
+import WelcomeGuidanceNavigation from "../WelcomeGuidanceNavigation";
 import StructuralMetadataSection from "../StructuralMetadata";
 import SubmissionScreen from "../SubmissionScreen";
 import { FormFooter, FormFooterItem } from "./CreateDataset.styles";
@@ -499,20 +502,34 @@ const CreateDatasetForm = ({
         }
     }, [existingFormData, isEditing]);
 
-    const formSections = useMemo(
-        () =>
-            [INITIAL_FORM_SECTION].concat(
-                getFirstLocationValues(schemaFields).filter(location => {
-                    if (location === DATASET_FILTERS_FORM_SECTION) {
-                        return schemaFields.some(
-                            field => field.location === location
-                        );
-                    }
-                    return hasVisibleFieldsForLocation(schemaFields, location);
-                })
-            ),
-        [schemaFields]
-    );
+    const formSections = useMemo(() => {
+        const availableLocations = getFirstLocationValues(schemaFields).filter(
+            location => {
+                if (location === INITIAL_FORM_SECTION) {
+                    return false;
+                }
+                if (location === DATASET_FILTERS_FORM_SECTION) {
+                    return schemaFields.some(
+                        field => field.location === location
+                    );
+                }
+                return hasVisibleFieldsForLocation(schemaFields, location);
+            }
+        );
+
+        const orderedLocations = FORM_SECTION_ORDER.filter(location =>
+            availableLocations.includes(location)
+        );
+        const orderedSet = new Set<string>(FORM_SECTION_ORDER);
+        const remainingLocations = availableLocations.filter(
+            location => !orderedSet.has(location)
+        );
+
+        return [INITIAL_FORM_SECTION].concat(
+            orderedLocations,
+            remainingLocations
+        );
+    }, [schemaFields]);
     const currentSectionIndex = selectedFormSection
         ? formSections.indexOf(selectedFormSection)
         : 0;
@@ -817,6 +834,9 @@ const CreateDatasetForm = ({
     const formatGuidance = (guidance?: string) =>
         guidance?.replaceAll("\\n", "\n");
 
+    const getWelcomeGuidanceContent = (guidance?: string) =>
+        formatGuidance(guidance)?.split("**Navigation & Workflow**")[0]?.trim();
+
     const updateGuidanceText = (fieldName: string, fieldArrayName?: string) => {
         const grantsGuidance = formatGuidance(
             getAssociatedProjectGrantsGuidance(schemaFields)
@@ -951,7 +971,7 @@ const CreateDatasetForm = ({
     useEffect(() => {
         if (selectedFormSection === INITIAL_FORM_SECTION) {
             setGuidanceText(
-                formatGuidance(getWelcomeSectionGuidance(schemaFields))
+                getWelcomeGuidanceContent(getWelcomeSectionGuidance(schemaFields))
             );
             return;
         }
@@ -1356,6 +1376,7 @@ const CreateDatasetForm = ({
                 {currentSectionIndex === 0 && (
                     <>
                         <IntroScreen
+                            teamId={teamId}
                             teamOptions={teamOptions}
                             handleOnUserInputChange={handleOnUserInputChange}
                             setDataCustodian={(value: number) =>
@@ -1382,6 +1403,7 @@ const CreateDatasetForm = ({
                                     content={guidanceText}
                                 />
                             )}
+                            <WelcomeGuidanceNavigation />
                         </Paper>
                     </>
                 )}
@@ -1518,11 +1540,19 @@ const CreateDatasetForm = ({
                                                               DATASET_TIMELINES_FORM_SECTION &&
                                                               datasetTimelinesSection?.title
                                                             ? datasetTimelinesSection.title
-                                                            : capitalise(
-                                                                splitCamelcase(
-                                                                    selectedFormSection
-                                                                )
-                                                            )}
+                                                            : selectedFormSection ===
+                                                                "Associated Project Grants"
+                                                              ? schemaFields.find(
+                                                                    field =>
+                                                                        field.location ===
+                                                                        "Associated Project Grants"
+                                                                )?.title ||
+                                                                "Project"
+                                                              : capitalise(
+                                                                    splitCamelcase(
+                                                                        selectedFormSection
+                                                                    )
+                                                                )}
                                                 </Typography>
                                             ))}
 
@@ -2451,6 +2481,7 @@ const CreateDatasetForm = ({
                                                 content={guidanceText}
                                             />
                                         )}
+                                        <GuidanceDownloads />
                                     </>
                                 )}
                             </Paper>

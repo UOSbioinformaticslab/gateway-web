@@ -409,8 +409,8 @@ function Table<T extends unknown>(props: TableProps<T>) {
             style={{
                 width: "100%",
                 overflowX: "auto",
-                overflowY: "auto",
-                maxHeight: "600px",
+                overflowY: isSearchResults ? "visible" : "auto",
+                maxHeight: isSearchResults ? undefined : "600px",
             }}>
             <table
                 css={style ?? styles.table}

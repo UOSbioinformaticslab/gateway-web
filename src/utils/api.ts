@@ -69,7 +69,7 @@ async function get<T>(
     const cookieStore = await cookies();
     const jwt = cookieStore.get(config.JWT_COOKIE);
     const session = await getSessionCookie();
-    const { cache, suppressError, serveRaw } = options;
+    const { cache, suppressError, serveRaw, headers: optionHeaders } = options;
     const nextConfig = cache
         ? {
               next: {
@@ -82,6 +82,7 @@ async function get<T>(
     const res = await fetch(url, {
         headers: {
             ...headers,
+            ...optionHeaders,
             Authorization: `Bearer ${jwt?.value}`,
             [sessionHeader]: sessionPrefix + session,
             ...getPartnerHeaders(),
@@ -278,13 +279,12 @@ async function post<T>(
 }
 
 async function getFilters(): Promise<Filter[]> {
-    const cache: Cache = {
-        tags: ["filters"],
-    };
-    return get<Filter[]>(
+    const response = await get<Filter[]>(
         `${apis.filtersV1UrlIP}?per_page=${FILTERS_PER_PAGE}`,
-        { cache }
+        { suppressError: true }
     );
+
+    return Array.isArray(response) ? response : [];
 }
 
 async function getCancerTypeFilters(): Promise<
@@ -445,6 +445,9 @@ async function getDataCustodianNetworks(
     );
 }
 
+const CRUK_GWDM_VERSION =
+    process.env.NEXT_PUBLIC_GWDM_VERSION || "2.1";
+
 async function getDataset(
     datasetId: string,
     schemaModel?: string,
@@ -459,10 +462,20 @@ async function getDataset(
         params.append("schema_version", schemaVersion);
     }
     const queryString = params.toString();
+    const gwdmHeaders =
+        schemaModel === "CRUK"
+            ? { "x-gwdm-version": CRUK_GWDM_VERSION }
+            : {};
 
     return await get<Dataset>(
         queryString ? `${baseUrl}?${queryString}` : baseUrl,
-        options
+        {
+            ...options,
+            headers: {
+                ...gwdmHeaders,
+                ...options?.headers,
+            },
+        }
     );
 }
 

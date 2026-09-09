@@ -33,7 +33,11 @@ const SearchPage = async () => {
     const SCHEMA_NAME = "CRUK";
     const SCHEMA_VERSION = "1.0.0";
 
-    const { schema } = await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION);
+    const traserResponse = process.env.TRASER_SERVICE_URL
+        ? await getSchemaFromTraser(SCHEMA_NAME, SCHEMA_VERSION)
+        : null;
+    const schema = traserResponse?.schema ?? { $defs: {} };
+
     return (
         <Search
             filters={adjustedFilters}
