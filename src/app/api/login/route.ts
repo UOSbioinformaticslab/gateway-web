@@ -32,6 +32,23 @@ function withPartnerProviderFromRequest<T extends Record<string, unknown>>(
     return withPartnerAuthBody(body);
 }
 
+function loginUpstream(
+    loginUrl: string,
+    session: string,
+    request: NextRequest,
+    payload: Record<string, unknown>
+) {
+    return fetch(loginUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            [sessionHeader]: sessionPrefix + session,
+            ...getPartnerHeadersForRequest(request),
+        },
+        body: JSON.stringify(payload),
+    });
+}
+
 export async function POST(request: NextRequest) {
     const session = await getSessionCookie();
     const cookieStore = await cookies();
@@ -48,7 +65,12 @@ export async function POST(request: NextRequest) {
         }
 
         const loginUrl = apis.loginV1UrlIP;
-        
+        const credentials = { email, password };
+        const partnerPayload = withPartnerProviderFromRequest(
+            request,
+            credentials
+        );
+
         if (process.env.NODE_ENV === "development") {
             logger.info(
                 { message: "Attempting login", url: loginUrl, email },
@@ -57,17 +79,27 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const response = await fetch(loginUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                [sessionHeader]: sessionPrefix + session,
-                ...getPartnerHeadersForRequest(request),
-            },
-            body: JSON.stringify(
-                withPartnerProviderFromRequest(request, { email, password })
-            ),
-        });
+        let response = await loginUpstream(
+            loginUrl,
+            session,
+            request,
+            partnerPayload
+        );
+
+        // CRUK-scoped users are stored with provider=cruk. Existing Gateway
+        // accounts use provider=service, so retry without provider on 401.
+        if (
+            response.status === 401 &&
+            partnerPayload.provider &&
+            body.provider == null
+        ) {
+            response = await loginUpstream(
+                loginUrl,
+                session,
+                request,
+                credentials
+            );
+        }
 
         if (!response.ok) {
             let errorData;

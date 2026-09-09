@@ -252,7 +252,13 @@ const formGenerateLegendItems = async (
             return {
                 name: section,
                 label:
-                    section === "Other"
+                    section === ASSOCIATED_PROJECT_GRANTS_SECTION
+                        ? schemaFields.find(
+                              field =>
+                                  field.location ===
+                                  ASSOCIATED_PROJECT_GRANTS_SECTION
+                          )?.title
+                        : section === "Other"
                         ? schemaFields.find(
                               field => field.location === "Other.data.types"
                           )?.title

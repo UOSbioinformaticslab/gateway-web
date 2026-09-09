@@ -40,8 +40,8 @@ const DATASET_STAT_PATHS = [
     "metadata.metadata.accessibility.access.deliveryLeadTime",
 ];
 
-const SCHEMA_NAME = process.env.NEXT_PUBLIC_SCHEMA_NAME || "HDRUK";
-const SCHEMA_VERSION = process.env.NEXT_PUBLIC_SCHEMA_VERSION || "4.0.0";
+const SCHEMA_NAME = "CRUK";
+const SCHEMA_VERSION = "1.0.0";
 
 const FALLBACK_DETAILS = {
     title: "Cholangiocarcinoma Patient-Derived Xenograft and Organoid Cohort",

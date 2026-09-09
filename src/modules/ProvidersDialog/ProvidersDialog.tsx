@@ -15,8 +15,8 @@ import useDialog from "@/hooks/useDialog";
 import useFullPathname from "@/hooks/useFullPathname";
 import { CUSTOMER_PORTAL_SUPPORT_URL } from "@/config/hrefs";
 import ProviderLinks from "../ProviderLinks";
-import SignInDialog from "../SignInDialog";
 import RegisterDialog from "../RegisterDialog";
+import SignInDialog from "../SignInDialog";
 
 const TRANSLATIONS_PROVIDERS_DIALOG = "modules.dialogs.ProvidersDialog";
 const oaId = process.env.NEXT_PUBLIC_OA_APP_ID;
@@ -71,14 +71,17 @@ const ProvidersDialog = () => {
                                 {
                                     label: "Add your collections and other resources",
                                 },
-                                {
-                                    label: "Use the Cohort Discovery advanced search tool (requires institutional or Azure logins)",
-                                },
                             ]}
                         />
                         <p>{t("intro2")}</p>
-                        
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}>
+
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 2,
+                                mb: 3,
+                            }}>
                             <Button
                                 variant="outlined"
                                 color="primary"
@@ -94,7 +97,6 @@ const ProvidersDialog = () => {
                                 {t("createAccount") || "Create an account"}
                             </Button>
                         </Box>
-
                     </>
                 )}
 
