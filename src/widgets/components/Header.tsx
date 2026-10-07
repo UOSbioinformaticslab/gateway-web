@@ -97,7 +97,7 @@ export default function Header({
                 <a href={gatewayUrl} target="_blank" rel="noreferrer">
                     <img
                         src="https://media.prod.hdruk.cloud/static/heath_data_research_gateway_logo.svg"
-                        alt="Gateway logo"
+                        alt="CRUK Data Hub logo"
                         width="118"
                     />
                 </a>

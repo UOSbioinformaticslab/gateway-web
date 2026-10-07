@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
             partnerPayload
         );
 
-        // CRUK-scoped users are stored with provider=cruk. Existing Gateway
+        // CRUK-scoped users are stored with provider=cruk. Existing CRUK Data Hub
         // accounts use provider=service, so retry without provider on 401.
         if (
             response.status === 401 &&

@@ -5,7 +5,7 @@ import "@/styles/wpStyles.css";
 import SupportPage from "../components/SupportPage";
 
 export const metadata = metaData({
-    title: "Getting started on the Gateway and managing your Team - Data Custodian",
+    title: "Getting started on the CRUK Data Hub and managing your Team - Data Custodian",
     description: "",
 });
 

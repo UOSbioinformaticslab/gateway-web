@@ -62,7 +62,7 @@ const STATIC_FILTER_SOURCE_OBJECT = {
         },
         {
             value: "GAT",
-            label: "Search Gateway Curated Publications",
+            label: "Search CRUK Data Hub Curated Publications",
         },
     ],
     label: STATIC_FILTER_SOURCE,

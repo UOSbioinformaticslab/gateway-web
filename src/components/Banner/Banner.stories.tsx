@@ -12,7 +12,7 @@ type Story = StoryObj<typeof Banner>;
 
 export const Default: Story = {
     args: {
-        title: "Gateway Releases",
+        title: "CRUK Data Hub Releases",
         subTitle:
             "The Gateway requires a significant volume of design and development work to deliver our vision and ambition. To achieve this our teams are continually working on the Gateway and deliver major software releases approximately every 4 weeks.",
         src: "/images/banners/release-notes.png",

@@ -35,10 +35,10 @@ describe("InfoHoverPanel", () => {
         expect(
             screen.getByText("Data Uses / Research Projects")
         ).toBeInTheDocument();
-        expect(screen.getByText("Welcome to the Gateway")).toBeInTheDocument();
+        expect(screen.getByText("Welcome to the CRUK Data Hub")).toBeInTheDocument();
         expect(
             screen.getByText(
-                "The Gateway streamlines the end-to-end user journey to search, discover and request access to the wealth of health and associated Datasets, Analysis Scripts & Software, Publications and Research Projects from across the UK and beyond."
+                "The CRUK Data Hub streamlines the end-to-end user journey to search, discover and request access to the wealth of health and associated Datasets, Analysis Scripts & Software, Publications and Research Projects from across the UK and beyond."
             )
         ).toBeInTheDocument();
     });

@@ -222,7 +222,7 @@ const formFields = [
             {
                 label: "Applicant name(s) (optional)",
                 name: "non_gateway_applicants",
-                info: "The name of the Principal Investigator, as well as any other individuals that have been authorised to use the data. If they are on the Gateway, please provide their profile URL",
+                info: "The name of the Principal Investigator, as well as any other individuals that have been authorised to use the data. If they are on the CRUK Data Hub, please provide their profile URL",
                 component: inputComponents.Autocomplete,
                 canCreate: true,
                 multiple: true,
@@ -335,9 +335,9 @@ const formFields = [
                 multiple: true,
             },
             {
-                label: "Non-Gateway Dataset(s) name",
+                label: "Non-CRUK Data Hub Dataset(s) name",
                 name: "non_gateway_datasets",
-                info: "The name of the dataset(s) being access, where the dataset(s) are not currently listed on the Gateway.",
+                info: "The name of the dataset(s) being access, where the dataset(s) are not currently listed on the CRUK Data Hub.",
                 component: inputComponents.Autocomplete,
                 multiple: true,
                 canCreate: true,
@@ -429,7 +429,7 @@ const formFields = [
             {
                 label: "Link to research outputs (optional)",
                 name: "non_gateway_outputs",
-                info: "A URL link to any academic or non-academic research outputs, as they become available, including code used. If the link is to a Gateway resource, this will automatically populate in related resources.",
+                info: "A URL link to any academic or non-academic research outputs, as they become available, including code used. If the link is to a CRUK Data Hub resource, this will automatically populate in related resources.",
                 component: inputComponents.Autocomplete,
                 // TODO - populate this list
                 options: [],

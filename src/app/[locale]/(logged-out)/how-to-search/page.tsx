@@ -8,7 +8,7 @@ import metaData from "@/utils/metadata";
 import "@/styles/wpStyles.css";
 
 export const metadata = metaData({
-    title: "How to search the Gateway",
+    title: "How to search the CRUK Data Hub",
     description: "",
 });
 const HowToSearchPage = async () => {

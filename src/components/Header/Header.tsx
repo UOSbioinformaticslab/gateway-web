@@ -124,7 +124,7 @@ function Header() {
                                 priority
                                 width={110}
                                 height={50}
-                                alt="HDR UK Gateway"
+                                alt="CRUK Data Hub"
                             />
                         </Link>
                         <Link

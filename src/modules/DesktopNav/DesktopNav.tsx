@@ -45,7 +45,7 @@ function DesktopNav({ headerVariant = "dark" }: DesktopNavProps) {
                 gap: 40,
             }}
             component="nav"
-            aria-label="HDR UK Gateway">
+            aria-label="CRUK Data Hub">
             {(navItems as NavItem[]).map(item => {
                 if (item.divider) {
                     return (

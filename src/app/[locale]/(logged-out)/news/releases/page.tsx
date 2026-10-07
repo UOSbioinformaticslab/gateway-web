@@ -13,7 +13,7 @@ const ReleasesPage = async () => {
 
     return (
         <>
-            <Banner title="Gateway Releases" />
+            <Banner title="CRUK Data Hub Releases" />
             <Container sx={{ background: "white", padding: 0 }}>
                 <ReleaseTabs allReleases={allReleases} />
             </Container>

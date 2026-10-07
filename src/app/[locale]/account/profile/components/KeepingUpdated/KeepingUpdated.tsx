@@ -40,10 +40,10 @@ function KeepingUpdated<T extends FieldValues>({
 
             <Divider />
             <Typography sx={{ marginTop: 2, marginBottom: 4 }}>
-                As a user of the Gateway we take the privacy and security of
+                As a user of the CRUK Data Hub we take the privacy and security of
                 your personal data seriously. Our privacy policy aims to give
                 you information on how Health Data Research UK collects and
-                processes your personal data through your use of this Gateway,
+                processes your personal data through your use of this CRUK Data Hub,
                 including any data you may provide by emailing us.
             </Typography>
         </Box>
