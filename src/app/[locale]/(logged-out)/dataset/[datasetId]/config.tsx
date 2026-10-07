@@ -40,7 +40,7 @@ const datasetFields: DatasetSection[] = [
                 type: FieldType.TEXT,
                 label: "DOI for dataset",
                 tooltip:
-                    "DOI for the specific dataset or dataset version. NOTE: This is not the DOI of the row level data within a dataset or the publication(s) associated with the dataset, but rather the DOI of the metadata describing the dataset as captured in the Gateway.",
+                    "DOI for the specific dataset or dataset version. NOTE: This is not the DOI of the row level data within a dataset or the publication(s) associated with the dataset, but rather the DOI of the metadata describing the dataset as captured in the CRUK Data Hub.",
             },
         ],
     },

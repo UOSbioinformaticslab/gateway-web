@@ -5,7 +5,7 @@ import "@/styles/wpStyles.css";
 import SupportPage from "../components/SupportPage";
 
 export const metadata = metaData({
-    title: "Using the Gateway Enquiry & Data Access Request Module - Data Custodian",
+    title: "Using the CRUK Data Hub Enquiry & Data Access Request Module - Data Custodian",
     description: "",
 });
 

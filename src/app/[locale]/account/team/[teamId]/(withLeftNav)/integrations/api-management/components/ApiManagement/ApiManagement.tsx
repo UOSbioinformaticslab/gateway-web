@@ -41,7 +41,7 @@ const ApiManagement = () => {
                 <ImageMediaCard
                     img={StaticImages.TEAM_INTEGRATIONS.createPrivateApp}
                     href={`/${RouteName.ACCOUNT}/${RouteName.TEAM}/${params?.teamId}/${RouteName.INTEGRATIONS}/${RouteName.API_MANAGEMENT}/${RouteName.CREATE}`}
-                    description="Create authentication keys and link to the Gateway"
+                    description="Create authentication keys and link to the CRUK Data Hub"
                     buttonText="Create Custom Integrations"
                 />
                 <ImageMediaCard

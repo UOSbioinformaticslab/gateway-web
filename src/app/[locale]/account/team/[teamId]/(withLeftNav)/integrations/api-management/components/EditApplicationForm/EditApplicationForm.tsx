@@ -132,7 +132,7 @@ const EditApplicationForm = ({
                 <Typography variant="h2">Custom Integrations</Typography>
                 <Typography>
                     Use this form to create, update and manage your api on the
-                    Gateway
+                    CRUK Data Hub
                 </Typography>
             </Paper>
             <Form onSubmit={handleSubmit(submitForm)}>

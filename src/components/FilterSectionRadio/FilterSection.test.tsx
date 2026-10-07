@@ -16,7 +16,7 @@ describe("FilterSectionRadio", () => {
                         },
                         {
                             value: "GAT",
-                            label: "Search Gateway",
+                            label: "Search CRUK Data Hub",
                         },
                     ],
                     label: "source",

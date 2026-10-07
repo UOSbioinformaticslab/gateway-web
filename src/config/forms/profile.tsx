@@ -96,7 +96,7 @@ const formFields = [
     },
     {
         label: "SSO email",
-        info: "This email address will receive service-related & marketing emails (e.g. terms and conditions changes, Gateway newsletter)",
+        info: "This email address will receive service-related & marketing emails (e.g. terms and conditions changes, CRUK Data Hub newsletter)",
         name: "email",
         component: inputComponents.TextField,
         required: true,
@@ -104,7 +104,7 @@ const formFields = [
     },
     {
         label: "Secondary email",
-        info: "Enter a secondary email address if you want contact from Health Data Research to an alternative address.\n This email address will receive notifications related to actions taken on the Gateway (e.g. responses to enquiries submitted via the Gateway)",
+        info: "Enter a secondary email address if you want contact from CRUK to an alternative address.\n This email address will receive notifications related to actions taken on the CRUK Data Hub (e.g. responses to enquiries submitted via the CRUK Data Hub)",
         name: "secondary_email",
         component: inputComponents.TextField,
     },
@@ -160,7 +160,7 @@ const formFields = [
     {
         label: (
             <span>
-                I agree to the HDRUK{" "}
+                I agree to CRUK{" "}
                 <a target="_blank" href={GATEWAY_TERMS_URL} rel="noreferrer">
                     Terms and Conditions
                 </a>
@@ -176,7 +176,7 @@ const formFieldsOpenAthens = formFields.map(field =>
     field.name === "secondary_email"
         ? {
               label: "Secondary email",
-              info: "Enter a secondary email address if you want contact from Health Data Research to an alternative address",
+              info: "Enter a secondary email address if you want contact from CRUK to an alternative address",
               name: "secondary_email",
               component: inputComponents.TextField,
               required: true,
@@ -187,13 +187,13 @@ const formFieldsOpenAthens = formFields.map(field =>
 const contactFormFields = [
     {
         title: "Feedback",
-        label: "I am happy to be contacted to share and give feedback on my experience with the Gateway",
+        label: "I am happy to be contacted to share and give feedback on my experience with the CRUK Data Hub",
         name: "contact_feedback",
         component: inputComponents.CheckboxRow,
     },
     {
         title: "News",
-        label: "I want to receive news, updates and curated marketing from the Gateway",
+        label: "I want to receive news, updates and curated marketing from the CRUK Data Hub",
         name: "contact_news",
         component: inputComponents.CheckboxRow,
     },

@@ -1,9 +1,9 @@
 [![LICENCE](https://img.shields.io/github/license/UOSbioinformaticslab/gateway-web)](https://github.com/UOSbioinformaticslab/gateway-web/blob/main/LICENSE)
 [![Support](https://img.shields.io/badge/Supported%20By-Cancer%20Research%20UK-2E008B)](https://www.cancerresearchuk.org)
 
-# Gateway Web - Frontend (Next.js)
+# CRUK Data Hub Web - Frontend (Next.js)
 
-Welcome to the Gateway Web frontend, a **Next.js** React application that powers the user interface of the Gateway. Maintained by the **University of Sussex Bioinformatics Lab** and supported by **[Cancer Research UK](https://www.cancerresearchuk.org)**, this application facilitates seamless interaction with the [Gateway API](https://github.com/HDRUK/gateway-api-2) using:
+Welcome to the CRUK Data Hub Web frontend, a **Next.js** React application that powers the user interface of the CRUK Data Hub. Maintained by the **University of Sussex Bioinformatics Lab** and supported by **[Cancer Research UK](https://www.cancerresearchuk.org)**, this application facilitates seamless interaction with the [Gateway API](https://github.com/HDRUK/gateway-api-2) using:
 
 - **[fetch](https://nextjs.org/docs/app/api-reference/functions/fetch)** for efficient server-side communication.
 - **[SWR](https://swr.vercel.app/)** for optimized client-side data fetching and state management.
@@ -70,7 +70,7 @@ A brief overview of the project's folder structure:
 ```
 ├── app/                # Next.js pages/api routes/actions
 ├── components/         # Reusable React components
-├── config/             # Reusable configuration throughout the gateway
+├── config/             # Reusable configuration throughout the hub
 ├── const/              # Constant values
 ├── hooks/              # React hooks
 ├── interfaces/         # Types and interfaces

@@ -70,7 +70,7 @@ describe("TeamDatasets", () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "No active datasets found on the Gateway for your team."
+                    "No active datasets found on the CRUK Data Hub for your team."
                 )
             ).toBeInTheDocument();
         });

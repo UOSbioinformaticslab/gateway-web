@@ -69,7 +69,7 @@ const ProvidersDialog = () => {
                                     label: "Submit data access enquiries and applications",
                                 },
                                 {
-                                    label: "Add your collections and other resources",
+                                    label: "Add your datasets and other resources",
                                 },
                             ]}
                         />

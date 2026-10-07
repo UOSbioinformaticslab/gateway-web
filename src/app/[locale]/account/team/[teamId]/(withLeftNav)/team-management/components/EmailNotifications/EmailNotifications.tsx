@@ -185,7 +185,7 @@ const EmailNotifications = ({ permissions, team }: EmailNotificationsProps) => {
                             marginBottom: 3,
                         }}>
                         Team related email notification will automatically be
-                        send to each team members preferred Gateway contact
+                        send to each team members preferred CRUK Data Hub contact
                         email. Team Admins can assign an alternative team email
                         account to send notification. Impacted team members will
                         be automatically notified when a role is assigned is

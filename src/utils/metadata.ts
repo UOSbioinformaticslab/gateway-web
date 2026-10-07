@@ -38,7 +38,7 @@ export default function metaData(
     return {
         title: meta.isDefault
             ? meta.title
-            : `${meta.title} - Health Data Research Gateway`,
+            : `${meta.title} - CRUK Data Hub`,
         // metadataBase: new URL(meta.url), // todo
         description: meta.description,
         robots: crawlers,

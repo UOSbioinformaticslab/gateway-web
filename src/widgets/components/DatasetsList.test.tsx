@@ -54,7 +54,7 @@ function getRowByTitle(title: string): HTMLElement {
 }
 
 describe("DatasetsList", () => {
-    it("renders dataset titles linking to Gateway dataset pages", () => {
+    it("renders dataset titles linking to CRUK Data Hub dataset pages", () => {
         render(<DatasetsList items={items} />);
 
         expect(

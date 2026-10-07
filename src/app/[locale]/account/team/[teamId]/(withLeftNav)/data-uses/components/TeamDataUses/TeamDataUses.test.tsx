@@ -39,7 +39,7 @@ describe("TeamDataUses", () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "No active data uses found on the Gateway for your team."
+                    "No active data uses found on the CRUK Data Hub for your team."
                 )
             ).toBeInTheDocument();
         });

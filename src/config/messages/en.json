@@ -161,14 +161,14 @@
         "dataCustodianSupport": {
             "title": "Data Custodians",
             "backToSupport": "Back to Data Custodians",
-            "gatewaySchemaTitle": "Gateway Schema",
+            "gatewaySchemaTitle": "CRUK Data Hub Schema",
             "uploadingToolsTitle": "Uploading Analysis Scripts & Software",
             "metadataOnboardingTitle": "Metadata Onboarding and Integrations",
             "uploadingPublicationsTitle": "Uploading Publications ",
             "uploadingDataUsesProjectsTitle": "Uploading Data Uses / Research Projects",
             "managingCollectionsTitle": "Managing Collections, Data Custodians and Data Custodian Networks",
-            "managingEnquiryDarTitle": "Using the Gateway Enquiry & Data Access Request Module",
-            "gettingStartedTitle": "Getting started on the Gateway and managing your Team",
+            "managingEnquiryDarTitle": "Using the CRUK Data Hub Enquiry & Data Access Request Module",
+            "gettingStartedTitle": "Getting started on the CRUK Data Hub and managing your Team",
             "theAllianceTitle": "The Alliance",
             "faqsTitle": "FAQs",
             "onboardingCohortDiscoveryTitle": "Onboarding to Cohort Discovery",
@@ -186,7 +186,7 @@
         "support": {
             "title": "Support Centre",
             "backToSupport": "Back to Support Centre",
-            "gatewaySchemaTitle": "Gateway Schema",
+            "gatewaySchemaTitle": "CRUK Data Hub Schema",
             "teamManagementTitle": "Team Management",
             "toolsTitle": "Uploading Analysis Scripts & Software",
             "searchTitle": "Exploring Data Resources",
@@ -224,8 +224,8 @@
         },
         "releases": {
             "noResults": "There are no releases for {year}",
-            "heading": "Welcome to our Gateway release summary page!",
-            "description1": "Here, you can learn more about the Gateway's newest features, improvements, and updates, through periodic summaries that are designed to be more digestible than our full ticket by ticket release notes. If you are interested in the detail, our full release notes can be accessed <githubLink>here</githubLink>. Our Technology Team is committed to continuously enhancing the Gateway, delivering regular updates and improvements through agile, user-focused development. Explore each <githubLink>detailed release</githubLink> to discover how the Gateway is evolving, or await the higher level summaries that we aim to publish every eight weeks (covering the previous four releases).",
+            "heading": "Welcome to our CRUK Data Hub release summary page!",
+            "description1": "Here, you can learn more about the CRUK Data Hub's newest features, improvements, and updates, through periodic summaries that are designed to be more digestible than our full ticket by ticket release notes. If you are interested in the detail, our full release notes can be accessed <githubLink>here</githubLink>. Our Technology Team is committed to continuously enhancing the Gateway, delivering regular updates and improvements through agile, user-focused development. Explore each <githubLink>detailed release</githubLink> to discover how the Gateway is evolving, or await the higher level summaries that we aim to publish every eight weeks (covering the previous four releases).",
             "description2": "To learn more about what is planned on our development roadmap please see the 'What next?' section <researchersLink>here</researchersLink>. If you would like to share feedback or suggest improvements to add to the Gateway roadmap, please contact us through our <supportLink>Support Centre</supportLink>."
         },
         "about": {
@@ -252,7 +252,7 @@
         "account": {
             "profile": {
                 "title": "Your profile",
-                "text": "Use this form to register an account and update your account on the Gateway",
+                "text": "Use this form to register an account and update your account on the CRUK Data Hub",
                 "cohortDiscoveryAdmin": {
                     "title": "Cohort Discovery Admin",
                     "text": "Find and manage status of all Cohort Discovery users, Click individual account users name to access decision page to review and edit status",
@@ -339,7 +339,7 @@
                 },
                 "teams": {
                     "title": "Teams",
-                    "text": "Onboard and manage data custodian teams on the Gateway",
+                    "text": "Onboard and manage data custodian teams on the CRUK Data Hub",
                     "addTeamButton": "Add a new team",
                     "components": {
                         "TeamsList": {
@@ -353,7 +353,7 @@
                     "create": {
                         "backButton": "Back to Teams list",
                         "title": "Add Team’s details",
-                        "text": "Add details of the data publisher team you want to create on the Gateway",
+                        "text": "Add details of the data publisher team you want to create on the CRUK Data Hub",
                         "aspectRatioInfo": "Please note the aspect ratio of the image should be approximately 2:1 (width:height)",
                         "addImageSuccess": "Image Uploaded",
                         "fileSelectButtonText": "Choose logo"
@@ -366,14 +366,14 @@
                 "publications": {
                     "components": {
                         "PublicationTab": {
-                            "noPublications": "No {status} publications found on the Gateway associated with your profile."
+                            "noPublications": "No {status} publications found on the CRUK Data Hub associated with your profile."
                         }
                     },
                     "create": {
                         "title": "Manage or create a publication entry",
                         "intro": "Publications should be peer reviewed documents (including pre-prints or articles published in a journal)",
                         "addResources": "Related resources (optional)",
-                        "addResourcesInfo": "Show relationships for publications, data uses, other publications and analysis scripts, tools and software. Resources must already be on the Gateway.",
+                        "addResourcesInfo": "Show relationships for publications, data uses, other publications and analysis scripts, tools and software. Resources must already be on the CRUK Data Hub.",
                         "addResourceButton": "Add resource",
                         "cancel": "Cancel",
                         "saveDraft": "Save as draft",
@@ -392,7 +392,7 @@
                                 "label": "Archive a publication"
                             },
                             "unarchive": {
-                                "label": "Unarchive publication so it is live on the Gateway",
+                                "label": "Unarchive publication so it is live on the CRUK Data Hub",
                                 "title": "Unarchive a publication",
                                 "buttonText": "Make Active",
                                 "confirmText": "Make Draft",
@@ -408,28 +408,28 @@
                         "RightPanel": {
                             "generalEnquiries": {
                                 "title": "General Enquiry",
-                                "text": "Send a general enquiry to one or multiple Data Custodians. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the Gateway.",
+                                "text": "Send a general enquiry to one or multiple Data Custodians. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the CRUK Data Hub.",
                                 "buttonText": "Make a general enquiry",
                                 "buttonTooltip": "Select at least one dataset to enable",
                                 "sidebarTitle": "Messages"
                             },
                             "feasibilityEnquiries": {
                                 "title": "Feasibility Enquiry",
-                                "text": "Send a feasibility enquiry to one or multiple Data Custodians. You must select all entities of interest from your library before starting a feasibility enquiry. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the Gateway.",
+                                "text": "Send a feasibility enquiry to one or multiple Data Custodians. You must select all entities of interest from your library before starting a feasibility enquiry. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the CRUK Data Hub.",
                                 "buttonText": "Make a feasibility enquiry",
                                 "buttonTooltip": "Select at least one dataset to enable",
                                 "sidebarTitle": "Messages"
                             },
                             "dataAccessRequest": {
                                 "title": "Data Access Request",
-                                "text": "Start your DAR application. Not all Data Custodians on the Gateway have this feature enabled. When DAR is not enabled, raise a feasibility enquiry to contact them directly about datasets.",
+                                "text": "Start your DAR application. Not all Data Custodians on the CRUK Data Hub have this feature enabled. When DAR is not enabled, raise a feasibility enquiry to contact them directly about datasets.",
                                 "buttonText": "Start a Data Access Request",
                                 "buttonTooltip": "Select at least one dataset to enable",
                                 "buttonTooltipDar": "You have selected dataset(s) from Data Custodian(s) that don't have an associated DAR application template"
                             },
                             "cohortDiscovery": {
                                 "title": "Cohort Discovery",
-                                "text": "Start a Cohort Discovery request. Not all Datasets on the Gateway have this feature enabled. You will also need to have Cohort Discovery access approved for your account.",
+                                "text": "Start a Cohort Discovery request. Not all Datasets on the CRUK Data Hub have this feature enabled. You will also need to have Cohort Discovery access approved for your account.",
                                 "buttonText": "Start a Cohort Discovery request",
                                 "buttonTooltip": "Select at least one dataset to enable.",
                                 "buttonTooltipCohort": "You have selected dataset(s) that do not support Cohort Discovery."
@@ -491,7 +491,7 @@
                     "uploadButton": "+ Upload",
                     "components": {
                         "DataUseTab": {
-                            "noDataUses": "No {status} data uses found on the Gateway for your team."
+                            "noDataUses": "No {status} data uses found on the CRUK Data Hub for your team."
                         },
                         "TeamDataUses": {
                             "create": "Add Data Use",
@@ -509,7 +509,7 @@
                                     "label": "Edit data use"
                                 },
                                 "archive": {
-                                    "label": "Archive data use so it is no longer live on the Gateway"
+                                    "label": "Archive data use so it is no longer live on the CRUK Data Hub"
                                 }
                             }
                         }
@@ -592,7 +592,7 @@
                                 "placeholderColumnName": "[Enter column name]",
                                 "placeholderDataType": "[Enter data type]",
                                 "uploadSuccess": "Structural metadata uploaded successfully.",
-                                "uploadMessage": "Please wait while we scan and process your file. When processing has finished, your data will display below and you will be able to submit the Metadata to the Gateway. Scanning and processing typically takes 30-45 seconds, please do not leave this page"
+                                "uploadMessage": "Please wait while we scan and process your file. When processing has finished, your data will display below and you will be able to submit the Metadata to the CRUK Data Hub. Scanning and processing typically takes 30-45 seconds, please do not leave this page"
                             },
                             "discardChanges": "Discard changes",
                             "saveAsDraft": "Save changes as draft",
@@ -605,7 +605,7 @@
                         },
                         "CreateDataUse": {
                             "downloadTitle": "Download template",
-                            "downloadInfo": "Please use the template provided to add new approved data uses. Alternatively, you can download your current data use register from the Gateway, edit offline and upload the edited file below.",
+                            "downloadInfo": "Please use the template provided to add new approved data uses. Alternatively, you can download your current data use register from the CRUK Data Hub, edit offline and upload the edited file below.",
                             "downloadButtonText": "Download the data use template",
                             "successMessage": "Data Use successfully created",
                             "upload": "Upload",
@@ -620,7 +620,7 @@
                         },
                         "DatasetTab": {
                             "downloadButton": "Download dataset information as .csv",
-                            "noDatasets": "No {status} datasets found on the Gateway for your team."
+                            "noDatasets": "No {status} datasets found on the CRUK Data Hub for your team."
                         },
                         "TeamDatasets": {
                             "title": "Datasets",
@@ -645,7 +645,7 @@
                                     "label": "Duplicate dataset metadata"
                                 },
                                 "archive": {
-                                    "label": "Archive dataset metadata so it is no longer live on the Gateway"
+                                    "label": "Archive dataset metadata so it is no longer live on the CRUK Data Hub"
                                 }
                             }
                         },
@@ -729,7 +729,7 @@
                         "title": "Manage or create analysis script, tool or software",
                         "intro": "Analysis script, tool or software can be anything you or someone else created or used during a research project",
                         "addResources": "Add resources (optional)",
-                        "addResourcesInfo": "Link publications, data uses and other analysis scripts, tools or software. Resources must be added to the Gateway first",
+                        "addResourcesInfo": "Link publications, data uses and other analysis scripts, tools or software. Resources must be added to the CRUK Data Hub first",
                         "addResourceButton": "Add resource",
                         "cancel": "Cancel",
                         "saveDraft": "Save as draft",
@@ -746,15 +746,15 @@
                                 "unarchive": {
                                     "buttonText": "Make Active",
                                     "confirmText": "Make Draft",
-                                    "title": "Unarchive analysis script, tool or software metadata so it is live on the Gateway",
+                                    "title": "Unarchive analysis script, tool or software metadata so it is live on the CRUK Data Hub",
                                     "content": "Select whether you would like to move this to Active (this will make your tool available within search results) or Draft (where you can edit the metadata before making it available within search results).",
-                                    "label": "Unarchive analysis script, tool or software metadata so it is live on the Gateway"
+                                    "label": "Unarchive analysis script, tool or software metadata so it is live on the CRUK Data Hub"
                                 },
                                 "edit": {
                                     "label": "Edit analysis script, tool or software metadata"
                                 },
                                 "archive": {
-                                    "label": "Archive analysis script, tool or software metadata so it is no longer live on the Gateway"
+                                    "label": "Archive analysis script, tool or software metadata so it is no longer live on the CRUK Data Hub"
                                 }
                             }
                         }
@@ -763,7 +763,7 @@
                 "integration": {
                     "create": {
                         "title": "Integration",
-                        "text": "Input and edit the authentication information for the Gateway system to use for the integration.",
+                        "text": "Input and edit the authentication information for the CRUK Data Hub system to use for the integration.",
                         "helper": "Entities created via a Predefined Integration can only be managed (updated or deleted/archived) via the Predefined Integration. Entities created via another method (manual, API integration) cannot be managed via the Predefined Integration."
                     }
                 },
@@ -883,7 +883,7 @@
                             },
                             "file": {
                                 "heading": "Create File-based Template",
-                                "description": "Upload an existing Data Access Request form for users to complete and upload to the Gateway"
+                                "description": "Upload an existing Data Access Request form for users to complete and upload to the CRUK Data Hub"
                             }
                         }
                     }
@@ -952,16 +952,16 @@
             }
         },
         "home": {
-            "touchDevice": "Explore the different functionalities of the Gateway",
+            "touchDevice": "Explore the different functionalities of the CRUK Data Hub",
             "seeNow": "See now",
             "meetTheTeam": "Meet the Team",
             "newsCardButtonText": "Read more",
-            "welcomeTitle": "Welcome to the Gateway",
-            "welcomeText": "The Gateway streamlines the end-to-end user journey to search, discover and request access to the wealth of health and associated Datasets, Analysis Scripts & Software, Publications and Research Projects from across the UK and beyond.",
+            "welcomeTitle": "Welcome to the CRUK Data Hub",
+            "welcomeText": "The CRUK Data Hub streamlines the end-to-end user journey to search, discover and request access to the wealth of health and associated Datasets, Analysis Scripts & Software, Publications and Research Projects from across the UK and beyond.",
             "datasets": {
                 "label": "Datasets & BioSamples",
                 "title": "Datasets & BioSamples",
-                "text": "Explore Datasets & BioSamples from across the UK and beyond and then navigate their associated content, such as, metadata, data provenance, and demographics or Gateway entities, such as, linked Datasets, Publications, and Analysis Scripts & Software."
+                "text": "Explore Datasets & BioSamples from across the UK and beyond and then navigate their associated content, such as, metadata, data provenance, and demographics or CRUK Data Hub entities, such as, linked Datasets, Publications, and Analysis Scripts & Software."
             },
             "dur": {
                 "label": "Data Uses / Research Projects",
@@ -976,12 +976,12 @@
             "dataCustodians": {
                 "label": "Data Custodians",
                 "title": "Data Custodians",
-                "text": "Search Data Custodians, discover their associated Gateway entities (e.g. Datasets, Publications, Analysis Scripts & Software), and find out how to contact them."
+                "text": "Search Data Custodians, discover their associated CRUK Data Hub entities (e.g. Datasets, Publications, Analysis Scripts & Software), and find out how to contact them."
             },
             "collections": {
                 "label": "Collections",
                 "title": "Collections",
-                "text": "Discover Gateway entities: Datasets & BioSamples, Analysis Scripts and Software, Data Uses / Research Projects, and Publications grouped together by domain, disease, theme, or organisation."
+                "text": "Discover CRUK Data Hub entities: Datasets & BioSamples, Analysis Scripts and Software, Data Uses / Research Projects, and Publications grouped together by domain, disease, theme, or organisation."
             },
             "phenotypes": {
                 "label": "Phenotypes",
@@ -996,7 +996,7 @@
             "dataCustodianNetworks": {
                 "label": "Data Custodian Networks",
                 "title": "Data Custodian Networks",
-                "text": "Discover networks of Data Custodians to learn about the Gateway entities available across a network e.g. the NHS Research Secure Data Environment (SDE) Network or Scottish Safe Haven Network."
+                "text": "Discover networks of Data Custodians to learn about the CRUK Data Hub entities available across a network e.g. the NHS Research Secure Data Environment (SDE) Network or Scottish Safe Haven Network."
             },
             "publications": {
                 "label": "Publications",
@@ -1031,11 +1031,11 @@
             "helpLinks": {
                 "item1": {
                     "title": "Support Centre",
-                    "text": "Explore Gateway features and learn how to use them. You can also submit queries and feedback to help us improve the Gateway."
+                    "text": "Explore CRUK Data Hub features and learn how to use them. You can also submit queries and feedback to help us improve the CRUK Data Hub."
                 },
                 "item2": {
                     "title": "Open-Source Development",
-                    "text": "Designed with and for the community, the Gateway is built for collaboration. Discover how you can get involved."
+                    "text": "Designed with and for the community, the CRUK Data Hub is built for collaboration. Discover how you can get involved."
                 }
             },
             "newsEvents": {
@@ -1135,14 +1135,14 @@
             "dataCustodianNetworks": "Data Custodian Networks",
             "dataCustodianNetworksTooltip": "Discover networks of Data Custodians to learn about the resources available across a network e.g. the NHS England SDE Network or the Research Data Scotland Network.",
             "collectionsHeader": "Collections",
-            "searchHeader": "Search the Gateway",
+            "searchHeader": "Search the CRUK Data Hub",
             "searchExplainerDatasets": "",
             "searchExplainerDataUse": "Search, for example, by project title, lay or technical summary, funders and sponsors, keywords",
             "searchExplainerPublications": "Search, for example, by Publication title, Publication DOI, journal name, authors, Dataset title, Dataset DOI, keywords",
             "searchExplainerCollections": "Search, for example, by Collection name, keywords",
             "searchExplainerTools": "Search, for example, by name, programming language, license type, keywords",
             "searchExplainerDataCustodians": "Search, for example, by Data Custodian, Datasets, Publication, Data Uses, Collection, or Analysis Scripts & Software",
-            "howToSearch": "How to search the Gateway",
+            "howToSearch": "How to search the CRUK Data Hub",
             "searchPlaceholder": "Enter your search term",
             "noResults": "No Results Found",
             "resultLimit": "There are more than 100 results. We recommend refining your search.",
@@ -1171,7 +1171,7 @@
                             "dataType": "Dataset type",
                             "dataTypeTooltip": "Select from the primary dataset types (e.g. Health and disease, Treatments/Interventions) or specific subtypes (e.g. Cancer, Mental health).",
                             "publisherName": "Data Custodian",
-                            "publisherNameTooltip": "Individual or organisation providing metadata on the Gateway",
+                            "publisherNameTooltip": "Individual or organisation providing metadata on the CRUK Data Hub",
                             "dataProviderColl": "Data Custodian Network",
                             "dataProviderCollTooltip": "Data Custodians that are linked in some way",
                             "collectionName": "Collection name",
@@ -1195,7 +1195,7 @@
                         },
                         "dataUseRegister": {
                             "publisherName": "Data Custodian",
-                            "publisherNameTooltip": "Individual or organisation providing metadata on the Gateway",
+                            "publisherNameTooltip": "Individual or organisation providing metadata on the CRUK Data Hub",
                             "organisationName": "Lead applicant organisation",
                             "organisationNameTooltip": "The name of the legal entity that signs the contract to access the data",
                             "datasetTitles": "Dataset",
@@ -1203,7 +1203,7 @@
                             "sector": "Organisation sector",
                             "sectorTooltip": "The type of organisation that has signed a contract to access the data",
                             "collectionNames": "Collection name",
-                            "collectionNamesTooltip": "Filter search results based on Gateway entities that are grouped around a particular topic"
+                            "collectionNamesTooltip": "Filter search results based on CRUK Data Hub entities that are grouped around a particular topic"
                         },
                         "paper": {
                             "datasetTitles": "Dataset",
@@ -1215,13 +1215,13 @@
                             "datasetLinkTypes": "Publication & dataset relationship",
                             "datasetLinkTypesTooltip": "Differentiate whether you are looking for a publication which describes or is about a dataset, or a publication which utilises the dataset for analysis",
                             "source": "Source",
-                            "sourceTooltip": "Select either to run your search against tailored fields in Europe PMC or search the Gateway publications"
+                            "sourceTooltip": "Select either to run your search against tailored fields in Europe PMC or search the CRUK Data Hub publications"
                         },
                         "collection": {
                             "datasetTitles": "Dataset",
                             "datasetTitlesTooltip": "The name of the dataset(s) being accessed",
                             "publisherName": "Data Custodian",
-                            "publisherNameTooltip": "Individual or organisation providing metadata on the Gateway"
+                            "publisherNameTooltip": "Individual or organisation providing metadata on the CRUK Data Hub"
                         },
                         "dataProvider": {
                             "datasetTitles": "Dataset",
@@ -1239,7 +1239,7 @@
                             "typeCategory": "Tool type",
                             "typeCategoryTooltip": "Categorisation based on where in the research journey an Analysis Script & Software is used",
                             "dataProvider": "Data Custodian",
-                            "dataProviderTooltip": "Individual or organisation providing metadata on the Gateway",
+                            "dataProviderTooltip": "Individual or organisation providing metadata on the CRUK Data Hub",
                             "datasetTitles": "Dataset",
                             "datasetTitlesTooltip": "The name of the dataset(s) being accessed"
                         }
@@ -1251,11 +1251,11 @@
                 },
                 "FeasibilityEnquiryForm": {
                     "itemName": "Feasibility Enquiry item",
-                    "helperText": "Send a feasibility enquiry to one or multiple Data Custodians. You must select all entities of interest from your library before starting a feasibility enquiry. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the Gateway.",
+                    "helperText": "Send a feasibility enquiry to one or multiple Data Custodians. You must select all entities of interest from your library before starting a feasibility enquiry. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the CRUK Data Hub.",
                     "saveButton": "Send message"
                 },
                 "GeneralEnquiryForm": {
-                    "helperText": "Send a general enquiry to one or multiple Data Custodians. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the Gateway.",
+                    "helperText": "Send a general enquiry to one or multiple Data Custodians. You will receive an email copy of the enquiry sent. The Data Custodian(s) will reply via email to your preferred email address, with a copy shared with the CRUK Data Hub.",
                     "saveButton": "Send message"
                 },
                 "PopulationFilter": {
@@ -1306,7 +1306,7 @@
                     },
                     "dataProvider": {
                         "label": "Lead Researcher/Institute ",
-                        "tooltip": "Individual or organisation to be contacted for a dataset on the Gateway"
+                        "tooltip": "Individual or organisation to be contacted for a dataset on the CRUK Data Hub"
                     },
                     "accessService": {
                         "label": "Access Service",
@@ -1629,7 +1629,7 @@
     },
     "components": {
         "CustomerSurvey": {
-            "title": "How satisfactory is your experience with the Gateway today?",
+            "title": "How satisfactory is your experience with the CRUK Data Hub today?",
             "tooltip-0": "Very Dissatisfied",
             "tooltip-1": "Dissatisfied",
             "tooltip-2": "Neutral",
@@ -1780,7 +1780,7 @@
             "DarEnquiryDialog": {
                 "titleEnabled": "Start a Data Access Request",
                 "titleNotEnabled": "Data access requests not enabled for this Data Custodian",
-                "messageNotEnabled": "The Data Custodian for this dataset has not yet enabled data access requests via the Gateway. Please select the Access Information button below to proceed to the dataset metadata page.",
+                "messageNotEnabled": "The Data Custodian for this dataset has not yet enabled data access requests via the CRUK Data Hub. Please select the Access Information button below to proceed to the dataset metadata page.",
                 "messageNotEnabledOtherInstructions": "Alternatively contact the Data Custodian using the <generalEnquiryLink></generalEnquiryLink> or <feasabilityEnquiryLink></feasabilityEnquiryLink> forms and they will contact you to discuss your requirements and guide you through their data access request process.",
                 "requestAccessButton": "Request Access",
                 "accessInformationButton": "Access information",
@@ -1805,8 +1805,8 @@
                     "google": "Google",
                     "openAthens": "institution"
                 },
-                "intro1": "Anyone can search and view datasets, collections and other resources with or without an account. Creating an account allows you to:",
-                "intro2": "You can sign in or create a Gateway account with any of the organisations below, simply click your preferred organisation and follow the on-screen instructions:",
+                "intro1": "Anyone can search and view datasets and other resources with or without an account. Creating an account allows you to:",
+                "intro2": "You can sign in or create a CRUK datahub account below:",
                 "suggestAnother": "Suggest another identity provider",
                 "selectAnother": "Select another provider"
             },
@@ -1887,7 +1887,7 @@
             },
             "RelatedResources": {
                 "title": "Add related resources",
-                "intro": "Search for data uses, publications and other analysis scripts, tools and software to add to your entry. Resources must already be on the Gateway.",
+                "intro": "Search for data uses, publications and other analysis scripts, tools and software to add to your entry. Resources must already be on the CRUK Data Hub.",
                 "resultsShown": "results shown",
                 "selected": "selected",
                 "cancel": "Cancel",
@@ -1941,7 +1941,7 @@
                 },
                 "datasetNameField": {
                     "placeholder": "Enter three or more letters to filter dataset names",
-                    "label": "Using a Gateway Dataset name, to find publications which may have used a Dataset"
+                    "label": "Using a CRUK Data Hub Dataset name, to find publications which may have used a Dataset"
                 },
                 "cancel": "Cancel",
                 "search": "Search"

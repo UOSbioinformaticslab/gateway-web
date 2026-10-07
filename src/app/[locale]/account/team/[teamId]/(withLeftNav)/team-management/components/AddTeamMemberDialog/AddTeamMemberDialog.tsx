@@ -90,7 +90,7 @@ const AddTeamMemberDialog = () => {
                 <MuiDialogContent>
                     <Typography sx={{ mb: 2 }}>
                         Users that you want to add to your team must already
-                        have an account on the Gateway
+                        have an account on the CRUK Data Hub
                     </Typography>
                     {isTeamLoading && <Loading />}
                     {team && user && !isTeamLoading && (

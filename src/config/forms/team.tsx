@@ -54,7 +54,7 @@ const formFields = [
     {
         label: "Introduction",
         name: "introduction",
-        info: "Provide a description of the organisation and/or services for display on the Data Custodian landing page. Include formatting as it should render on the Gateway",
+        info: "Provide a description of the organisation and/or services for display on the Data Custodian landing page. Include formatting as it should render on the CRUK Data Hub",
         component: inputComponents.Wysiwyg,
     },
     {
@@ -67,7 +67,7 @@ const formFields = [
     {
         label: "Organisation aliases",
         name: "aliases",
-        info: "Input alternative names the organisation is known by - these help users find the Team when searching the Gateway",
+        info: "Input alternative names the organisation is known by - these help users find the Team when searching the CRUK Data Hub",
         component: inputComponents.Autocomplete,
         options: [],
         canCreate: true,

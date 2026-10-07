@@ -10,7 +10,7 @@ describe("KeepingUpdated", () => {
                 fields={[
                     {
                         title: "Feedback",
-                        label: "I am happy to be contacted to share and give feedback on my experience with the Gateway",
+                        label: "I am happy to be contacted to share and give feedback on my experience with the CRUK Data Hub",
                         name: "contact_feedback",
                         component: "CheckboxRow",
                     },

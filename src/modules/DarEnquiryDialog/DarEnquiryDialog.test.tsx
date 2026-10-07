@@ -25,7 +25,7 @@ describe("<DarEnquiryDialog />", () => {
 
         expect(
             screen.getByText(
-                "The Data Custodian for this dataset has not yet enabled data access requests via the Gateway. Please select the Access Information button below to proceed to the dataset metadata page."
+                "The Data Custodian for this dataset has not yet enabled data access requests via the CRUK Data Hub. Please select the Access Information button below to proceed to the dataset metadata page."
             )
         ).toBeInTheDocument();
     });
