@@ -335,6 +335,11 @@ const CreateDatasetForm = ({
 
         setStructuralMetadata(latestMetadata?.structuralMetadata?.tables || []);
 
+        const existingFilters = latestMetadata?.datasetFilters || latestMetadata?.metadata?.datasetFilters || [];
+        if (Array.isArray(existingFilters) && existingFilters.length > 0) {
+            setDatasetFilterIds(new Set(existingFilters.map((f: unknown) => typeof f === 'object' && f !== null && 'id' in f ? (f as { id: string }).id : String(f)).filter(Boolean)));
+        }
+
         const mappedFormData = mapExistingDatasetToFormFields(
             schemaFields,
             latestMetadata
@@ -652,6 +657,7 @@ const CreateDatasetForm = ({
                               observations: [],
                               coverage: null,
                               ...mappedFormData,
+                              datasetFilters: Array.from(datasetFilterIds),
                               structuralMetadata: {
                                   ...mappedFormData.structuralMetadata,
                                   tables: structuralMetadata,
@@ -673,6 +679,7 @@ const CreateDatasetForm = ({
                               observations: [],
                               coverage: null,
                               ...mappedFormData,
+                              datasetFilters: Array.from(datasetFilterIds),
                               structuralMetadata: {
                                   ...mappedFormData.structuralMetadata,
                                   tables: structuralMetadata,
@@ -694,6 +701,7 @@ const CreateDatasetForm = ({
                               observations: [],
                               coverage: null,
                               ...mappedFormData,
+                              datasetFilters: Array.from(datasetFilterIds),
                               issued: today,
                               modified: today,
                               structuralMetadata: {

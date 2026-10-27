@@ -12865,6 +12865,13 @@ export const filterData = {
                     },
                 },
             },
+            "0_0_5": {
+                id: "0_0_5",
+                label: "Pan Cancer",
+                category: "cancerTypes",
+                primaryGroup: "cancer-type",
+                description: "applies to multiple cancer types.",
+            },
         },
     },
     "0_1": {

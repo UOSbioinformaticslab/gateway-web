@@ -582,32 +582,159 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
         <Paper elevation={0} sx={{ p: 3, bgcolor: 'white'}}>
             {selectedClassification ? (
                 <Box>
-                    <Button
-                        startIcon={<ArrowBackIcon />}
-                        onClick={() => { setSelectedClassification(null); setSearchTerm(''); }}
-                        sx={{ mb: 2, textTransform: 'none' }}
-                    >
-                        Back to Selection
-                    </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                        <Button
+                            startIcon={<ArrowBackIcon />}
+                            onClick={() => { setSelectedClassification(null); setSearchTerm(''); }}
+                            sx={{ textTransform: 'none' }}
+                        >
+                            Back to Selection
+                        </Button>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', textTransform: 'uppercase' }}>
+                                Also apply:
+                            </Typography>
+                            <Button
+                                type="button"
+                                id="pan-cancer-sub-filter-button"
+                                onClick={() => handleFilterChange("0_0_5")}
+                                variant="outlined"
+                                size="small"
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: 1.5,
+                                    px: 1.25,
+                                    py: 0.25,
+                                    fontSize: '0.8125rem',
+                                    fontWeight: 600,
+                                    borderColor: selectedFilters.has("0_0_5") ? COLORS.pink : '#D1D5DB',
+                                    bgcolor: 'white',
+                                    color: selectedFilters.has("0_0_5") ? COLORS.pink : 'text.primary',
+                                    '&:hover': {
+                                        borderColor: COLORS.pink,
+                                        bgcolor: selectedFilters.has("0_0_5") ? '#FFF1F7' : 'white',
+                                        color: COLORS.pink,
+                                    },
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                }}
+                                title="applies to multiple cancer types."
+                            >
+                                <span style={{ fontSize: '0.875rem' }}>🌐</span>
+                                <span>Pan-cancer</span>
+                                {selectedFilters.has("0_0_5") && (
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            ml: 0.5,
+                                            fontSize: '0.7rem',
+                                            bgcolor: COLORS.pink,
+                                            color: 'white',
+                                            borderRadius: '50%',
+                                            width: 14,
+                                            height: 14,
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontWeight: 800,
+                                        }}
+                                    >
+                                        ✓
+                                    </Box>
+                                )}
+                            </Button>
+                        </Box>
+                    </Box>
                     <Divider sx={{ mb: 3 }} />
                     {renderContent()}
                 </Box>
             ) : (
                 <Box>
-                    <Typography
+                    <Box
                         sx={{
-                            display: 'block',
-                            color: colors.black,
-                            fontSize: { mobile: '1.125rem', tablet: '1.25rem' },
-                            fontWeight: 600,
-                            lineHeight: 1.4,
-                            textAlign: { mobile: 'center', tablet: 'left' },
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: 1.5,
                             mb: 2,
                             mt: { mobile: -0.5, tablet: -1 },
                         }}
                     >
-                        Click on your choice of classification to begin
-                    </Typography>
+                        <Typography
+                            component="span"
+                            sx={{
+                                color: colors.black,
+                                fontSize: { mobile: '1.125rem', tablet: '1.25rem' },
+                                fontWeight: 600,
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            Browse
+                        </Typography>
+                        <Button
+                            type="button"
+                            id="pan-cancer-filter-button"
+                            onClick={() => handleFilterChange("0_0_5")}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: 1.5,
+                                px: 1.5,
+                                py: 0.5,
+                                fontSize: '0.875rem',
+                                fontWeight: 600,
+                                borderColor: selectedFilters.has("0_0_5") ? COLORS.pink : '#D1D5DB',
+                                bgcolor: 'white',
+                                color: selectedFilters.has("0_0_5") ? COLORS.pink : 'text.primary',
+                                '&:hover': {
+                                    borderColor: COLORS.pink,
+                                    bgcolor: selectedFilters.has("0_0_5") ? '#FFF1F7' : 'white',
+                                    color: COLORS.pink,
+                                },
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.75,
+                                boxShadow: 'none',
+                            }}
+                            title="applies to multiple cancer types."
+                        >
+                            <span style={{ fontSize: '1rem' }}>🌐</span>
+                            <span>Pan-cancer</span>
+                            {selectedFilters.has("0_0_5") && (
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        ml: 0.5,
+                                        fontSize: '0.75rem',
+                                        bgcolor: COLORS.pink,
+                                        color: 'white',
+                                        borderRadius: '50%',
+                                        width: 16,
+                                        height: 16,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontWeight: 800,
+                                    }}
+                                >
+                                    ✓
+                                </Box>
+                            )}
+                        </Button>
+                        <Typography
+                            component="span"
+                            sx={{
+                                color: colors.black,
+                                fontSize: { mobile: '1.125rem', tablet: '1.25rem' },
+                                fontWeight: 600,
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            datasets and/or click on a classification below to specify individual cancers
+                        </Typography>
+                    </Box>
 
                     <Grid container spacing={3}>
                         <Grid size={3}>

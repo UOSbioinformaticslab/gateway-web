@@ -6,16 +6,19 @@ import {
     Checkbox,
     CircularProgress,
     Collapse,
+    Divider,
     FormControlLabel,
     InputAdornment,
     Tab,
     Tabs,
     TextField,
+    Tooltip,
     Typography,
 } from "@mui/material";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Paper from "@/components/Paper";
 import NestedFilterTree from "@/components/NestedFilterTree";
 import { colors } from "@/config/theme";
@@ -253,6 +256,80 @@ const DatasetFiltersSection = ({
                 borderRadius: 2,
                 p: { mobile: 2, tablet: 2.5 },
             }}>
+            {/* Guidance banner clarifying Pan Cancer vs ICD-O */}
+            <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ color: "text.secondary", fontSize: "0.8125rem" }}>
+                    Specify <strong>Pan Cancer</strong> if your dataset applies to multiple cancer types, <strong>and/or</strong> use the <strong>ICD-O Classification</strong> below to specify individual cancer topography and histology.
+                </Typography>
+            </Box>
+
+            {/* Option 1: Pan-Cancer Filter Card */}
+            <Paper
+                elevation={0}
+                sx={{
+                    mb: 2,
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: "2px solid",
+                    borderColor: selectedFilters.has("0_0_5") ? COLORS.pink : "grey.300",
+                    bgcolor: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    transition: "all 0.2s ease-in-out",
+                }}
+            >
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={selectedFilters.has("0_0_5")}
+                            onChange={() => onFilterChange("0_0_5")}
+                            sx={{
+                                color: "grey.400",
+                                "&.Mui-checked": {
+                                    color: COLORS.pink,
+                                },
+                            }}
+                        />
+                    }
+                    label={
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <span style={{ fontSize: "1.1rem" }}>🌐</span>
+                            <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", color: "text.primary" }}>
+                                Pan Cancer
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                                — applies to multiple cancer types.
+                            </Typography>
+                        </Box>
+                    }
+                    sx={{ m: 0 }}
+                />
+                <Tooltip title="applies to multiple cancer types." placement="left">
+                    <InfoOutlinedIcon sx={{ fontSize: 18, color: "grey.500", cursor: "help" }} />
+                </Tooltip>
+            </Paper>
+
+            {/* Visual Divider: AND / OR */}
+            <Box sx={{ display: "flex", alignItems: "center", my: 2 }}>
+                <Divider sx={{ flexGrow: 1 }} />
+                <Typography
+                    variant="caption"
+                    sx={{
+                        mx: 2,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        color: "text.disabled",
+                        fontSize: "0.75rem",
+                    }}
+                >
+                    — AND / OR specify ICD-O classification —
+                </Typography>
+                <Divider sx={{ flexGrow: 1 }} />
+            </Box>
+
+            {/* Option 2: ICD-O Classification */}
             <Typography
                 variant="h5"
                 component="h3"

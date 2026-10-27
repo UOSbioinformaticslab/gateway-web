@@ -1,6 +1,6 @@
 import { filterDetailsMap } from './filter-setup';
 
-type FilterType = "hist" | "top" | "cruk" | "snomed" | "tcga" | "data" | "access" | "unknown";
+type FilterType = "hist" | "top" | "cruk" | "snomed" | "tcga" | "pan" | "data" | "access" | "unknown";
 
 const filterType = (id: string): FilterType => {
     const info = id.split("_");
@@ -23,6 +23,7 @@ const filterType = (id: string): FilterType => {
         else if (second === "2") return "cruk";
         else if (second === "3") return "snomed";
         else if (second === "4") return "tcga";
+        else if (second === "5") return "pan";
         return "unknown";
     }
 };
@@ -97,7 +98,8 @@ const calculateLogicMessage = ({
     const top = filters.filter(f => filterType(f.id) === "top"
         || filterType(f.id) === "cruk"
         || filterType(f.id) === "snomed"
-        || filterType(f.id) === "tcga");
+        || filterType(f.id) === "tcga"
+        || filterType(f.id) === "pan");
     const data = filters.filter(f => filterType(f.id) === "data");
     const access = filters.filter(f => filterType(f.id) === "access");
 
