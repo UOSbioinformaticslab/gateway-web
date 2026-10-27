@@ -259,7 +259,7 @@ const DatasetFiltersSection = ({
             {/* Guidance banner clarifying Pan Cancer vs ICD-O */}
             <Box sx={{ mb: 2 }}>
                 <Typography variant="body2" sx={{ color: "text.secondary", fontSize: "0.8125rem" }}>
-                    Specify <strong>Pan Cancer</strong> if your dataset applies to multiple cancer types, <strong>and/or</strong> use the <strong>ICD-O Classification</strong> below to specify individual cancer topography and histology.
+                    Specify <strong>Pan Cancer</strong> if your dataset applies to multiple cancer types, <strong>and/or</strong> use the <strong>ICD-O Classification</strong> below to specify cancer topography (primary site) and, where relevant, histology.
                 </Typography>
             </Box>
 
@@ -337,8 +337,7 @@ const DatasetFiltersSection = ({
                 ICD-O Classification
             </Typography>
             <Typography sx={{ mb: 2, color: "text.secondary" }}>
-                Please provide the ICD-O Topography and Histology codes. You
-                will be asked to provide translations later.
+                Please provide the ICD-O Topography code (primary site) and, if relevant, the Histology code. (If histology is not applicable, general neoplasms are assumed for automated TCGA and CRUK mappings).
             </Typography>
             {renderSearch("Search ICD-O terms...")}
             <Box
@@ -363,11 +362,18 @@ const DatasetFiltersSection = ({
                     </Box>
                 </Paper>
                 <Paper elevation={0} sx={panelSx}>
-                    <Typography
-                        variant="subtitle1"
-                        sx={{ fontWeight: 700, mb: 1.5 }}>
-                        Histology
-                    </Typography>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: 700 }}>
+                            Histology
+                        </Typography>
+                        <Typography
+                            variant="caption"
+                            sx={{ color: "text.secondary", fontWeight: 400 }}>
+                            (Optional / Where Relevant)
+                        </Typography>
+                    </Box>
                     <Box sx={listScrollSx}>
                         <NestedFilterTree
                             items={histologyItems}

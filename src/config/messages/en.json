@@ -531,7 +531,7 @@
                                 "sidebarLabel": "Sidebar:",
                                 "sidebar": "Use status icons to track progress (Red \"X\" for missing mandatory fields; Amber \"!\" for missing optional fields).",
                                 "datasetFiltersLabel": "Dataset Filters:",
-                                "datasetFilters": "Tag your data with either Pan Cancer OR at least one Topography and Histology pair, plus Data Type and Access Type. Access to data normally changes as a project and resulting datasets mature.",
+                                "datasetFilters": "Tag your data with either Pan Cancer OR at least one Topography (Histology is optional), plus Data Type and Access Type. Access to data normally changes as a project and resulting datasets mature.",
                                 "autoExpansionLabel": "Auto-Expansion:",
                                 "autoExpansion": "In those fields where you can add more than one entry typing in the last row automatically creates a new row.",
                                 "privacyLabel": "Privacy:",

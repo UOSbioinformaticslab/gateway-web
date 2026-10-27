@@ -54,7 +54,7 @@ const DatasetFiltersGuidancePanel = ({
                 criteria: type of cancer, type of data and access conditions.
             </Typography>
             <Typography sx={{ mb: 3 }}>
-                Specify <strong>Pan Cancer</strong> if your dataset applies to multiple cancer types — or use <strong>ICD-O Classification</strong> (Topography and Histology) for specific cancers. This is automatically translated to CRUK and TCGA equivalents.
+                Specify <strong>Pan Cancer</strong> if your dataset applies to multiple cancer types, <strong>and/or</strong> use <strong>ICD-O Classification</strong> (Topography and, where relevant, Histology) for specific cancers. This is automatically translated to CRUK and TCGA equivalents.
             </Typography>
 
             <Typography

@@ -559,12 +559,17 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
                                 </Box>
                             </Paper>
                             <Paper elevation={0} sx={icdoPanelSx}>
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{ color: colors.black, fontWeight: 700, mb: 1.5 }}
-                                >
-                                    Histology
-                                </Typography>
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+                                    <Typography
+                                        variant="subtitle1"
+                                        sx={{ color: colors.black, fontWeight: 700 }}
+                                    >
+                                        Histology
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: colors.grey600, fontWeight: 400 }}>
+                                        (Optional)
+                                    </Typography>
+                                </Box>
                                 <Box sx={icdoListScrollSx}>
                                     <NestedFilterList items={filteredHistology} {...listProps} />
                                 </Box>
@@ -747,7 +752,7 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
                             <ClassificationCard title="SNOMED-CT" description="Systematized Nomenclature of Medicine." classificationKey="snomed" emoji="🏷️" />
                         </Grid>
                         <Grid size={3}>
-                            <ClassificationCard title="ICD-O Classification" description="Official pathology terms (Topography & Histology)." classificationKey="icdo" emoji="🔬" />
+                            <ClassificationCard title="ICD-O Classification" description="Official pathology terms: Topography (site) & optional Histology (morphology)." classificationKey="icdo" emoji="🔬" />
                         </Grid>
                     </Grid>
                 </Box>
@@ -808,16 +813,19 @@ const DataTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setSea
 };
 
 const AccessibilityPanel = ({ handleFilterChange, selectedFilters, searchTerm, setSearchTerm, filteredIds, isSearching }) => {
-    if (!filterData || !filterData['0_1'] || !filterData['0_1'].children) {
-        return <Paper elevation={0} sx={{ p: 3 }}>Loading filter data...</Paper>;
-    }
-    
-    const items = Object.values(filterData['0_1'].children);
+    const items = useMemo(() => {
+        if (!filterData || !filterData['0_1'] || !filterData['0_1'].children) return [];
+        return Object.values(filterData['0_1'].children);
+    }, []);
 
     const visibleItems = useMemo(() => {
         if (!filteredIds) return items;
         return items.filter(item => filteredIds.has(item.id));
     }, [items, filteredIds]);
+
+    if (!filterData || !filterData['0_1'] || !filterData['0_1'].children) {
+        return <Paper elevation={0} sx={{ p: 3 }}>Loading filter data...</Paper>;
+    }
 
     return (
         <Paper elevation={0} sx={{ p: 3 }}>
