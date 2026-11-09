@@ -126,6 +126,7 @@ import WelcomeGuidanceNavigation from "../WelcomeGuidanceNavigation";
 import StructuralMetadataSection from "../StructuralMetadata";
 import SubmissionScreen from "../SubmissionScreen";
 import { FormFooter, FormFooterItem } from "./CreateDataset.styles";
+import { filterTelemetry } from "@/utils/filterModificationsTelemetry";
 
 const DatasetFiltersSection = dynamic(
     () => import("../DatasetFilters"),
@@ -385,6 +386,12 @@ const CreateDatasetForm = ({
     const [selectedFormSection, setSelectedFormSection] = useState<string>("");
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [guidanceText, setGuidanceText] = useState<string>();
+
+    useEffect(() => {
+        if (selectedFormSection) {
+            filterTelemetry.recordVisitedSection(selectedFormSection);
+        }
+    }, [selectedFormSection]);
 
     const datasetVersionQuery = `input_schema=${SCHEMA_NAME}&input_version=${SCHEMA_VERSION}`;
     const postDatasetUrl = `${baseDatasetsUrl}?${datasetVersionQuery}`;
@@ -757,6 +764,20 @@ const CreateDatasetForm = ({
                     : await createDataset(formPayload as NewDataset);
 
             if (formPostRequest !== null) {
+                const datasetTitle =
+                    (formPayload?.metadata?.metadata?.summary?.title as string) ||
+                    "";
+                const targetDatasetId =
+                    (formPostRequest as string) ||
+                    (params?.datasetId as string) ||
+                    datasetId ||
+                    "";
+                filterTelemetry.sendSessionTelemetry({
+                    datasetId: targetDatasetId,
+                    datasetName: datasetTitle,
+                    currentFilters: Array.from(datasetFilterIds),
+                });
+
                 push(
                     `/${locale}/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${
                         RouteName.DATASETS

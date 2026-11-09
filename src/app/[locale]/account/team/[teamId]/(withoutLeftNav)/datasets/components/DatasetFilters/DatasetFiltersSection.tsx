@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+    Alert,
     Box,
+    Button,
     Checkbox,
     CircularProgress,
     Collapse,
@@ -19,8 +21,12 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import { useFormContext } from "react-hook-form";
 import Paper from "@/components/Paper";
 import NestedFilterTree from "@/components/NestedFilterTree";
+import { ProposedFilterArea } from "@/components/ProposedFilterArea";
+import { useFilterRecommendations } from "@/hooks/useFilterRecommendations";
 import { colors } from "@/config/theme";
 
 type FilterData = typeof import("@/utils/filter-setup").filterData;
@@ -37,6 +43,8 @@ type FilterTab = "cancer" | "data" | "access";
 interface DatasetFiltersSectionProps {
     selectedFilters: Set<string>;
     onFilterChange: (id: string) => void;
+    formData?: Record<string, unknown>;
+    datasetId?: string | number | null;
 }
 
 const pruneHierarchy = (
@@ -68,7 +76,34 @@ const pruneHierarchy = (
 const DatasetFiltersSection = ({
     selectedFilters,
     onFilterChange,
+    formData,
+    datasetId,
 }: DatasetFiltersSectionProps) => {
+    const formContext = useFormContext();
+    const {
+        suggestedFilters,
+        isGeneratingSuggestions,
+        suggestionNotice,
+        handleGenerateSuggestions,
+        handleAcceptSuggestion,
+        handleDismissSuggestion,
+        handleAcceptAllSuggestions,
+        handleDismissAllSuggestions,
+        clearSuggestedFilters,
+    } = useFilterRecommendations({
+        selectedFilterIds: selectedFilters,
+        onAddFilter: (id: string) => {
+            if (!selectedFilters.has(id)) {
+                onFilterChange(id);
+            }
+        },
+    });
+
+    const handleTriggerRecommendations = () => {
+        const currentFormData = formData || (formContext ? formContext.getValues() : {});
+        handleGenerateSuggestions(currentFormData, datasetId);
+    };
+
     const [filterData, setFilterData] = useState<FilterData | null>(null);
     const [filterDetailsMap, setFilterDetailsMap] =
         useState<FilterDetailsMap | null>(null);
@@ -562,18 +597,79 @@ const DatasetFiltersSection = ({
 
     return (
         <Box sx={{ p: 0 }}>
-            <Typography variant="h2" sx={{ mb: 1 }}>
-                Dataset Filters
-            </Typography>
-            <Typography sx={{ mb: 1 }}>
-                Please tag your dataset with specific filters identifying the
-                type of cancer covered, the type of data it contains and
-                accessibility. This improves the searchability of your dataset.
-            </Typography>
-            <Typography sx={{ mb: 2, color: colors.red700, fontWeight: 700 }}>
-                Required: At least one Topography, one Histology, one Data Type,
-                and one Access Type.
-            </Typography>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    mb: 1.5,
+                }}>
+                <Box sx={{ flex: 1, minWidth: 280 }}>
+                    <Typography variant="h2" sx={{ mb: 1 }}>
+                        Dataset Filters
+                    </Typography>
+                    <Typography sx={{ mb: 1 }}>
+                        Please tag your dataset with specific filters identifying the
+                        type of cancer covered, the type of data it contains and
+                        accessibility. This improves the searchability of your dataset.
+                    </Typography>
+                    <Typography sx={{ mb: 1, color: colors.red700, fontWeight: 700 }}>
+                        Required: At least one Topography, one Histology, one Data Type,
+                        and one Access Type.
+                    </Typography>
+                </Box>
+                <Box sx={{ pt: 0.5 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleTriggerRecommendations}
+                        disabled={isGeneratingSuggestions}
+                        startIcon={
+                            isGeneratingSuggestions ? (
+                                <CircularProgress size={18} sx={{ color: "white" }} />
+                            ) : (
+                                <AutoAwesomeIcon />
+                            )
+                        }
+                        sx={{
+                            backgroundColor: COLORS.pink,
+                            color: "white",
+                            textTransform: "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            px: 2.2,
+                            py: 1,
+                            boxShadow: "0 2px 6px rgba(209, 10, 111, 0.25)",
+                            "&:hover": {
+                                backgroundColor: "#B0085C",
+                            },
+                        }}>
+                        {isGeneratingSuggestions
+                            ? "Analyzing Metadata..."
+                            : "Auto-Generate Filter Suggestions"}
+                    </Button>
+                </Box>
+            </Box>
+
+            {suggestionNotice && (
+                <Alert
+                    severity={suggestionNotice.type}
+                    onClose={() => clearSuggestedFilters()}
+                    sx={{ mb: 2.5, borderRadius: 2 }}>
+                    {suggestionNotice.message}
+                </Alert>
+            )}
+
+            {suggestedFilters.length > 0 && (
+                <ProposedFilterArea
+                    suggestions={suggestedFilters}
+                    onAccept={handleAcceptSuggestion}
+                    onDismiss={handleDismissSuggestion}
+                    onAcceptAll={handleAcceptAllSuggestions}
+                    onDismissAll={handleDismissAllSuggestions}
+                />
+            )}
 
             <Tabs
                 value={activeTab}
