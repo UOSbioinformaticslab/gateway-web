@@ -27,24 +27,14 @@ const OBSERVATIONS_FORM_SECTION = "observations";
 const DEMOGRAPHIC_FREQUENCY_FORM_SECTION = "demographicFrequency";
 const OMICS_FORM_SECTION = "omics";
 
-/** Matches visibleSections in cruk-semantic-schema (excluding welcome, prepended separately). */
-const FORM_SECTION_ORDER = [
-    "Dataset Version",
-    "Associated Project Grants",
-    "summary",
-    "documentation",
-    STRUCTURAL_METADATA_FORM_SECTION,
-    OTHER_DATA_TYPES_FORM_SECTION,
-    ENTITY_RELATIONSHIP_DIAGRAM_FORM_SECTION,
-    OBSERVATIONS_FORM_SECTION,
-    DEMOGRAPHIC_FREQUENCY_FORM_SECTION,
-    OMICS_FORM_SECTION,
-    DATASET_TIMELINES_FORM_SECTION,
-    ACCESSIBILITY_FORM_SECTION,
-    COVERAGE_FORM_SECTION,
-    TOOLS_AND_PUBLICATIONS_FORM_SECTION,
-    DATASET_FILTERS_FORM_SECTION,
-] as const;
+import semanticSchema from "cruk-semantic-schema";
+import { SECTION_MAP } from "@/utils/semanticFormEnricher";
+
+/** Derived dynamically from visibleSections in cruk-semantic-schema (excluding welcome, prepended separately). */
+const FORM_SECTION_ORDER = (semanticSchema.visibleSections || [])
+    .filter((secKey: string) => secKey !== "welcome")
+    .map((secKey: string) => SECTION_MAP[secKey])
+    .filter(Boolean) as readonly string[];
 
 export {
     INITIAL_FORM_SECTION,

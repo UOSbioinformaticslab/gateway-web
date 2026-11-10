@@ -3,17 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, Chip, Divider, Typography } from "@mui/material";
 import Paper from "@/components/Paper";
+import { MarkDownSanitizedWithHtml } from "@/components/MarkDownSanitizedWithHTML";
 
 type FilterDetailsMap = typeof import("@/utils/filter-setup").filterDetailsMap;
 
 interface DatasetFiltersGuidancePanelProps {
     selectedFilters: Set<string>;
     onRemoveFilter: (id: string) => void;
+    guidance?: string | null;
 }
 
 const DatasetFiltersGuidancePanel = ({
     selectedFilters,
     onRemoveFilter,
+    guidance,
 }: DatasetFiltersGuidancePanelProps) => {
     const [filterDetailsMap, setFilterDetailsMap] =
         useState<FilterDetailsMap | null>(null);
@@ -49,15 +52,23 @@ const DatasetFiltersGuidancePanel = ({
                 Dataset Filters
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Typography sx={{ mb: 2 }}>
-                Datasets in the CRUK datahub are filtered according to three
-                criteria: type of cancer, type of data and access conditions.
-            </Typography>
-            <Typography sx={{ mb: 3 }}>
-                Use ICD-O terminology to categorise each of the cancers covered,
-                and keywords to include further important details. This is
-                automatically translated to CRUK and TCGA equivalents.
-            </Typography>
+            {guidance ? (
+                <Box sx={{ mb: 3 }}>
+                    <MarkDownSanitizedWithHtml content={guidance} />
+                </Box>
+            ) : (
+                <>
+                    <Typography sx={{ mb: 2 }}>
+                        Datasets in the CRUK datahub are filtered according to three
+                        criteria: type of cancer, type of data and access conditions.
+                    </Typography>
+                    <Typography sx={{ mb: 3 }}>
+                        Use ICD-O terminology to categorise each of the cancers covered,
+                        and keywords to include further important details. This is
+                        automatically translated to CRUK and TCGA equivalents.
+                    </Typography>
+                </>
+            )}
 
             <Typography
                 variant="h3"

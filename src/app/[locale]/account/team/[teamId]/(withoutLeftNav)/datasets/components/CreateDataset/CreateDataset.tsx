@@ -560,8 +560,12 @@ const CreateDatasetForm = ({
 
         const [fieldParent] = visibleFieldsInSelectedSection;
 
-        if (fieldParent.fields?.length) {
-            return false;
+        if (
+            selectedFormSection === "Dataset Version" ||
+            fieldParent.title === selectedFormSection ||
+            fieldParent.field?.label === selectedFormSection
+        ) {
+            return true;
         }
 
         return getFormHydrationFieldHeaderProps(fieldParent).show;
@@ -2437,6 +2441,7 @@ const CreateDatasetForm = ({
                                         onRemoveFilter={
                                             handleDatasetFilterChange
                                         }
+                                        guidance={guidanceText}
                                     />
                                 ) : (
                                     <>

@@ -44,7 +44,15 @@ Run the following command to install the required packages:
 npm install
 ```
 
-#### 5️⃣ Start the development server
+#### 5️⃣ Updating CRUK Semantic Schema
+The dataset upload form (visible sections, guidance panels, field definitions, and validation rules) is dynamically hydrated using [`cruk-semantic-schema`](https://github.com/UOSBioinformaticslab/cruk-semantic-schema) (pointing to the `#dev` branch in `package.json`).
+
+Whenever changes to the semantic schema are pushed to GitHub, pull the latest definitions into `gateway-web` by running:
+```bash
+npm update cruk-semantic-schema
+```
+
+#### 6️⃣ Start the development server
 Once dependencies are installed, start the application using:
 ```bash
 npm run dev
@@ -56,6 +64,7 @@ By default, the application will be available at **[http://localhost:3000](http:
 In the project directory, you can run the following commands:
 
 - **`npm run dev`** – Starts the development server.
+- **`npm update cruk-semantic-schema`** – Pulls the latest semantic schema definitions (`#dev` branch) from GitHub.
 - **`npm run build`** – Builds the application for production.
 - **`npm start`** – Runs the compiled production build.
 - **`npm run lint`** – Runs ESLint to check for code quality issues.

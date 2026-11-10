@@ -30,6 +30,9 @@
       ],
       "@/*": [
         "./src/*"
+      ],
+      "cruk-semantic-schema": [
+        "../../semantic-schema/cruk-semantic-schema/semanticSchema.json"
       ]
     }
   },
