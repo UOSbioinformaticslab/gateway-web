@@ -1,104 +1,135 @@
-import { Collapse, ListItem, ListItemText } from "@mui/material";
+import { Box } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { SearchResultTool } from "@/interfaces/Search";
-import Box from "@/components/Box";
-import Button from "@/components/Button";
-import EllipsisLineLimit from "@/components/EllipsisLineLimit";
-import Link from "@/components/Link";
-import { MarkDownSanitizedWithHtml } from "@/components/MarkDownSanitizedWithHTML";
-import ToolDetailsDialog from "@/modules/ToolDetailsDialog";
-import useDialog from "@/hooks/useDialog";
-import { colors } from "@/config/theme";
+import { OpenInNewIcon } from "@/consts/icons";
 import { RouteName } from "@/consts/routeName";
-import { ToolDescription } from "./ResultCardTool.styles";
+import {
+    DescriptionLabel,
+    DescriptionRow,
+    DescriptionText,
+    ExternalLink,
+    LinkGroup,
+    LinkLabel,
+    NoneLinked,
+    ResourcePill,
+    ResourcePillText,
+    ToolCard,
+    ToolHeader,
+    ToolName,
+} from "./ResultCardTool.styles";
+import {
+    LinkedResource,
+    plainText,
+    toolDatasets,
+    toolExternalUrl,
+    toolProjects,
+} from "./toolLinks";
 
 interface ResultCardToolProps {
     result: SearchResultTool;
-    /** When false, the description synopsis is hidden. */
-    showSynopsis?: boolean;
 }
 
 const TRANSLATION_PATH = "pages.search.components.ResultCardTool";
 
-const ResultCardTool = ({
-    result,
-    showSynopsis = true,
-}: ResultCardToolProps) => {
+const ResourcePills = ({
+    resources,
+    hrefFor,
+}: {
+    resources: LinkedResource[];
+    hrefFor: (resource: LinkedResource) => string | undefined;
+}) => {
+    return (
+        <>
+            {resources.map(resource => {
+                const href = hrefFor(resource);
+                if (!href) {
+                    return (
+                        <ResourcePillText key={resource.name}>
+                            {resource.name}
+                        </ResourcePillText>
+                    );
+                }
+
+                return (
+                    <ResourcePill
+                        key={`${resource.id}-${resource.name}`}
+                        href={href}>
+                        {resource.name}
+                    </ResourcePill>
+                );
+            })}
+        </>
+    );
+};
+
+const ResultCardTool = ({ result }: ResultCardToolProps) => {
     const t = useTranslations(TRANSLATION_PATH);
-    const { _id: toolId } = result;
-
-    const { showDialog } = useDialog();
-
-    const handleShowAll = () => {
-        showDialog(ToolDetailsDialog, { result });
-    };
-
-    const { name, description } = result;
+    const datasets = toolDatasets(result);
+    const projects = toolProjects(result);
+    const externalUrl = toolExternalUrl(result);
+    const description = plainText(result.description);
 
     return (
-        <ListItem
-            alignItems="flex-start"
-            sx={{
-                borderBottom: `1px solid ${colors.grey300}`,
-                "&:last-of-type": {
-                    borderBottom: "none",
-                    pb: 0,
-                },
-            }}>
-            <ListItemText
-                disableTypography
-                primary={
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            width: "100%",
-                            p: 0,
-                            mb: 1.5,
-                        }}>
-                        <Link
-                            href={`/${RouteName.TOOL_ITEM}/${toolId}`}
-                            fontSize={16}
-                            fontWeight={600}>
-                            <EllipsisLineLimit text={name} component="span" />
-                        </Link>
-                        {description && (
-                            <Button
-                                onClick={handleShowAll}
-                                size="small"
-                                variant="outlined"
-                                color="secondary"
-                                sx={{
-                                    flexShrink: 0,
-                                    alignItems: "flex-start",
-                                    ml: 2,
-                                }}
-                                aria-label={`Quick view: ${name}`}>
-                                {t("showAll")}
-                            </Button>
+        <ToolCard component="article">
+            <ToolHeader>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: 1.5,
+                        minWidth: 0,
+                    }}>
+                    <ToolName href={`/${RouteName.TOOL_ITEM}/${result._id}`}>
+                        {result.name}
+                    </ToolName>
+                    {externalUrl && (
+                        <ExternalLink href={externalUrl}>
+                            {t("externalLink")}
+                            <OpenInNewIcon sx={{ fontSize: 12 }} />
+                        </ExternalLink>
+                    )}
+                </Box>
+                <LinkGroup>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <LinkLabel>{t("datasets")}:</LinkLabel>
+                        {datasets.length ? (
+                            <ResourcePills
+                                resources={datasets}
+                                hrefFor={resource =>
+                                    resource.id
+                                        ? `/${RouteName.DATASET_ITEM}/${resource.id}`
+                                        : undefined
+                                }
+                            />
+                        ) : (
+                            <NoneLinked>{t("none")}</NoneLinked>
                         )}
                     </Box>
-                }
-                secondary={
-                    <Collapse in={showSynopsis} timeout="auto" unmountOnExit>
-                        <ToolDescription
-                            maxLine={2}
-                            component="div"
-                            text={
-                                description ? (
-                                    <MarkDownSanitizedWithHtml
-                                        content={description}
-                                    />
-                                ) : (
-                                    t("notAvailable")
-                                )
-                            }
-                        />
-                    </Collapse>
-                }
-            />
-        </ListItem>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                        <LinkLabel>{t("projects")}:</LinkLabel>
+                        {projects.length ? (
+                            <ResourcePills
+                                resources={projects}
+                                hrefFor={resource =>
+                                    resource.id
+                                        ? `/${RouteName.DATA_USE_ITEM}/${resource.id}`
+                                        : undefined
+                                }
+                            />
+                        ) : (
+                            <NoneLinked>{t("none")}</NoneLinked>
+                        )}
+                    </Box>
+                </LinkGroup>
+            </ToolHeader>
+            <DescriptionRow>
+                <DescriptionLabel>{t("description")}:</DescriptionLabel>
+                <DescriptionText title={description}>
+                    {description || t("noDescription")}
+                </DescriptionText>
+            </DescriptionRow>
+        </ToolCard>
     );
 };
 

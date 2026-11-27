@@ -131,6 +131,8 @@ import FilterPanel from "../FilterPanel";
 import ResultCardCollection from "../ResultCardCollection";
 import ResultCardDataProvider from "../ResultCardDataProviders";
 import ResultCardDataUse from "../ResultCardDataUse";
+import PublicationDirectory from "../PublicationDirectory";
+import ToolDirectory from "../ToolDirectory";
 import ResultCardPublication from "../ResultCardPublication/ResultCardPublication";
 import ResultCardTool from "../ResultCardTool/ResultCardTool";
 import ResultsList from "../ResultsList";
@@ -411,6 +413,13 @@ const Search = ({
         ]
     );
 
+    const directoryPageSize = 100;
+    const isPublicationDirectory =
+        useSearchAggregation &&
+        queryParams.type === SearchCategory.PUBLICATIONS;
+    const isToolDirectory =
+        useSearchAggregation && queryParams.type === SearchCategory.TOOLS;
+
     const searchUrl = useSearchAggregation
         ? apis.searchAggregationV2Url
         : `${apis.searchV1Url}/${queryParams.type}?${
@@ -439,7 +448,9 @@ const Search = ({
                   per_page:
                       queryParams.type === SearchCategory.DATASETS
                           ? 200
-                          : queryParams.per_page,
+                          : isPublicationDirectory || isToolDirectory
+                            ? directoryPageSize
+                            : queryParams.per_page,
                   page:
                       queryParams.type === SearchCategory.DATASETS
                           ? 1
@@ -472,7 +483,11 @@ const Search = ({
             searchResponse as SearchAggregationData | null | undefined,
             SEARCH_AGGREGATION_PROVIDER,
             isDatasetSearch ? 1 : Number(queryParams.page),
-            isDatasetSearch ? 200 : Number(queryParams.per_page)
+            isDatasetSearch
+                ? 200
+                : isPublicationDirectory || isToolDirectory
+                  ? directoryPageSize
+                  : Number(queryParams.per_page)
         );
     }, [
         useSearchAggregation,
@@ -634,7 +649,6 @@ const Search = ({
                     <ResultCardPublication
                         result={result as SearchResultPublication}
                         key={resultId}
-                        showSynopsis={synopsesExpanded}
                     />
                 );
             case SearchCategory.COLLECTIONS:
@@ -656,7 +670,6 @@ const Search = ({
                     <ResultCardTool
                         result={result as SearchResultTool}
                         key={resultId}
-                        showSynopsis={synopsesExpanded}
                     />
                 );
             default:
@@ -791,6 +804,13 @@ const Search = ({
         [queryParams.type]
     );
 
+    const isTools = useMemo(
+        () => queryParams.type === SearchCategory.TOOLS,
+        [queryParams.type]
+    );
+
+    const isDirectory = isPublications || isTools;
+
     const isEuropePmcSearch = useMemo(
         () => queryParams.source === EUROPE_PMC_SOURCE_FIELD,
         [queryParams.source]
@@ -804,6 +824,13 @@ const Search = ({
             ),
         [queryParams.query, queryParams.source]
     );
+
+    const resultsReady =
+        !shouldFetchSearch ||
+        data === null ||
+        (data != null && !!data.path?.includes(queryParams.type));
+    const showSearchLoading =
+        isSearching || (shouldFetchSearch && data === undefined);
 
     const PublicationSearchDialogMemoised = useMemo(() => {
         return () => (
@@ -1064,29 +1091,30 @@ const Search = ({
                                     </Button>
                                 )}
                             </Box>
-                            {(isSearching ||
-                                (shouldFetchSearch && data === undefined)) && (
+                            {showSearchLoading && !isDirectory && (
                                 <Loading ariaLabel={t("loadingAriaLabel")} />
                             )}
-                            {!isSearching &&
-                                !isEuropePmcSearchNoQuery &&
-                                (!shouldFetchSearch ||
-                                    data === null ||
-                                    (data != null &&
-                                        data?.path?.includes(
-                                            queryParams.type
-                                        ))) && (
+                            {(isDirectory
+                                ? !isEuropePmcSearchNoQuery
+                                : !showSearchLoading &&
+                                  !isEuropePmcSearchNoQuery &&
+                                  resultsReady) && (
                                     <Box
                                         sx={{
                                             display: "flex",
                                             flexDirection: "column",
                                             gap: 2,
-                                            backgroundColor: colors.white,
-                                            border: `1px solid ${colors.grey300}`,
-                                            borderRadius: 2,
-                                            boxShadow: `0px 1px 3px ${colors.grey300}`,
-                                            p: 2,
-                                            mb: 2,
+                                            ...(isDirectory
+                                                ? { mb: 2 }
+                                                : {
+                                                      backgroundColor:
+                                                          colors.white,
+                                                      border: `1px solid ${colors.grey300}`,
+                                                      borderRadius: 2,
+                                                      boxShadow: `0px 1px 3px ${colors.grey300}`,
+                                                      p: 2,
+                                                      mb: 2,
+                                                  }),
                                         }}>
                                         {queryParams.type ===
                                             SearchCategory.COLLECTIONS && (
@@ -1111,86 +1139,133 @@ const Search = ({
                                                 </Box>
                                             </>
                                         )}
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                width: "100%",
-                                                maxWidth: "97%",
-                                                marginX: "auto",
-                                            }}>
-                                            <SearchBar
-                                                defaultValue={queryParams.query}
-                                                explainerText={getExplainerText()}
-                                                resetAction={() =>
-                                                    resetQueryInput()
+                                        {!isDirectory && (
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    width: "100%",
+                                                    maxWidth: "97%",
+                                                    marginX: "auto",
+                                                }}>
+                                                <SearchBar
+                                                    defaultValue={
+                                                        queryParams.query
+                                                    }
+                                                    explainerText={getExplainerText()}
+                                                    resetAction={() =>
+                                                        resetQueryInput()
+                                                    }
+                                                    isDisabled={
+                                                        queryParams.type ===
+                                                        SearchCategory.DATASETS
+                                                            ? false
+                                                            : !queryParams.query
+                                                    }
+                                                    submitAction={onQuerySubmit}
+                                                    queryPlaceholder={t(
+                                                        "searchPlaceholder"
+                                                    )}
+                                                    queryName={QUERY_FIELD}
+                                                    inputOverrideAction={
+                                                        isEuropePmcSearch
+                                                            ? europePmcModalAction
+                                                            : undefined
+                                                    }
+                                                    synopsesExpanded={
+                                                        synopsesExpanded
+                                                    }
+                                                    onSynopsesToggle={() =>
+                                                        setSynopsesExpanded(
+                                                            v => !v
+                                                        )
+                                                    }
+                                                    sortSlot={
+                                                        queryParams.type ===
+                                                        SearchCategory.DATASETS ? (
+                                                            <DatasetSort
+                                                                column={
+                                                                    datasetSort.column
+                                                                }
+                                                                onChange={column =>
+                                                                    handleDatasetSortChange(
+                                                                        column,
+                                                                        "asc"
+                                                                    )
+                                                                }
+                                                            />
+                                                        ) : undefined
+                                                    }
+                                                />
+                                            </Box>
+                                        )}
+                                        {isPublications ? (
+                                            <PublicationDirectory
+                                                isLoading={
+                                                    showSearchLoading ||
+                                                    !resultsReady
                                                 }
-                                                isDisabled={
-                                                    queryParams.type ===
-                                                    SearchCategory.DATASETS
-                                                        ? false
-                                                        : !queryParams.query
+                                                results={
+                                                    resultsReady
+                                                        ? ((data?.list ??
+                                                              []) as SearchResultPublication[])
+                                                        : []
                                                 }
-                                                submitAction={onQuerySubmit}
-                                                queryPlaceholder={t(
-                                                    "searchPlaceholder"
-                                                )}
-                                                queryName={QUERY_FIELD}
-                                                inputOverrideAction={
-                                                    isEuropePmcSearch
-                                                        ? europePmcModalAction
-                                                        : undefined
+                                                total={
+                                                    resultsReady
+                                                        ? (data?.total ?? 0)
+                                                        : 0
                                                 }
-                                                valueOverride={
-                                                    isPublications
-                                                        ? queryParams.query
-                                                        : undefined
-                                                }
-                                                synopsesExpanded={
-                                                    synopsesExpanded
-                                                }
-                                                onSynopsesToggle={() =>
-                                                    setSynopsesExpanded(v => !v)
-                                                }
-                                                sortSlot={
-                                                    queryParams.type ===
-                                                    SearchCategory.DATASETS ? (
-                                                        <DatasetSort
-                                                            column={
-                                                                datasetSort.column
-                                                            }
-                                                            onChange={column =>
-                                                                handleDatasetSortChange(
-                                                                    column,
-                                                                    "asc"
-                                                                )
-                                                            }
-                                                        />
-                                                    ) : undefined
+                                                query={queryParams.query || ""}
+                                                onQueryChange={query =>
+                                                    onQuerySubmit({ query })
                                                 }
                                             />
-                                        </Box>
-                                        <Box
-                                            id="search-results-synopses"
-                                            component="section"
-                                            aria-describedby="result-summary"
-                                            aria-label="results list"
-                                            sx={{
-                                                p: `0 ${theme.spacing(2)}`,
-                                            }}>
-                                            {(
-                                                queryParams.type ===
-                                                SearchCategory.DATASETS
-                                                    ? datasetTableResults.length
-                                                    : data?.list?.length
-                                            ) ? (
-                                                renderResults()
-                                            ) : (
-                                                <Box sx={{ pb: 2 }}>
-                                                    {t("noResults")}
-                                                </Box>
-                                            )}
-                                        </Box>
+                                        ) : isTools ? (
+                                            <ToolDirectory
+                                                isLoading={
+                                                    showSearchLoading ||
+                                                    !resultsReady
+                                                }
+                                                results={
+                                                    resultsReady
+                                                        ? ((data?.list ??
+                                                              []) as SearchResultTool[])
+                                                        : []
+                                                }
+                                                total={
+                                                    resultsReady
+                                                        ? (data?.total ?? 0)
+                                                        : 0
+                                                }
+                                                query={queryParams.query || ""}
+                                                onQueryChange={query =>
+                                                    onQuerySubmit({ query })
+                                                }
+                                            />
+                                        ) : (
+                                            <Box
+                                                id="search-results-synopses"
+                                                component="section"
+                                                aria-describedby="result-summary"
+                                                aria-label="results list"
+                                                sx={{
+                                                    p: `0 ${theme.spacing(2)}`,
+                                                }}>
+                                                {(
+                                                    queryParams.type ===
+                                                    SearchCategory.DATASETS
+                                                        ? datasetTableResults.length
+                                                        : data?.list?.length
+                                                ) ? (
+                                                    renderResults()
+                                                ) : (
+                                                    <Box sx={{ pb: 2 }}>
+                                                        {t("noResults")}
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        )}
                                     </Box>
                                 )}
                             <Pagination
