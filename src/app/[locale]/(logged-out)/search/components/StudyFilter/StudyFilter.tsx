@@ -38,11 +38,22 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { colors } from "@/config/theme";
 // Preserved Logic Imports
 import { filterDetailsMap, filterData } from '@/utils/filter-setup';
 import { filterType, includeParents, plusParents, getMessage, calculateLogicMessage } from '@/utils/logic-utils';
 import { executeFilterLogic } from '@/utils/filterLogic';
+
+const PAN_CANCER_FILTER_ID = "pan-cancer";
+
+filterDetailsMap.set(PAN_CANCER_FILTER_ID, {
+    id: PAN_CANCER_FILTER_ID,
+    label: "Pan Cancer",
+    category: "cancerTypes",
+    group: "cancer-type",
+});
 
 // --- Brand Colors ---
 const COLORS = {
@@ -202,66 +213,70 @@ const NestedFilterItem = ({ item, handleFilterChange, selectedFilters, level }) 
 
 const FilterLogicSummary = ({
     selectedFilters,
-    logicMessage,
-    setLogicMessage,
-    isMessageManuallyEdited,
-    setIsMessageManuallyEdited,
+    handleFilterChange,
 }: {
     selectedFilters: Set<string>;
-    logicMessage: string;
-    setLogicMessage: (message: string) => void;
-    isMessageManuallyEdited: boolean;
-    setIsMessageManuallyEdited: (edited: boolean) => void;
+    handleFilterChange: (id: string) => void;
+    logicMessage?: string;
+    setLogicMessage?: (message: string) => void;
+    isMessageManuallyEdited?: boolean;
+    setIsMessageManuallyEdited?: (edited: boolean) => void;
 }) => {
-    // Utility references passed down conceptually or imported
-    const handleReset = useCallback(() => {
-        const filters = Array.from(selectedFilters).map(id => ({ id }));
-        const autoMessage = calculateLogicMessage({
-            filters,
-            filterType,
-            plusParents,
-            includeParents,
-            getMessage,
-        });
-        setLogicMessage(autoMessage);
-        setIsMessageManuallyEdited(false);
-    }, [selectedFilters, setLogicMessage, setIsMessageManuallyEdited]);
+    const chips = useMemo(() => {
+        return Array.from(selectedFilters).map(fullId => {
+            const details = filterDetailsMap.get(fullId);
+            if (!details) return null;
+            return { fullId, label: details.label };
+        }).filter(Boolean);
+    }, [selectedFilters]);
 
-    if (!selectedFilters || selectedFilters.size === 0) return null;
+    if (chips.length === 0) return null;
 
     return (
-        <Paper variant="outlined" sx={{ p: 2, mt: 2, bgcolor: COLORS.lightBg, borderColor: isMessageManuallyEdited ? 'warning.main' : 'divider' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="subtitle2" fontWeight="bold">Filter Logic</Typography>
-                {isMessageManuallyEdited && (
-                    <Button size="small" onClick={handleReset} variant="outlined" color="primary">
-                        Reset to Auto Logic
-                    </Button>
-                )}
-            </Box>
-
-            <TextField
-                fullWidth
-                multiline
-                minRows={2}
-                maxRows={6}
-                value={logicMessage || "No filters selected"}
-                onChange={(e) => {
-                    setLogicMessage(e.target.value);
-                    setIsMessageManuallyEdited(true);
+        <Box
+            sx={{
+                mt: 1.5,
+                px: 2,
+                py: 1.5,
+                border: '1px solid',
+                borderColor: '#d5dbe3',
+                borderRadius: 1.5,
+                bgcolor: '#fbfcfd',
+            }}
+        >
+            <Typography
+                sx={{
+                    color: colors.grey700,
+                    fontSize: '0.9rem',
+                    lineHeight: 1.5,
+                    mb: 1.5,
                 }}
-                variant="outlined"
-                size="small"
-                sx={{ bgcolor: 'white' }}
-                inputProps={{ style: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
-            />
-
-            {isMessageManuallyEdited && (
-                <Typography variant="caption" color="warning.main" sx={{ mt: 1, display: 'block' }}>
-                    Note: Filter logic has been manually edited. Reset logic to resume auto-updates.
-                </Typography>
-            )}
-        </Paper>
+            >
+                Default logic shown below. You can toggle AND/OR or bracket groups by clicking the filters to be bracketed and then pressing the Bracket Button that appears.
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                {chips.map(chip => (
+                    <Chip
+                        key={chip.fullId}
+                        label={chip.label}
+                        onDelete={() => handleFilterChange(chip.fullId)}
+                        deleteIcon={<CloseIcon sx={{ fontSize: 16 }} />}
+                        size="small"
+                        sx={{
+                            bgcolor: '#e7f0f8',
+                            color: COLORS.blue,
+                            fontWeight: 600,
+                            height: 30,
+                            borderRadius: 1,
+                            '& .MuiChip-deleteIcon': {
+                                color: COLORS.blue,
+                                '&:hover': { color: COLORS.pink },
+                            },
+                        }}
+                    />
+                ))}
+            </Box>
+        </Box>
     );
 };
 
@@ -270,11 +285,12 @@ const FilterLogicSummary = ({
 const FilterChipArea = ({
     selectedFilters,
     handleFilterChange,
-    logicMessage,
-    setLogicMessage,
-    isMessageManuallyEdited,
-    setIsMessageManuallyEdited,
+    logicMessage: _logicMessage,
+    setLogicMessage: _setLogicMessage,
+    isMessageManuallyEdited: _isMessageManuallyEdited,
+    setIsMessageManuallyEdited: _setIsMessageManuallyEdited,
 }) => {
+    const [logicOpen, setLogicOpen] = useState(false);
     const chips = useMemo(() => {
         return Array.from(selectedFilters).map(fullId => {
             const details = filterDetailsMap.get(fullId);
@@ -291,38 +307,70 @@ const FilterChipArea = ({
     if (chips.length === 0) return null;
 
     return (
-        <Paper elevation={1} sx={{ p: 2, mb: 2, borderRadius: 2 }}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {chips.map(chip => (
-                    <Chip
-                        key={chip.fullId}
-                        label={
-                            <span>
-                                <span style={{ opacity: 0.7 }}>{chip.category}: </span>
-                                <strong>{chip.label}</strong>
-                            </span>
-                        }
-                        onDelete={() => handleFilterChange(chip.fullId)}
-                        deleteIcon={<CloseIcon />}
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                            color: chip.isCancer ? COLORS.pink : COLORS.blue,
-                            borderColor: chip.isCancer ? COLORS.pink : COLORS.blue,
-                            bgcolor: 'white',
-                            fontWeight: 500
-                        }}
-                    />
-                ))}
+        <Box
+            sx={{
+                mx: { mobile: 2, tablet: 2.5 },
+                mt: 1.5,
+                mb: 1,
+            }}
+        >
+            <Box
+                sx={{
+                    px: 1.5,
+                    py: 1.25,
+                    border: '1px solid',
+                    borderColor: 'grey.300',
+                    borderRadius: 2,
+                    bgcolor: COLORS.white,
+                }}
+            >
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {chips.map(chip => (
+                        <Chip
+                            key={chip.fullId}
+                            label={
+                                <span>
+                                    <span style={{ opacity: 0.7 }}>{chip.category}: </span>
+                                    <strong>{chip.label}</strong>
+                                </span>
+                            }
+                            onDelete={() => handleFilterChange(chip.fullId)}
+                            deleteIcon={<CloseIcon sx={{ fontSize: 16 }} />}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                                color: 'text.primary',
+                                borderColor: COLORS.border,
+                                bgcolor: 'white',
+                                fontWeight: 500,
+                                height: 30,
+                            }}
+                        />
+                    ))}
+                </Box>
             </Box>
-            <FilterLogicSummary
-                selectedFilters={selectedFilters}
-                logicMessage={logicMessage}
-                setLogicMessage={setLogicMessage}
-                isMessageManuallyEdited={isMessageManuallyEdited}
-                setIsMessageManuallyEdited={setIsMessageManuallyEdited}
-            />
-        </Paper>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 0.75 }}>
+                <Button
+                    size="small"
+                    onClick={() => setLogicOpen(open => !open)}
+                    endIcon={logicOpen ? <ExpandLess /> : <ExpandMore />}
+                    sx={{
+                        textTransform: 'none',
+                        color: COLORS.blue,
+                        fontWeight: 600,
+                        fontSize: '0.95rem',
+                    }}
+                >
+                    {logicOpen ? 'Hide Advanced Logic Builder' : 'Show Advanced Logic Builder'}
+                </Button>
+            </Box>
+            <Collapse in={logicOpen}>
+                <FilterLogicSummary
+                    selectedFilters={selectedFilters}
+                    handleFilterChange={handleFilterChange}
+                />
+            </Collapse>
+        </Box>
     );
 };
 
@@ -330,6 +378,7 @@ const FilterChipArea = ({
 
 const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setSearchTerm, filteredIds, isSearching, pruneHierarchy }) => {
     const [selectedClassification, setSelectedClassification] = useState(null);
+    const panCancerSelected = selectedFilters.has(PAN_CANCER_FILTER_ID);
     
     if (!filterData || !filterData['0_0'] || !filterData['0_0'].children) {
         return <Paper elevation={0} sx={{ p: 3 }}>Loading filter data...</Paper>;
@@ -594,20 +643,80 @@ const CancerTypePanel = ({ handleFilterChange, selectedFilters, searchTerm, setS
                 </Box>
             ) : (
                 <Box>
+                    {selectedFilters.size === 0 && (
                     <Typography
                         sx={{
                             display: 'block',
-                            color: colors.black,
+                            color: colors.grey600,
                             fontSize: { mobile: '1.125rem', tablet: '1.25rem' },
-                            fontWeight: 600,
+                            fontWeight: 500,
                             lineHeight: 1.4,
-                            textAlign: { mobile: 'center', tablet: 'left' },
+                            textAlign: 'center',
                             mb: 2,
                             mt: { mobile: -0.5, tablet: -1 },
                         }}
                     >
-                        Click on your choice of classification to begin
+                        👆 Select a category above to start building your custom filter
                     </Typography>
+                    )}
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            columnGap: 1.25,
+                            rowGap: 1,
+                            mb: 2.5,
+                        }}
+                    >
+                        <Typography
+                            component="span"
+                            sx={{
+                                fontWeight: 700,
+                                color: colors.black,
+                                fontSize: '1rem',
+                            }}
+                        >
+                            Browse
+                        </Typography>
+                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<PublicOutlinedIcon sx={{ fontSize: '1.05rem !important' }} />}
+                                onClick={() => handleFilterChange(PAN_CANCER_FILTER_ID)}
+                                aria-pressed={panCancerSelected}
+                                sx={{
+                                    textTransform: 'none',
+                                    borderRadius: 999,
+                                    borderColor: panCancerSelected ? COLORS.blue : COLORS.border,
+                                    color: COLORS.blue,
+                                    fontWeight: 600,
+                                    bgcolor: 'white',
+                                    px: 1.25,
+                                    py: 0.25,
+                                    minHeight: 32,
+                                    '& .MuiButton-startIcon': { mr: 0.5, color: COLORS.blue },
+                                }}
+                            >
+                                Pan-cancer
+                            </Button>
+                            {panCancerSelected && (
+                                <CheckCircleIcon sx={{ color: COLORS.pink, fontSize: 22 }} />
+                            )}
+                        </Box>
+                        <Typography
+                            component="span"
+                            sx={{
+                                color: colors.grey700,
+                                fontSize: '0.95rem',
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            datasets and/or click on a classification below to specify individual cancers
+                        </Typography>
+                    </Box>
 
                     <Grid container spacing={3}>
                         <Grid size={3}>
@@ -756,10 +865,10 @@ const FilterCategoryCard = ({
             p: { mobile: 1.125, tablet: 1.5 },
             cursor: 'pointer',
             textAlign: 'center',
-            bgcolor: COLORS.white,
+            bgcolor: selected ? 'rgba(209, 10, 111, 0.04)' : COLORS.white,
             borderRadius: 2,
             border: '2px solid',
-            borderColor: selected ? COLORS.pink : COLORS.border,
+            borderColor: COLORS.pink,
             boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.06)',
             transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
             '&:hover': {
@@ -804,7 +913,7 @@ const FilterCategoryCard = ({
     const theme = useTheme();
     const helpDialogIsNarrow = useMediaQuery(theme.breakpoints.down('tablet'));
 
-    const [activePanel, setActivePanel] = useState<string | null>('cancer');
+    const [activePanel, setActivePanel] = useState<string | null>(null);
     const [helpOpen, setHelpOpen] = useState(false);
 
     const [selectedFilters, setSelectedFilters] = useState<Set<string>>(
@@ -826,7 +935,8 @@ const FilterCategoryCard = ({
             const filters = Array.from(selectedFilters).map(id => ({ id }));
             const newMessage = calculateLogicMessage({
                 filters,
-                filterType,
+                filterType: (id: string) =>
+                    id === PAN_CANCER_FILTER_ID ? "cruk" : filterType(id),
                 plusParents,
                 includeParents,
                 getMessage,
@@ -886,6 +996,7 @@ const FilterCategoryCard = ({
     const counts = useMemo(() => {
         let c=0, d=0, a=0;
         selectedFilters.forEach(id => {
+            if (id === PAN_CANCER_FILTER_ID) return;
             const grp = filterDetailsMap.get(id)?.group;
             if (grp === 'cancer-type') c++;
             else if (grp === 'data-type') d++;
@@ -975,7 +1086,7 @@ const FilterCategoryCard = ({
                             m: 0,
                         }}
                     >
-                        First filter the studies
+                        First filter the datasets
                     </Typography>
                     <Button
                         variant="contained"

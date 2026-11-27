@@ -90,7 +90,8 @@ export function mapSearchAggregation(
         .filter(id => id && !hitIds.has(id))
         .map(placeholderHit);
 
-    const list = [...hits, ...missing];
+    const list =
+        payload.type === "datasets" ? [...hits, ...missing] : hits;
     const total = result?.total ?? list.length;
     const safePage = Number.isFinite(page) && page > 0 ? page : 1;
     const safePerPage =
