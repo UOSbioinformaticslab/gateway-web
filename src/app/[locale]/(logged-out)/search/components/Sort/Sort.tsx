@@ -40,7 +40,7 @@ const Sort = ({
         },
     });
 
-    const [options, setOptions] = useState<Options[]>([]);
+    const [options, setOptions] = useState<Options[]>(sortOptions);
 
     const watchSort = watch(sortName);
 

@@ -1,9 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { generateDatasetMetadataV1 } from "@/mocks/data/dataset";
+import { SearchResultDataset } from "@/interfaces/Search";
 import {
     getAllParams,
+    getDatasetTableDataRange,
     getDateRange,
+    getNonCommercialUseOnly,
     getPopulationSize,
     getUrlFromSearchParams,
     hasMinimumSearchCharLength,
@@ -200,6 +203,51 @@ describe("Search utils", () => {
             const url = getUrlFromSearchParams("datause", "", {}, "title:asc");
 
             expect(url).toBe(`${basePath}?type=datause&sort=title%3Aasc`);
+        });
+    });
+
+    describe("dataset table columns", () => {
+        const result = {
+            metadata: {
+                datasetFilters: [
+                    { category: "accessType", label: "no restriction" },
+                    { category: "accessType", label: "non-commercial use only" },
+                ],
+                provenance: {
+                    temporal: {
+                        startDate: "2016-04-01",
+                        endDate: "2022-11-30",
+                    },
+                },
+            },
+        } as SearchResultDataset;
+
+        it("marks non-commercial use when that filter is present", () => {
+            expect(getNonCommercialUseOnly(result)).toBe("True");
+        });
+
+        it("marks commercial use as allowed when the filter is absent", () => {
+            expect(
+                getNonCommercialUseOnly({
+                    metadata: { datasetFilters: [] },
+                } as SearchResultDataset)
+            ).toBe("False");
+        });
+
+        it("formats the data range from both coverage years", () => {
+            expect(getDatasetTableDataRange(result)).toBe("2016 - 2022");
+        });
+
+        it("returns no data range unless both years are present", () => {
+            expect(
+                getDatasetTableDataRange({
+                    metadata: {
+                        provenance: {
+                            temporal: { startDate: "2016-04-01", endDate: null },
+                        },
+                    },
+                } as SearchResultDataset)
+            ).toBeNull();
         });
     });
 });

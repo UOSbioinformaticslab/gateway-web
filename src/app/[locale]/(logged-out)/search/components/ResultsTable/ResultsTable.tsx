@@ -2,7 +2,6 @@ import { Box, Stack, TableContainer, Tooltip, Typography } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import { get } from "lodash";
 import { useTranslations } from "next-intl";
-import { KeyedMutator } from "swr";
 import { PageTemplatePromo } from "@/interfaces/Cms";
 import { Library } from "@/interfaces/Library";
 import { SearchResultDataset } from "@/interfaces/Search";
@@ -15,35 +14,54 @@ import { useCohortStatus } from "@/hooks/useCohortStatus";
 import useGet from "@/hooks/useGet";
 import apis from "@/config/apis";
 import { RouteName } from "@/consts/routeName";
+import {
+    getAccessibility,
+    getDatasetTableDataRange,
+    getLeadResearcher,
+    getNonCommercialUseOnly,
+    getPopulationSize,
+} from "@/utils/search";
 import ActionDropdown from "../ActionDropdown";
-import { getAccessibility, getDateRange, getLeadResearcher, getPopulationSize } from "@/utils/search";
-import { formatTextDelimiter } from "@/utils/dataset";
+
+const RESULTS_TABLE_TRANSLATION_PATH = "pages.search.components.ResultsTable";
 
 const ICON_OPTS = [
-    { url: "/images/icons/animal.webp", label: "Model Organism Study" },
-    { url: "/images/icons/background.webp", label: "Background Information" },
-    { url: "/images/icons/biobank.webp", label: "Samples Available" },
-    { url: "/images/icons/invitro.webp", label: "In Vitro Study" },
-    { url: "/images/icons/lab_results.webp", label: "Lab Results" },
-    { url: "/images/icons/longitudinal.webp", label: "Longitudinal Study" },
-    { url: "/images/icons/medical_imaging.webp", label: "Medical Imaging" },
-    { url: "/images/icons/omics.webp", label: "Omics" },
-    { url: "/images/icons/population.webp", label: "Patient Study" },
-    { url: "/images/icons/treatments.webp", label: "Treatments" },
+    { url: "/images/icons/animal.webp", labelKey: "icons.modelOrganism" },
+    { url: "/images/icons/background.webp", labelKey: "icons.background" },
+    { url: "/images/icons/biobank.webp", labelKey: "icons.biobank" },
+    { url: "/images/icons/invitro.webp", labelKey: "icons.inVitro" },
+    { url: "/images/icons/lab_results.webp", labelKey: "icons.labResults" },
+    { url: "/images/icons/longitudinal.webp", labelKey: "icons.longitudinal" },
+    {
+        url: "/images/icons/medical_imaging.webp",
+        labelKey: "icons.medicalImaging",
+    },
+    { url: "/images/icons/omics.webp", labelKey: "icons.omics" },
+    { url: "/images/icons/population.webp", labelKey: "icons.patientStudy" },
+    { url: "/images/icons/treatments.webp", labelKey: "icons.treatments" },
 ];
 
-function pickTitleBandIcons(row: SearchResultDataset) {
+function pickTitleBandIcons(
+    row: SearchResultDataset,
+    labelFor: (key: string) => string
+) {
     const id = Number(row._id) || 0;
     const first = ICON_OPTS[id % ICON_OPTS.length];
     const second = ICON_OPTS[(id + 4) % ICON_OPTS.length];
+    const withLabel = (option: (typeof ICON_OPTS)[number]) => ({
+        url: option.url,
+        label: labelFor(option.labelKey),
+    });
+
     if (first.url === second.url) {
-        return [first];
+        return [withLabel(first)];
     }
-    return [first, second];
+    return [withLabel(first), withLabel(second)];
 }
 
 function TitleBandStudyIcons({ row }: { row: SearchResultDataset }) {
-    const icons = pickTitleBandIcons(row);
+    const t = useTranslations(RESULTS_TABLE_TRANSLATION_PATH);
+    const icons = pickTitleBandIcons(row, t);
     return (
         <Stack direction="row" spacing={0.75} alignItems="center" useFlexGap>
             {icons.map(opt => (
@@ -89,63 +107,61 @@ interface ResultTableProps {
     /** When false, synopsis rows under each result are hidden. */
     showSynopsis?: boolean;
 }
-const CONFORMS_TO_PATH = "metadata.accessibility.formatAndStandards.conformsTo";
-const ACCESS_SERVICE_PATH =
-    "metadata.accessibility.access.accessServiceCategory";
+const MissingValue = ({ label }: { label: string }) => (
+    <span style={{ color: "grey" }}>{label}</span>
+);
+
 const columnHelper = createColumnHelper<SearchResultDataset>();
 
 const getColumns = ({
     translations,
-    showLibraryModal,
-    mutateLibraries,
-    isCohortDiscoveryDisabled,
-    cohortDiscovery,
 }: {
     translations: { [id: string]: string };
-    libraryData?: Library[];
-    showLibraryModal: (props: { datasetId: number }) => void;
-    mutateLibraries: KeyedMutator<Library[] | undefined>;
-    isCohortDiscoveryDisabled: boolean;
-    cohortDiscovery: PageTemplatePromo;
 }) => [
     columnHelper.display({
         id: "title",
         cell: ({ row: { original } }) => {
-            const { _id: datasetId } = original;
-            const linkHref = `/${RouteName.DATASET_ITEM}/${datasetId}`;
+            const leadResearcher = getLeadResearcher(original);
 
-            return (
-                <Link href={linkHref}>
-                    <EllipsisLineLimit text={getLeadResearcher(original)} />
-                </Link>
+            return leadResearcher ? (
+                <EllipsisLineLimit text={leadResearcher} />
+            ) : (
+                <MissingValue label={translations.notGiven} />
             );
         },
         meta: { isPinned: true, hasPinnedBorder: true },
-        header: () => <span>Lead Researcher</span>,
+        header: () => <span>{translations.leadResearcherLabel}</span>,
         minSize: 300,
         size: 400,
     }),
-     columnHelper.display({
+    columnHelper.display({
         id: "populationSize",
-        cell: ({ row: { original } }) => (
-            <div style={{ textAlign: "center" }}>
-                {getPopulationSize(
-                    original,
-                    translations.populationSizeNotReported
-                )}
-            </div>
-        ),
+        cell: ({ row: { original } }) => {
+            const populationSize = getPopulationSize(
+                original,
+                translations.notGiven
+            );
+
+            return (
+                <div style={{ textAlign: "center" }}>
+                    {populationSize === translations.notGiven ? (
+                        <MissingValue label={translations.notGiven} />
+                    ) : (
+                        populationSize
+                    )}
+                </div>
+            );
+        },
         header: () => (
             <Tooltip
                 describeChild
                 title={translations.populationSizeTooltip}
                 tabIndex={0}>
-                <span>Pop. Size</span>
+                <span>{translations.populationSizeLabel}</span>
             </Tooltip>
         ),
         size: 120,
     }),
-
     columnHelper.display({
         id: "dataProvider",
         cell: ({ row: { original } }) => {
@@ -155,48 +171,43 @@ const getColumns = ({
                 <div style={{ textAlign: "center" }}>
                     {accessibility ? (
                         <EllipsisLineLimit text={accessibility} />
-                    ) : null}
+                    ) : (
+                        <MissingValue label={translations.notGiven} />
+                    )}
                 </div>
             );
         },
-        header: () => <span>Accessibility</span>,
-        size: 400,
+        header: () => <span>{translations.accessibilityLabel}</span>,
+        size: 220,
     }),
     columnHelper.display({
-        id: "dateRange",
-        cell: info => (
-            <div style={{ textAlign: "center" }}>
-                {getDateRange(info.row.original?.metadata)}
-            </div>
-        ),
-        header: () => <span>Earliest Data</span>,
-        size: 120,
-    }),
-       columnHelper.display({
-        id: "accessService",
+        id: "nonCommercialUseOnly",
         cell: ({ row: { original } }) => (
             <div style={{ textAlign: "center" }}>
-                {get(original, ACCESS_SERVICE_PATH)}
+                {getNonCommercialUseOnly(original)}
             </div>
         ),
-        header: () => <span>Start Date</span>,
-        minSize: 100,
-        size: 120,
+        header: () => <span>{translations.nonCommercialUseOnlyLabel}</span>,
+        size: 220,
     }),
-      columnHelper.display({
-        id: "conformsTo",
-        cell: ({ row: { original } }) => (
-            <div style={{ textAlign: "center" }}>
-                {formatTextDelimiter(get(original, CONFORMS_TO_PATH))}
-            </div>
-        ),
-        header: () => <span>Updated</span>,
-        size: 180,
-    }),
+    columnHelper.display({
+        id: "dataRange",
+        cell: ({ row: { original } }) => {
+            const dataRange = getDatasetTableDataRange(original);
 
+            return (
+                <div style={{ textAlign: "center" }}>
+                    {dataRange ?? (
+                        <MissingValue label={translations.notGiven} />
+                    )}
+                </div>
+            );
+        },
+        header: () => <span>{translations.dataRangeLabel}</span>,
+        size: 140,
+    }),
 ];
 
-const RESULTS_TABLE_TRANSLATION_PATH = "pages.search.components.ResultsTable";
 const ResultTable = ({
     results,
     showLibraryModal,
@@ -219,18 +230,14 @@ const ResultTable = ({
             : false;
 
     const translations = {
-        metaDataLabel: t("title.label"),
-        populationSizeLabel: t("populationSize.label"),
+        notGiven: t("notGiven"),
+        synopsis: t("synopsis"),
+        leadResearcherLabel: t("leadResearcher.label"),
+        populationSizeLabel: t("populationSize.shortLabel"),
         populationSizeTooltip: t("populationSize.tooltip"),
-        populationSizeNotReported: t("populationSize.notReported"),
-        dateRangePublisherLabel: t("dateRangePublisher.label"),
-        dateRangePublisherTooltip: t("dateRangePublisher.tooltip"),
-        dataStandardLabel: t("dataStandard.label"),
-        dataStandardTooltip: t("dataStandard.tooltip"),
-        dataProviderLabel: t("dataProvider.label"),
-        dataProviderTooltip: t("dataProvider.tooltip"),
-        accessServiceLabel: t("accessService.label"),
-
+        accessibilityLabel: t("accessibility.label"),
+        nonCommercialUseOnlyLabel: t("nonCommercialUseOnly.label"),
+        dataRangeLabel: t("dataRange.label"),
         actionLabel: t("action.label"),
     };
 
@@ -251,17 +258,10 @@ const ResultTable = ({
                     style={{ background: "background.paper", borderRadius: 2 }}
                     showSynopsis={showSynopsis}
                     renderSynopsis={row => {
-                        const highlight = row.highlight;
-                        const raw =
-                            highlight?.abstract?.[0] ??
-                            highlight?.description?.[0] ??
-                            get(row, "metadata.summary.abstract");
-                        if (
-                            raw == null ||
-                            String(raw).replace(/<[^>]*>/g, "").trim() === ""
-                        ) {
-                            return null;
-                        }
+                        const abstract = get(row, "metadata.summary.abstract");
+                        const text =
+                            typeof abstract === "string" ? abstract.trim() : "";
+
                         return (
                             <Typography
                                 variant="body1"
@@ -276,12 +276,12 @@ const ResultTable = ({
                                         fontStyle: "italic",
                                     },
                                 }}>
-                                <strong>Synopsis: </strong>
-                                <span
-                                    dangerouslySetInnerHTML={{
-                                        __html: String(raw),
-                                    }}
-                                />
+                                <strong>{translations.synopsis} </strong>
+                                {text || (
+                                    <MissingValue
+                                        label={translations.notGiven}
+                                    />
+                                )}
                             </Typography>
                         );
                     }}
@@ -291,7 +291,9 @@ const ResultTable = ({
                             libraryData={libraryData ?? []}
                             showLibraryModal={showLibraryModal}
                             mutateLibraries={mutateLibraries}
-                            isCohortDiscoveryDisabled={isCohortDiscoveryDisabled}
+                            isCohortDiscoveryDisabled={
+                                isCohortDiscoveryDisabled
+                            }
                             cohortDiscovery={cohortDiscovery}
                         />
                     )}
@@ -308,14 +310,7 @@ const ResultTable = ({
                     renderTitleBandExtras={row => (
                         <TitleBandStudyIcons row={row} />
                     )}
-                    columns={getColumns({
-                        translations,
-                        libraryData,
-                        showLibraryModal,
-                        mutateLibraries,
-                        isCohortDiscoveryDisabled,
-                        cohortDiscovery,
-                    })}
+                    columns={getColumns({ translations })}
                     rows={results}
                 />
             </TableContainer>

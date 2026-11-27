@@ -104,7 +104,15 @@ import {
 } from "@/consts/icons";
 import { PostLoginActions } from "@/consts/postLoginActions";
 import { RouteName } from "@/consts/routeName";
-import { FILTER_TYPE_MAPPING, SEARCH_AGGREGATION_PROVIDER } from "@/consts/search";
+import {
+    FILTER_TYPE_MAPPING,
+    SEARCH_AGGREGATION_PROVIDER,
+} from "@/consts/search";
+import {
+    applyDatasetView,
+    DatasetSortColumn,
+    DatasetSortDirection,
+} from "@/utils/datasetResults";
 import type { FilterData } from "@/utils/filter-setup";
 import {
     cleanSearchFilters,
@@ -117,6 +125,7 @@ import { getPartnerContext } from "@/utils/partnerHeaders";
 import { getAllParams, getSaveSearchFilters } from "@/utils/search";
 import useAddLibraryModal from "../../hooks/useAddLibraryModal";
 import DataCustodianNetwork from "../DataCustodianNetwork";
+import DatasetSort from "../DatasetSort";
 import FilterChips from "../FilterChips";
 import FilterPanel from "../FilterPanel";
 import ResultCardCollection from "../ResultCardCollection";
@@ -199,6 +208,23 @@ const Search = ({
     );
 
     const [synopsesExpanded, setSynopsesExpanded] = useState(true);
+    const [datasetSort, setDatasetSort] = useState<{
+        column: DatasetSortColumn;
+        direction: DatasetSortDirection;
+    }>({ column: "title", direction: "asc" });
+    const [datasetFilterIds, setDatasetFilterIds] = useState<string[]>([]);
+    const handleDatasetFiltersChange = useCallback((ids: string[]) => {
+        setDatasetFilterIds(ids);
+    }, []);
+    const handleDatasetSortChange = useCallback(
+        (column: string, direction: DatasetSortDirection) => {
+            setDatasetSort({
+                column: column as DatasetSortColumn,
+                direction,
+            });
+        },
+        []
+    );
 
     const updateQueryString = useCallback(
         (name: string, value: string) => {
@@ -410,8 +436,14 @@ const Search = ({
                   query: queryParams.query || undefined,
                   type: queryParams.type,
                   sort: queryParams.sort,
-                  per_page: queryParams.per_page,
-                  page: queryParams.page,
+                  per_page:
+                      queryParams.type === SearchCategory.DATASETS
+                          ? 200
+                          : queryParams.per_page,
+                  page:
+                      queryParams.type === SearchCategory.DATASETS
+                          ? 1
+                          : queryParams.page,
                   dataSource: SEARCH_AGGREGATION_PROVIDER,
                   ...pickedFilters,
               }
@@ -435,17 +467,37 @@ const Search = ({
                 | undefined;
         }
 
+        const isDatasetSearch = queryParams.type === SearchCategory.DATASETS;
         return mapSearchAggregation(
             searchResponse as SearchAggregationData | null | undefined,
             SEARCH_AGGREGATION_PROVIDER,
-            Number(queryParams.page),
-            Number(queryParams.per_page)
+            isDatasetSearch ? 1 : Number(queryParams.page),
+            isDatasetSearch ? 200 : Number(queryParams.per_page)
         );
     }, [
         useSearchAggregation,
         searchResponse,
         queryParams.page,
         queryParams.per_page,
+        queryParams.type,
+    ]);
+
+    const datasetTableResults = useMemo(() => {
+        if (queryParams.type !== SearchCategory.DATASETS) return [];
+
+        return applyDatasetView((data?.list ?? []) as SearchResultDataset[], {
+            query: queryParams.query || "",
+            filterIds: datasetFilterIds,
+            sortColumn: datasetSort.column,
+            sortDirection: datasetSort.direction,
+        });
+    }, [
+        data?.list,
+        datasetFilterIds,
+        datasetSort.column,
+        datasetSort.direction,
+        queryParams.query,
+        queryParams.type,
     ]);
 
     useEffect(() => {
@@ -631,7 +683,7 @@ const Search = ({
         if (queryParams.type === SearchCategory.DATASETS) {
             return (
                 <ResultsTable
-                    results={data?.list as SearchResultDataset[]}
+                    results={datasetTableResults}
                     showLibraryModal={showLibraryModal}
                     cohortDiscovery={cohortDiscovery}
                     showSynopsis={synopsesExpanded}
@@ -1046,14 +1098,18 @@ const Search = ({
                                             />
                                         )}
 
-                                        <Box>
-                                            <FilterHeader />
-                                        </Box>
                                         {queryParams.type ===
                                             SearchCategory.DATASETS && (
-                                            <Box mb={2}>
-                                                <StudyFilter />
-                                            </Box>
+                                            <>
+                                                <FilterHeader />
+                                                <Box mb={2}>
+                                                    <StudyFilter
+                                                        onSelectedFiltersChange={
+                                                            handleDatasetFiltersChange
+                                                        }
+                                                    />
+                                                </Box>
+                                            </>
                                         )}
                                         <Box
                                             sx={{
@@ -1069,7 +1125,12 @@ const Search = ({
                                                 resetAction={() =>
                                                     resetQueryInput()
                                                 }
-                                                isDisabled={!queryParams.query}
+                                                isDisabled={
+                                                    queryParams.type ===
+                                                    SearchCategory.DATASETS
+                                                        ? false
+                                                        : !queryParams.query
+                                                }
                                                 submitAction={onQuerySubmit}
                                                 queryPlaceholder={t(
                                                     "searchPlaceholder"
@@ -1091,6 +1152,22 @@ const Search = ({
                                                 onSynopsesToggle={() =>
                                                     setSynopsesExpanded(v => !v)
                                                 }
+                                                sortSlot={
+                                                    queryParams.type ===
+                                                    SearchCategory.DATASETS ? (
+                                                        <DatasetSort
+                                                            column={
+                                                                datasetSort.column
+                                                            }
+                                                            onChange={column =>
+                                                                handleDatasetSortChange(
+                                                                    column,
+                                                                    "asc"
+                                                                )
+                                                            }
+                                                        />
+                                                    ) : undefined
+                                                }
                                             />
                                         </Box>
                                         <Box
@@ -1101,7 +1178,12 @@ const Search = ({
                                             sx={{
                                                 p: `0 ${theme.spacing(2)}`,
                                             }}>
-                                            {data?.list?.length ? (
+                                            {(
+                                                queryParams.type ===
+                                                SearchCategory.DATASETS
+                                                    ? datasetTableResults.length
+                                                    : data?.list?.length
+                                            ) ? (
                                                 renderResults()
                                             ) : (
                                                 <Box sx={{ pb: 2 }}>

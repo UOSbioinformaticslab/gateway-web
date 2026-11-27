@@ -53,18 +53,51 @@ const getLeadResearcher = (result: SearchResultDataset): string => {
     return "";
 };
 
-const getAccessibility = (result: SearchResultDataset): string => {
-    const datasetFilters = get(result, "metadata.datasetFilters") as
-        | { category?: string; label?: string }[]
-        | undefined;
-    if (!Array.isArray(datasetFilters)) return "";
+type DatasetFilter = { category?: string; label?: string };
 
-    const accessibility = datasetFilters.find(
+const NON_COMMERCIAL_USE_LABEL = "non-commercial use only";
+
+const getDatasetFilters = (result: SearchResultDataset): DatasetFilter[] => {
+    const datasetFilters = get(result, "metadata.datasetFilters");
+    return Array.isArray(datasetFilters) ? datasetFilters : [];
+};
+
+const yearFromDate = (value: unknown): string => {
+    if (typeof value !== "string" || value.length < 4) return "";
+    return value.substring(0, 4);
+};
+
+const getAccessibility = (result: SearchResultDataset): string => {
+    const accessibility = getDatasetFilters(result).find(
         filter => filter.category === "accessType"
     );
     const label = accessibility?.label?.trim();
 
     return label || "";
+};
+
+const getNonCommercialUseOnly = (
+    result: SearchResultDataset
+): "True" | "False" =>
+    getDatasetFilters(result).some(
+        filter => filter.label === NON_COMMERCIAL_USE_LABEL
+    )
+        ? "True"
+        : "False";
+
+const getDatasetTableDataRange = (
+    result: SearchResultDataset
+): string | null => {
+    const startYear = yearFromDate(
+        get(result, "metadata.provenance.temporal.startDate") ??
+            get(result, "metadata.temporal.startDate")
+    );
+    const endYear = yearFromDate(
+        get(result, "metadata.provenance.temporal.endDate") ??
+            get(result, "metadata.temporal.endDate")
+    );
+
+    return startYear && endYear ? `${startYear} - ${endYear}` : null;
 };
 
 const getAllParams = (searchParams: ReadonlyURLSearchParams | null) => {
@@ -141,9 +174,11 @@ const hasMinimumSearchCharLength = (value: string | null | undefined) => {
 export {
     getAccessibility,
     getAllParams,
+    getDatasetTableDataRange,
     getDateRange,
     getFiltersFromSaveSearch,
     getLeadResearcher,
+    getNonCommercialUseOnly,
     getPopulationSize,
     getSaveSearchFilters,
     getUrlFromSearchParams,
