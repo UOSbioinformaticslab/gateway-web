@@ -1,7 +1,12 @@
-import { useEffect,useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import theme, { colors } from "@/config/theme";
+import { TextField } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
+import { useTranslations } from "next-intl";
+import theme from "@/config/theme";
 import { SearchIcon } from "@/consts/icons";
+import Button from "../Button";
+import Paper from "../Paper";
 import {
     ExplainerText,
     FormWrapper,
@@ -9,17 +14,8 @@ import {
     SearchForm,
     SearchInput,
 } from "./SearchBar.styles";
-import Paper from "../Paper";
-import Button from "../Button";
 
-import MenuItem from "@mui/material/MenuItem";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { Badge,TextField, Checkbox, FormControlLabel, IconButton } from "@mui/material";
-
+const TRANSLATION_PATH = "pages.search.components.SearchBar";
 
 interface SearchBarProps {
     resetAction: () => void;
@@ -37,6 +33,8 @@ interface SearchBarProps {
     /** When set with `onSynopsesToggle`, synopses visibility is controlled by the parent (e.g. search results). */
     synopsesExpanded?: boolean;
     onSynopsesToggle?: () => void;
+    /** Replaces the default sort select, for example the dataset sort. */
+    sortSlot?: ReactNode;
 }
 export const TEST_ID_WRAPPER = "search-bar";
 export const TEST_ID_RESET_BUTTON = "reset-btn";
@@ -56,12 +54,25 @@ const SearchBar = ({
     isDisabled = false,
     synopsesExpanded: synopsesExpandedProp,
     onSynopsesToggle,
+    sortSlot,
 }: SearchBarProps) => {
+    const t = useTranslations(TRANSLATION_PATH);
+    const sortOptions = useMemo(
+        () => [
+            { value: "favourite", label: t("favourite") },
+            { value: "dateAdded", label: t("updatedDate") },
+            { value: "studyTitle", label: t("studyTitle") },
+            { value: "leadResearcherInstitute", label: t("leadResearcher") },
+            { value: "populationSize", label: t("populationSize") },
+            { value: "position", label: t("accessibility") },
+            { value: "earliestData", label: t("earliestData") },
+            { value: "dateStarted", label: t("startDate") },
+        ],
+        [t]
+    );
     const { control, handleSubmit, setValue } = useForm({
         defaultValues: { [queryName]: defaultValue },
     });
-    const [cart, setCart] = useState([]);
-    const [isDeepSearch, setIsDeepSearch] = useState(false);
     const [synopsesExpandedInternal, setSynopsesExpandedInternal] =
         useState(true);
     const isSynopsesControlled =
@@ -69,14 +80,7 @@ const SearchBar = ({
     const synopsesExpanded = isSynopsesControlled
         ? synopsesExpandedProp!
         : synopsesExpandedInternal;
-    const [showCartModal, setShowCartModal] = useState(false);
-    const [sortConfig, setSortConfig] = useState({ column: 'dateAdded', direction: 'desc' });
-    const handleSort = (column) => {
-        setSortConfig(prevConfig => ({
-            column,
-            direction: prevConfig.column === column && prevConfig.direction === 'asc' ? 'desc' : 'asc'
-        }));
-    };
+    const [sortColumn, setSortColumn] = useState("dateAdded");
     useEffect(() => {
         setValue(queryName, valueOverride);
     }, [queryName, setValue, valueOverride]);
@@ -88,18 +92,16 @@ const SearchBar = ({
             sx={{
                 p: 1,
                 mb: 0,
-                bgcolor: '#f1f1f1',
-                display: 'flex',
-                alignItems: 'center',
+                bgcolor: "#f1f1f1",
+                display: "flex",
+                alignItems: "center",
                 gap: 1,
-                width: '100%',
-                flexWrap: 'nowrap',
-            }}
-        >
+                width: "100%",
+                flexWrap: "nowrap",
+            }}>
             <FormWrapper
                 data-testid={TEST_ID_WRAPPER}
-                sx={{ flex: "0 0 50%", minWidth: 0, marginTop: 1 }}
-            >
+                sx={{ flex: "0 0 50%", minWidth: 0, marginTop: 1 }}>
                 <SearchForm onSubmit={handleSubmit(submitAction)} role="search">
                     <InputWrapper
                         onClick={() =>
@@ -127,48 +129,27 @@ const SearchBar = ({
                     </InputWrapper>
                 </SearchForm>
                 {explainerText ? (
-                    <ExplainerText sx={{ mt: 0.5 }}>{explainerText}</ExplainerText>
+                    <ExplainerText sx={{ mt: 0.5 }}>
+                        {explainerText}
+                    </ExplainerText>
                 ) : null}
             </FormWrapper>
 
-            {/* Cart Badge */}
-            <IconButton onClick={() => setShowCartModal(true)} color="primary" sx={{ flexShrink: 0 }}>
-                <Badge badgeContent={cart.length} color="error">
-                    <ShoppingCartIcon sx={{ fontSize: 28 }} />
-                </Badge>
-            </IconButton>
-
-            {/* Deep Search Checkbox */}
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={isDeepSearch}
-                        onChange={(e) => setIsDeepSearch(e.target.checked)}
-                        color="primary"
-                    />
-                }
-                label="Deep Search"
-                sx={{ flexShrink: 0 }}
-            />
-
-            {/* Sort Dropdown */}
-            <TextField
-                select
-                label="Sort by"
-                size="small"
-                value={sortConfig.column}
-                onChange={(e) => handleSort(e.target.value)}
-                sx={{ width: 180, bgcolor: 'white', flexShrink: 0 }}
-            >
-                <MenuItem value="favourite">Favourites</MenuItem>
-                <MenuItem value="dateAdded">Updated Date</MenuItem>
-                <MenuItem value="studyTitle">Study Title</MenuItem>
-                <MenuItem value="leadResearcherInstitute">Lead Researcher</MenuItem>
-                <MenuItem value="populationSize">Population Size</MenuItem>
-                <MenuItem value="position">Accessibility</MenuItem>
-                <MenuItem value="earliestData">Earliest Data</MenuItem>
-                <MenuItem value="dateStarted">Start Date</MenuItem>
-            </TextField>
+            {sortSlot ?? (
+                <TextField
+                    select
+                    label={t("sortBy")}
+                    size="small"
+                    value={sortColumn}
+                    onChange={event => setSortColumn(event.target.value)}
+                    sx={{ width: 180, bgcolor: "white", flexShrink: 0 }}>
+                    {sortOptions.map(option => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            )}
 
             {/* Collapse/Expand Toggle */}
             <Button
@@ -185,13 +166,11 @@ const SearchBar = ({
                     textTransform: "none",
                     fontWeight: "bold",
                     flexShrink: 0,
-                }}
-            >
-                {synopsesExpanded ? "Collapse Synopses" : "Expand Synopses"}
+                }}>
+                {synopsesExpanded ? t("collapseSynopses") : t("expandSynopses")}
             </Button>
         </Paper>
     );
 };
 
 export default SearchBar;
-
