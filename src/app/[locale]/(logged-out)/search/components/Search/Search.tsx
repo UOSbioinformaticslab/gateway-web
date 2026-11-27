@@ -104,7 +104,7 @@ import {
 } from "@/consts/icons";
 import { PostLoginActions } from "@/consts/postLoginActions";
 import { RouteName } from "@/consts/routeName";
-import { FILTER_TYPE_MAPPING, SEARCH_AGGREGATION_PROVIDER, SEARCH_AGGREGATION_PROVIDERS } from "@/consts/search";
+import { FILTER_TYPE_MAPPING, SEARCH_AGGREGATION_PROVIDER } from "@/consts/search";
 import type { FilterData } from "@/utils/filter-setup";
 import {
     cleanSearchFilters,
@@ -159,7 +159,7 @@ const Search = ({
     filters,
     cohortDiscovery,
     schema,
-    cancerTypeFilters,
+    cancerTypeFilters: _cancerTypeFilters,
 }: SearchProps) => {
     const { showDialog, hideDialog } = useDialog();
     const [hasSearched, setHasSearched] = useState(false);
@@ -351,9 +351,14 @@ const Search = ({
         queryParams
     );
 
+    const isTypesenseSearch =
+        queryParams.type !== SearchCategory.DATASETS &&
+        (queryParams.type !== SearchCategory.PUBLICATIONS ||
+            queryParams.source === GATEWAY_SOURCE_FIELD);
+
     const useSearchAggregation =
-        queryParams.type === SearchCategory.DATASETS &&
-        getPartnerContext().toUpperCase() === "CRUK";
+        getPartnerContext().toUpperCase() === "CRUK" &&
+        (queryParams.type === SearchCategory.DATASETS || isTypesenseSearch);
 
     const hasSearchCriteria = useMemo(() => {
         const hasQuery = !!queryParams.query && queryParams.query.trim() !== "";
@@ -363,6 +368,7 @@ const Search = ({
 
     const shouldFetchSearch = useMemo(
         () =>
+            useSearchAggregation ||
             forceSearch ||
             queryParams.type !== SearchCategory.PUBLICATIONS ||
             (queryParams.source === GATEWAY_SOURCE_FIELD &&
@@ -375,17 +381,22 @@ const Search = ({
             queryParams.query,
             queryParams.source,
             queryParams.type,
+            useSearchAggregation,
         ]
     );
 
     const searchUrl = useSearchAggregation
         ? apis.searchAggregationV2Url
-        : `${apis.searchV1Url}/${queryParams.type}?view_type=mini&per_page=${
-              queryParams.per_page
-          }&page=${queryParams.page}&sort=${queryParams.sort}${
+        : `${apis.searchV1Url}/${queryParams.type}?${
+              queryParams.type === SearchCategory.PUBLICATIONS
+                  ? ""
+                  : "view_type=mini&"
+          }per_page=${queryParams.per_page}&page=${queryParams.page}&sort=${
+              queryParams.sort
+          }${
               queryParams.type === SearchCategory.PUBLICATIONS
                   ? `&${STATIC_FILTER_SOURCE}=${queryParams.source}`
-                  : ``
+                  : ""
           }`;
 
     const {
@@ -396,12 +407,12 @@ const Search = ({
         searchUrl,
         useSearchAggregation
             ? {
-                  query: queryParams.query ?? "",
-                  type: SearchCategory.DATASETS,
-                  providers: [...SEARCH_AGGREGATION_PROVIDERS],
-                  page: Number(queryParams.page),
-                  per_page: Number(queryParams.per_page),
+                  query: queryParams.query || undefined,
+                  type: queryParams.type,
                   sort: queryParams.sort,
+                  per_page: queryParams.per_page,
+                  page: queryParams.page,
+                  dataSource: SEARCH_AGGREGATION_PROVIDER,
                   ...pickedFilters,
               }
             : {
@@ -1041,20 +1052,7 @@ const Search = ({
                                         {queryParams.type ===
                                             SearchCategory.DATASETS && (
                                             <Box mb={2}>
-                                                <StudyFilter
-                                                    filterData={
-                                                        cancerTypeFilters
-                                                    }
-                                                    onFilterChange={selectedFilters => {
-                                                        // eslint-disable-next-line no-console
-                                                        console.log(
-                                                            "Selected filters:",
-                                                            Array.from(
-                                                                selectedFilters as Set<unknown>
-                                                            )
-                                                        );
-                                                    }}
-                                                />
+                                                <StudyFilter />
                                             </Box>
                                         )}
                                         <Box
