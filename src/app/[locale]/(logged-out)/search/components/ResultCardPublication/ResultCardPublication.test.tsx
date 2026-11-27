@@ -2,7 +2,7 @@ import { render, screen } from "@/utils/testUtils";
 import ResultCardPublication from "./ResultCardPublication";
 
 const MOCK_DATA = {
-    abstract: "Abstract",
+    abstract: "Abstract.",
     authors: "Authors",
     journal_name: "Journal name",
     paper_title: "Paper",
@@ -15,19 +15,34 @@ describe("ResultCardPublication", () => {
         render(<ResultCardPublication result={MOCK_DATA} />);
 
         expect(screen.getByText(MOCK_DATA.abstract)).toBeInTheDocument();
-        expect(screen.getAllByText(MOCK_DATA.authors)[0]).toBeInTheDocument();
+        expect(screen.getByText(MOCK_DATA.authors)).toBeInTheDocument();
         expect(screen.getByText(MOCK_DATA.journal_name)).toBeInTheDocument();
         expect(screen.getByText(MOCK_DATA.paper_title)).toBeInTheDocument();
         expect(
             screen.getByText(`Published: ${MOCK_DATA.year_of_publication}`)
         ).toBeInTheDocument();
+        expect(screen.getByText("Data dependencies")).toBeInTheDocument();
+        expect(screen.getAllByText("None linked")).toHaveLength(2);
     });
-    it("should render `Not available` when no authors", async () => {
+
+    it("should render `Unknown Author` when no authors", async () => {
         render(
             <ResultCardPublication
                 result={{ ...MOCK_DATA, authors: undefined }}
             />
         );
-        expect(screen.getAllByText(`Not available`)[0]).toBeInTheDocument();
+        expect(screen.getByText("Unknown Author")).toBeInTheDocument();
+    });
+
+    it("should shorten multiple authors", async () => {
+        render(
+            <ResultCardPublication
+                result={{
+                    ...MOCK_DATA,
+                    authors: "Elangovan, Premkumar, Smith",
+                }}
+            />
+        );
+        expect(screen.getByText("Elangovan et al.")).toBeInTheDocument();
     });
 });

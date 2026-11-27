@@ -127,14 +127,33 @@ export interface SearchResultDataUse extends SearchResultBase {
     non_gateway_datasets: string[];
 }
 
+export interface PublicationDatasetVersion {
+    id: number;
+    dataset_id: number;
+    name: string;
+}
+
+export interface PublicationProjectLink {
+    id: number;
+    project_title?: string;
+}
+
 export interface SearchResultPublication extends SearchResultBase {
     abstract?: string;
     paper_title: string;
     authors?: string;
     journal_name?: string;
     year_of_publication?: string;
-    full_text_url: string;
-    url: string;
+    full_text_url?: string;
+    url?: string;
+    paper_doi?: string;
+    datasetTitles?: string[];
+    datasetVersions?: PublicationDatasetVersion[];
+    durs?: PublicationProjectLink[];
+    _source?: {
+        datasetTitles?: string[];
+        paper_doi?: string;
+    };
 }
 
 export interface SearchResultTool extends SearchResultBase {
@@ -149,8 +168,16 @@ export interface SearchResultTool extends SearchResultBase {
     programming_language?: string[];
     programming_package?: string[];
     datasets?: string[];
+    durTitles?: string[];
+    url?: string;
     category?: string;
     associatedAuthors?: string;
+    _source?: {
+        url?: string;
+        name?: string;
+        description?: string;
+        associated_authors?: string;
+    };
 }
 
 export interface SearchResultCollection extends SearchResultBase {
