@@ -2,6 +2,7 @@ import { LeftNavItem } from "@/interfaces/Ui";
 import {
     ControlPointIcon,
     DescriptionIcon,
+    DescriptionOutlinedIcon,
     ToolIcon,
     HelpOutlineOutlinedIcon,
     DataUseIcon,
@@ -102,9 +103,9 @@ const getProfileNav = (permissions: {
             label: "Collections",
             href: `/${RouteName.ACCOUNT}/${RouteName.PROFILE}/${RouteName.COLLECTIONS}`,
         },
-                {
-            icon: <BookmarksOutlinedIcon />,
-            label: "Project Grants",
+        {
+            icon: <DescriptionOutlinedIcon />,
+            label: "Project",
             href: `/${RouteName.ACCOUNT}/${RouteName.PROFILE}/${RouteName.PROJECT_GRANTS}`,
         },
     ];
@@ -240,6 +241,16 @@ const getTeamNav = (
                       icon: <BookmarksOutlinedIcon />,
                       label: "Collections",
                       href: `/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${RouteName.COLLECTIONS}`,
+                  },
+              ]
+            : []),
+        ...(permissions["project-grants.read"] ||
+        permissions["collections.read"]
+            ? [
+                  {
+                      icon: <DescriptionOutlinedIcon />,
+                      label: "Project",
+                      href: `/${RouteName.ACCOUNT}/${RouteName.TEAM}/${teamId}/${RouteName.PROJECT_GRANTS}`,
                   },
               ]
             : []),

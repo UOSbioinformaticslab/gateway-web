@@ -104,6 +104,16 @@
                     "message": "Collection has been updated"
                 }
             }
+        },
+        "archiveProject": {
+            "success": {
+                "delete": {
+                    "message": "Project has been archived"
+                },
+                "patch": {
+                    "message": "Project has been updated"
+                }
+            }
         }
     },
     "common": {
@@ -721,6 +731,60 @@
                         },
                         "CollectionsTab": {
                             "notFound": "No {label} collections found"
+                        }
+                    }
+                },
+                "projectGrants": {
+                    "create": {
+                        "title": "Guide to Uploading and Modifying Information about your CRUK project",
+                        "intro": "If this is a new project, you will find here some initial information that we have derived from your accepted CRUK grant proposal. Feel free to add details - particularly to the section about the project scope.",
+                        "introExisting": "To modify information about an existing project, select from the list below to view and edit the information displayed",
+                        "selectExisting": "Existing project",
+                        "selectExistingPlaceholder": "Select an existing project",
+                        "cancel": "Cancel",
+                        "saveDraft": "Save as draft",
+                        "publish": "Publish",
+                        "labelTag": "Project",
+                        "fields": {
+                            "name": "Project Grant Title",
+                            "nameInfo": "The Project Grant Title should be unique to the CRUK datahub. Add your institute or name if necessary to disambiguate",
+                            "leadResearcher": "Lead researcher",
+                            "leadResearcherInfo": "The lead researcher named on the grant.",
+                            "institute": "Lead research institute",
+                            "grantNumbers": "Grant number(s)",
+                            "grantNumbersInfo": "List of CRUK and any other grant numbers. Separate multiple numbers with a comma.",
+                            "startDate": "Project start date",
+                            "startDateInfo": "Starting date of the project grant.",
+                            "endDate": "Project end date",
+                            "endDateInfo": "Current end date of the project grant.",
+                            "scope": "Project scope",
+                            "scopeInfo": "Data and biospecimens expected to result from the grant."
+                        }
+                    },
+                    "components": {
+                        "TeamProjectGrants": {
+                            "title": "Projects",
+                            "text": "View, add, edit, archive and check the status of your projects.",
+                            "create": "Add new Project",
+                            "actions": {
+                                "unarchive": {
+                                    "buttonText": "Make Active",
+                                    "confirmText": "Make Draft",
+                                    "title": "Unarchive the Project so it is live on the Gateway",
+                                    "content": "Select whether you would like to move this to Active (this will make your project available within search results) or Draft (where you can edit the project before making it available within search results).",
+                                    "label": "Unarchive the Project so it is live on the Gateway"
+                                },
+                                "edit": {
+                                    "label": "Edit Project"
+                                },
+                                "archive": {
+                                    "label": "Archive the Project so it is no longer live on the Gateway"
+                                }
+                            }
+                        },
+                        "ProjectGrantsTab": {
+                            "notFound": "No {label} projects found",
+                            "searchPlaceholder": "Search project titles"
                         }
                     }
                 },
@@ -1926,6 +1990,13 @@
             "users": "Users",
             "entities": "Entities",
             "entitiesCounts": "Datasets ({nDatasets}), Data Uses ({nDur}), Publications ({nPublications}), Tools ({nTools})",
+            "lastActivity": "Last activity"
+        },
+        "ProjectGrantCard": {
+            "leadResearcher": "Lead researcher",
+            "institute": "Institute",
+            "grantNumber": "Grant number",
+            "dates": "Dates",
             "lastActivity": "Last activity"
         },
         "NestedFilterSection": {
