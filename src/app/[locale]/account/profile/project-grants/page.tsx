@@ -2,11 +2,11 @@ import BoxContainer from "@/components/BoxContainer";
 import { getUser } from "@/utils/api";
 import metaData, { noFollowRobots } from "@/utils/metadata";
 import { getPermissions } from "@/utils/permissions";
-import TeamCollections from "../../team/[teamId]/(withLeftNav)/collections/components/TeamCollections";
+import TeamProjectGrants from "../../team/[teamId]/(withLeftNav)/project-grants/components/TeamProjectGrants";
 
 export const metadata = metaData(
     {
-        title: "Project Grants - My Account",
+        title: "Projects - My Account",
         description: "",
     },
     noFollowRobots
@@ -19,7 +19,7 @@ export default async function ProjectGrantsPage() {
 
     return (
         <BoxContainer sx={{ gap: 0 }}>
-            <TeamCollections permissions={permissions} userId={userId} />
+            <TeamProjectGrants permissions={permissions} userId={userId} />
         </BoxContainer>
     );
 }
