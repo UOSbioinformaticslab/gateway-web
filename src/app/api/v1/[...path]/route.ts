@@ -7,13 +7,17 @@ import { getSessionCookie } from "@/utils/getSessionCookie";
 import { logger } from "@/utils/logger";
 import { getPartnerHeaders } from "@/utils/partnerHeaders";
 
-async function getAuthHeaders() {
+async function getAuthHeaders(allowAnonymous = false) {
     const session = await getSessionCookie();
     const cookieStore = await cookies();
     const jwtToken = cookieStore.get(config.JWT_COOKIE)?.value;
 
     if (!jwtToken) {
-        return null;
+        if (!allowAnonymous) return null;
+        return {
+            [sessionHeader]: sessionPrefix + session,
+            ...getPartnerHeaders(),
+        };
     }
 
     return {
@@ -28,7 +32,12 @@ async function proxy(
     context: { params: Promise<{ path: string[] }> }
 ) {
     const session = await getSessionCookie();
-    const headers = await getAuthHeaders();
+    const { path } = await context.params;
+    const isPublicProjectGrantList =
+        request.method === "GET" &&
+        path.length === 1 &&
+        path[0] === "project_grants";
+    const headers = await getAuthHeaders(isPublicProjectGrantList);
 
     if (!headers) {
         return NextResponse.json(
@@ -53,7 +62,6 @@ async function proxy(
     }
 
     try {
-        const { path } = await context.params;
         const query = request.nextUrl.search;
         const url = `${apis.apiV1IPUrl}/${path.join("/")}${query}`;
 

@@ -127,7 +127,7 @@ module.exports = {
       url     : `${site}/search?sampleAvailability`,
     },
     { ignore  : ignoreNotForm,
-      url     : `${site}/search?type=dur`,
+      url     : `${site}/search?type=project`,
     },
     { ignore  : ignoreNotForm,
       url     : `${site}/search?type=collections`,

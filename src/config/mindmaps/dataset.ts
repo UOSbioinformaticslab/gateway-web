@@ -12,7 +12,7 @@ const outerNodeValues = [
     },
     {
         name: "durs",
-        href: "/search?type=dur",
+        href: "/search?type=project",
     },
     {
         name: "curatedPublications",

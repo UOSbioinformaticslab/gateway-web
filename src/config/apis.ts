@@ -67,6 +67,8 @@ const apis = {
     dataCustodianNetworkV2UrlIP: `${apiV2IPUrl}/data_custodian_networks`,
     publicationsV1Url: `${apiV1Url}/publications`,
     publicationsV1UrlIP: `${apiV1IPUrl}/publications`,
+    projectGrantsV1Url: `${apiV1Url}/project_grants`,
+    projectGrantsV1UrlIP: `${apiV1IPUrl}/project_grants`,
     toolsV1Url: `${apiV1Url}/tools`,
     toolsV1UrlIP: `${apiV1IPUrl}/tools`,
     toolsV2Url: `${apiV2Url}/tools`,
