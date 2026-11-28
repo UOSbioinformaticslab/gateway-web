@@ -1149,6 +1149,25 @@
             "downloadResults": "Download results",
             "downloadStarted": "Your download has started",
             "dur": "Data Uses / Research Projects",
+            "project": "Research Projects",
+            "projectHeader": {
+                "title": "Unleashing the power of big data",
+                "browse": "Browse our Research Projects",
+                "welcome": "Welcome to the CRUK Data Hub, your gateway to data produced by research funded through Cancer Research UK.",
+                "search": "Here you can search our current research grants, lead investigators, and project scopes."
+            },
+            "projectGrants": {
+                "searchPlaceholder": "Search projects, researchers, or institutes...",
+                "collapseAll": "Collapse All Scopes",
+                "expandAll": "Expand All Scopes",
+                "leadResearcher": "Lead Researcher",
+                "institute": "Institute",
+                "startDate": "Start Date",
+                "endDate": "End Date",
+                "grantNumber": "Grant Number",
+                "noResults": "No research projects match your search.",
+                "loading": "Loading research projects"
+            },
             "data_custodians": "Data Custodians",
             "loadingAriaLabel": "Loading search results",
             "saveSearch": "Save search",

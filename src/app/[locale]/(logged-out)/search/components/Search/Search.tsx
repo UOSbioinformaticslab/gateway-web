@@ -131,6 +131,8 @@ import FilterPanel from "../FilterPanel";
 import ResultCardCollection from "../ResultCardCollection";
 import ResultCardDataProvider from "../ResultCardDataProviders";
 import ResultCardDataUse from "../ResultCardDataUse";
+import ProjectGrantDirectory from "../ProjectGrantDirectory";
+import ProjectHeader from "../ProjectHeader";
 import PublicationDirectory from "../PublicationDirectory";
 import ToolDirectory from "../ToolDirectory";
 import ResultCardPublication from "../ResultCardPublication/ResultCardPublication";
@@ -141,6 +143,18 @@ import { FilterHeader } from "../StudyFilter/FilterHeader";
 import StudyFilter from "../StudyFilter/StudyFilter";
 
 const TRANSLATION_PATH = "pages.search";
+const LEGACY_DATA_USE_TYPE = "dur";
+
+const toSearchCategory = (value?: string | null): SearchCategory => {
+    if (
+        value === LEGACY_DATA_USE_TYPE ||
+        value === SearchCategory.DATA_USE
+    ) {
+        return SearchCategory.DATA_USE;
+    }
+
+    return (value as SearchCategory) || SearchCategory.DATASETS;
+};
 const STATIC_FILTER_SOURCE = "source";
 const GATEWAY_SOURCE_FIELD = "GAT";
 const EUROPE_PMC_SOURCE_FIELD = "FED";
@@ -244,9 +258,7 @@ const Search = ({
         sort: getParamString(SORT_FIELD) || searchFormConfig.defaultValues.sort,
         page: getParamString(PAGE_FIELD) || "1",
         per_page: "25",
-        type:
-            (getParamString(TYPE_FIELD) as SearchCategory) ||
-            SearchCategory.DATASETS,
+        type: toSearchCategory(getParamString(TYPE_FIELD)),
         [STATIC_FILTER_SOURCE]:
             getParamString(STATIC_FILTER_SOURCE) ||
             searchFormConfig.defaultValues.source,
@@ -374,8 +386,14 @@ const Search = ({
         updatePath(QUERY_FIELD, "");
     };
 
+    const apiSearchType =
+        queryParams.type === SearchCategory.DATA_USE
+            ? LEGACY_DATA_USE_TYPE
+            : queryParams.type;
+
     const pickedFilters = pickOnlyFilters(
-        FILTER_TYPE_MAPPING[queryParams.type],
+        FILTER_TYPE_MAPPING[queryParams.type] ||
+            FILTER_TYPE_MAPPING[apiSearchType],
         queryParams
     );
 
@@ -396,13 +414,14 @@ const Search = ({
 
     const shouldFetchSearch = useMemo(
         () =>
-            useSearchAggregation ||
-            forceSearch ||
-            queryParams.type !== SearchCategory.PUBLICATIONS ||
-            (queryParams.source === GATEWAY_SOURCE_FIELD &&
-                hasSearchCriteria) ||
-            (queryParams.source === EUROPE_PMC_SOURCE_FIELD &&
-                !!queryParams.query),
+            queryParams.type !== SearchCategory.DATA_USE &&
+            (useSearchAggregation ||
+                forceSearch ||
+                queryParams.type !== SearchCategory.PUBLICATIONS ||
+                (queryParams.source === GATEWAY_SOURCE_FIELD &&
+                    hasSearchCriteria) ||
+                (queryParams.source === EUROPE_PMC_SOURCE_FIELD &&
+                    !!queryParams.query)),
         [
             forceSearch,
             hasSearchCriteria,
@@ -422,7 +441,7 @@ const Search = ({
 
     const searchUrl = useSearchAggregation
         ? apis.searchAggregationV2Url
-        : `${apis.searchV1Url}/${queryParams.type}?${
+        : `${apis.searchV1Url}/${apiSearchType}?${
               queryParams.type === SearchCategory.PUBLICATIONS
                   ? ""
                   : "view_type=mini&"
@@ -443,7 +462,7 @@ const Search = ({
         useSearchAggregation
             ? {
                   query: queryParams.query || undefined,
-                  type: queryParams.type,
+                  type: apiSearchType,
                   sort: queryParams.sort,
                   per_page:
                       queryParams.type === SearchCategory.DATASETS
@@ -544,6 +563,14 @@ const Search = ({
         mutate();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (searchParams?.get(TYPE_FIELD) !== LEGACY_DATA_USE_TYPE) return;
+
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(TYPE_FIELD, SearchCategory.DATA_USE);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, [pathname, router, searchParams]);
 
     // Update the list of libraries
     const { mutate: mutateLibraries } = useGet<Library[]>(
@@ -809,6 +836,7 @@ const Search = ({
         [queryParams.type]
     );
 
+    const isProject = queryParams.type === SearchCategory.DATA_USE;
     const isDirectory = isPublications || isTools;
 
     const isEuropePmcSearch = useMemo(
@@ -828,7 +856,11 @@ const Search = ({
     const resultsReady =
         !shouldFetchSearch ||
         data === null ||
-        (data != null && !!data.path?.includes(queryParams.type));
+        (data != null &&
+            !!(
+                data.path?.includes(apiSearchType) ||
+                data.path?.includes(queryParams.type)
+            ));
     const showSearchLoading =
         isSearching || (shouldFetchSearch && data === undefined);
 
@@ -1091,14 +1123,21 @@ const Search = ({
                                     </Button>
                                 )}
                             </Box>
-                            {showSearchLoading && !isDirectory && (
+                            {isProject && (
+                                <>
+                                    <ProjectHeader />
+                                    <ProjectGrantDirectory />
+                                </>
+                            )}
+                            {showSearchLoading && !isDirectory && !isProject && (
                                 <Loading ariaLabel={t("loadingAriaLabel")} />
                             )}
-                            {(isDirectory
-                                ? !isEuropePmcSearchNoQuery
-                                : !showSearchLoading &&
-                                  !isEuropePmcSearchNoQuery &&
-                                  resultsReady) && (
+                            {!isProject &&
+                                (isDirectory
+                                    ? !isEuropePmcSearchNoQuery
+                                    : !showSearchLoading &&
+                                      !isEuropePmcSearchNoQuery &&
+                                      resultsReady) && (
                                     <Box
                                         sx={{
                                             display: "flex",
@@ -1268,21 +1307,23 @@ const Search = ({
                                         )}
                                     </Box>
                                 )}
-                            <Pagination
-                                isLoading={isSearching}
-                                page={parseInt(queryParams.page, 10)}
-                                count={data?.lastPage}
-                                onChange={(
-                                    e: React.ChangeEvent<unknown>,
-                                    page: number
-                                ) => {
-                                    setQueryParams({
-                                        ...queryParams,
-                                        page: page.toString(),
-                                    });
-                                    updatePath(PAGE_FIELD, page.toString());
-                                }}
-                            />
+                            {!isProject && (
+                                <Pagination
+                                    isLoading={isSearching}
+                                    page={parseInt(queryParams.page, 10)}
+                                    count={data?.lastPage}
+                                    onChange={(
+                                        e: React.ChangeEvent<unknown>,
+                                        page: number
+                                    ) => {
+                                        setQueryParams({
+                                            ...queryParams,
+                                            page: page.toString(),
+                                        });
+                                        updatePath(PAGE_FIELD, page.toString());
+                                    }}
+                                />
+                            )}
                         </Box>
                     </Box>
                 </Box>

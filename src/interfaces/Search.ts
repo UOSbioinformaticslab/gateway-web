@@ -233,7 +233,7 @@ export enum SearchCategory {
     COLLECTIONS = "collections",
     DATA_CUSTODIANS = "data_custodians",
     DATASETS = "datasets",
-    DATA_USE = "dur",
+    DATA_USE = "project",
     TOOLS = "tools",
     PUBLICATIONS = "publications",
 }

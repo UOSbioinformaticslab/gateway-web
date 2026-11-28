@@ -4,6 +4,7 @@ const SEARCH_AGGREGATION_PROVIDERS = [SEARCH_AGGREGATION_PROVIDER] as const;
 const FILTER_TYPE_MAPPING: { [key: string]: string } = {
     datasets: "dataset",
     dur: "dataUseRegister",
+    project: "dataUseRegister",
     publications: "paper",
     collections: "collection",
     data_providers: "dataProvider",
