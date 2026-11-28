@@ -113,6 +113,7 @@ import {
     DatasetSortColumn,
     DatasetSortDirection,
 } from "@/utils/datasetResults";
+import { LogicToken } from "@/utils/logic-utils";
 import type { FilterData } from "@/utils/filter-setup";
 import {
     cleanSearchFilters,
@@ -229,9 +230,9 @@ const Search = ({
         direction: DatasetSortDirection;
     }>({ column: "title", direction: "asc" });
     const [datasetFilterIds, setDatasetFilterIds] = useState<string[]>([]);
-    const handleDatasetFiltersChange = useCallback((ids: string[]) => {
-        setDatasetFilterIds(ids);
-    }, []);
+    const [datasetLogicTokens, setDatasetLogicTokens] = useState<LogicToken[]>(
+        []
+    );
     const handleDatasetSortChange = useCallback(
         (column: string, direction: DatasetSortDirection) => {
             setDatasetSort({
@@ -294,6 +295,35 @@ const Search = ({
     });
 
     const showDatasetFilterPanel = queryParams.type === SearchCategory.DATASETS;
+    const submitDatasetFilter = usePost<Record<string, unknown>>(
+        apis.searchAggregationV2Url,
+        {
+            successNotificationsOn: false,
+            errorNotificationsOn: false,
+        }
+    );
+    const handleFindDatasetFilters = useCallback(
+        async (filters: { ids: string[]; tokens: LogicToken[] }) => {
+            if (filters.ids.length === 0) {
+                setDatasetFilterIds([]);
+                setDatasetLogicTokens([]);
+                return;
+            }
+
+            const response = await submitDatasetFilter({
+                type: SearchCategory.DATASETS,
+                query: queryParams.query || undefined,
+                filterIds: filters.ids,
+                datasetFilterLogic: filters.tokens,
+            });
+
+            if (!response) return;
+
+            setDatasetFilterIds(filters.ids);
+            setDatasetLogicTokens(filters.tokens);
+        },
+        [queryParams.query, submitDatasetFilter]
+    );
 
     const [datasetNamesArray, setDatasetNamesArray] = useState<string[]>([]);
 
@@ -522,12 +552,14 @@ const Search = ({
         return applyDatasetView((data?.list ?? []) as SearchResultDataset[], {
             query: queryParams.query || "",
             filterIds: datasetFilterIds,
+            logicTokens: datasetLogicTokens,
             sortColumn: datasetSort.column,
             sortDirection: datasetSort.direction,
         });
     }, [
         data?.list,
         datasetFilterIds,
+        datasetLogicTokens,
         datasetSort.column,
         datasetSort.direction,
         queryParams.query,
@@ -1171,8 +1203,8 @@ const Search = ({
                                                 <FilterHeader />
                                                 <Box mb={2}>
                                                     <StudyFilter
-                                                        onSelectedFiltersChange={
-                                                            handleDatasetFiltersChange
+                                                        onFindFilters={
+                                                            handleFindDatasetFilters
                                                         }
                                                     />
                                                 </Box>

@@ -1385,7 +1385,11 @@
                     "chips": {
                         "showLogic": "Show Advanced Logic Builder",
                         "hideLogic": "Hide Advanced Logic Builder",
-                        "logicDescription": "Default logic shown below. You can toggle AND/OR or bracket groups by clicking the filters to be bracketed and then pressing the Bracket Button that appears."
+                        "logicDescription": "Default logic shown below. You can toggle AND/OR or bracket groups by clicking the filters to be bracketed and then pressing the Bracket Button that appears.",
+                        "bracket": "Bracket",
+                        "clearSelection": "Clear Selection",
+                        "resetLogic": "Reset to Auto Logic",
+                        "toggleOperator": "Click text to toggle AND/OR"
                     },
                     "cancer": {
                         "back": "Back to Selection",

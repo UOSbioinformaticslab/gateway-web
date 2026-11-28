@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { SearchResultDataset } from "@/interfaces/Search";
-import { filterType } from "@/utils/logic-utils";
+import { evaluateLogicTokens, filterType, LogicToken } from "@/utils/logic-utils";
 import {
     getAccessibility,
     getDatasetTableDataRange,
@@ -53,11 +53,23 @@ const hasSelectedFilter = (owned: Set<string>, id: string): boolean => {
 
 export const datasetMatchesFilters = (
     result: SearchResultDataset,
-    selectedIds: string[]
+    selectedIds: string[],
+    logicTokens?: LogicToken[]
 ): boolean => {
-    if (selectedIds.length === 0) return true;
+    if (selectedIds.length === 0 && (!logicTokens || logicTokens.length === 0)) {
+        return true;
+    }
 
     const owned = ownedFilterIds(result);
+
+    if (logicTokens && logicTokens.length > 0) {
+        const evaluated = evaluateLogicTokens(logicTokens, id =>
+            hasSelectedFilter(owned, id)
+        );
+        if (evaluated !== null) return evaluated;
+    }
+
+    if (selectedIds.length === 0) return true;
     const histology: string[] = [];
     const topography: string[] = [];
     const data: string[] = [];
@@ -168,6 +180,7 @@ export const applyDatasetView = (
     options: {
         query: string;
         filterIds: string[];
+        logicTokens?: LogicToken[];
         sortColumn: DatasetSortColumn;
         sortDirection: DatasetSortDirection;
     }
@@ -176,7 +189,11 @@ export const applyDatasetView = (
         .filter(
             result =>
                 datasetMatchesQuery(result, options.query) &&
-                datasetMatchesFilters(result, options.filterIds)
+                datasetMatchesFilters(
+                    result,
+                    options.filterIds,
+                    options.logicTokens
+                )
         )
         .sort((left, right) =>
             compareDatasets(

@@ -66,6 +66,52 @@ describe("applyDatasetView", () => {
         expect(viewed.map(item => item._id)).toEqual(["1"]);
     });
 
+    it("treats AND as narrower than OR", () => {
+        const results = [
+            dataset("a", "Not for profit", {
+                datasetFilters: [
+                    {
+                        id: "0_1_4",
+                        label: "not for profit organisation use only",
+                    },
+                ],
+            }),
+            dataset("b", "Non commercial", {
+                datasetFilters: [
+                    { id: "0_1_5", label: "non-commercial use only" },
+                ],
+            }),
+        ];
+        const orTokens = [
+            { kind: "term" as const, id: "0_1_4", label: "not for profit" },
+            { kind: "op" as const, value: "OR" as const },
+            { kind: "term" as const, id: "0_1_5", label: "non-commercial" },
+        ];
+        const andTokens = orTokens.map(token =>
+            token.kind === "op" ? { ...token, value: "AND" as const } : token
+        );
+
+        expect(
+            applyDatasetView(results, {
+                query: "",
+                filterIds: ["0_1_4", "0_1_5"],
+                logicTokens: orTokens,
+                sortColumn: "title",
+                sortDirection: "asc",
+            }).map(item => item._id)
+        ).toEqual(["b", "a"]);
+
+        expect(
+            applyDatasetView(results, {
+                query: "",
+                filterIds: ["0_1_4", "0_1_5"],
+                logicTokens: andTokens,
+                sortColumn: "title",
+                sortDirection: "asc",
+            }).map(item => item._id)
+        ).toEqual([]);
+    });
+
     it("sorts the table by population size", () => {
         const viewed = applyDatasetView(results, {
             query: "",
