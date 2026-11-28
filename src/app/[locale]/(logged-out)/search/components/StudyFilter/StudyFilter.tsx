@@ -1,16 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { colors } from "@/config/theme";
 import { filterDetailsMap } from "@/utils/filter-setup";
-import { executeFilterLogic } from "@/utils/filterLogic";
 import {
+    buildLogicTokens,
     calculateLogicMessage,
     filterType,
     getMessage,
     includeParents,
+    LogicToken,
     plusParents,
 } from "@/utils/logic-utils";
 import AccessibilityPanel from "./AccessibilityPanel";
@@ -63,9 +64,9 @@ const CATEGORIES: {
 ];
 
 const StudyFilter = ({
-    onSelectedFiltersChange,
+    onFindFilters,
 }: {
-    onSelectedFiltersChange?: (ids: string[]) => void;
+    onFindFilters?: (filters: { ids: string[]; tokens: LogicToken[] }) => void;
 }) => {
     const t = useTranslations(TRANSLATION_PATH);
     const [activePanel, setActivePanel] = useState<FilterPanelId | null>(null);
@@ -77,6 +78,7 @@ const StudyFilter = ({
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredIds, setFilteredIds] = useState<Set<string> | null>(null);
     const [isSearching, setIsSearching] = useState(false);
+    const logicTokensRef = useRef<LogicToken[]>([]);
 
     const allFilters = useMemo(
         () => Array.from(filterDetailsMap.values()) as FilterDetail[],
@@ -97,9 +99,9 @@ const StudyFilter = ({
         );
     }, [selectedFilters]);
 
-    useEffect(() => {
-        onSelectedFiltersChange?.(Array.from(selectedFilters));
-    }, [onSelectedFiltersChange, selectedFilters]);
+    const handleLogicTokensChange = useCallback((tokens: LogicToken[]) => {
+        logicTokensRef.current = tokens;
+    }, []);
 
     useEffect(() => {
         if (
@@ -161,13 +163,22 @@ const StudyFilter = ({
         setSelectedFilters(new Set());
         setSearchTerm("");
         setLogicMessage("");
-    }, []);
+        logicTokensRef.current = [];
+        onFindFilters?.({ ids: [], tokens: [] });
+    }, [onFindFilters]);
 
     const handleFindStudies = useCallback(() => {
-        if (counts.total > 0 && logicMessage) {
-            executeFilterLogic(logicMessage);
-        }
-    }, [counts.total, logicMessage]);
+        if (counts.total === 0) return;
+
+        const ids = Array.from(selectedFilters);
+        const drafted = logicTokensRef.current;
+        const tokens =
+            drafted.length > 0
+                ? drafted
+                : buildLogicTokens(ids.map(id => ({ id })));
+
+        onFindFilters?.({ ids, tokens });
+    }, [counts.total, onFindFilters, selectedFilters]);
 
     const openPanel = (panel: FilterPanelId) => {
         setActivePanel(panel);
@@ -316,6 +327,7 @@ const StudyFilter = ({
             <FilterChipArea
                 selectedFilters={selectedFilters}
                 handleFilterChange={handleFilterChange}
+                onLogicTokensChange={handleLogicTokensChange}
             />
             <Box sx={{ p: 0 }}>
                 {activePanel === "cancer" && (
